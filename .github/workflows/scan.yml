@@ -60,3 +60,16 @@ jobs:
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "Scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
+
+      - name: Trigger Netlify production deploy
+        if: success()
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "::warning::NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID not set; skipping Netlify deploy. Set them in repo settings to auto-deploy after each scan."
+            exit 0
+          fi
+          npm install --no-save netlify-cli@latest
+          npx netlify deploy --prod --dir=frontend/dist --auth="$NETLIFY_AUTH_TOKEN" --site="$NETLIFY_SITE_ID" --message="scan-$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
