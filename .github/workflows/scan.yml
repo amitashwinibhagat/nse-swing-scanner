@@ -40,13 +40,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
 
-      - name: Run full scan
+- name: Run full scan
         working-directory: backend
-        run: python scanner.py --sleep 0.3 --output ../frontend/public/data/latest_scan.json
-        # NOTE: no --sample flag -> full Nifty 500 universe.
-        # If NSE/yfinance/Screener rate-limits mid-run, this step will fail and the
-        # workflow stops WITHOUT committing a partial/corrupt file - the
-        # frontend keeps serving the last good scan until the next run.
+        run: python scanner.py --top-n 100 --workers 8 --sleep 0.2 --output ../frontend/public/data/latest_scan.json
+        # Nifty 100 by market cap (top 100) with 8 parallel workers.
+        # Typical cold-cache runtime: ~4-7 minutes. Warm cache: ~1-2 minutes.
+        # If NSE/yfinance/Screener rate-limits mid-run, this step will fail
+        # and the workflow stops WITHOUT committing a partial/corrupt file -
+        # the frontend keeps serving the last good scan until the next run.
 
       - name: Validate JSON contract
         working-directory: backend

@@ -1,25 +1,40 @@
 """
 universe.py
-Fetches the Nifty 500 constituent list from NSE's public archives (free, no auth).
+Fetches NSE index constituent lists (Nifty 100 / 200 / 500) from NSE's public
+archives (free, no auth).
 
 Source verified live: https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv
 NOTE: NSE returns 503 without a browser-like User-Agent header. This is not an auth
 wall, just basic bot-filtering — the headers below are sufficient and require no login.
 
-Confidence: high (endpoint tested and returned 501 rows — header + 500 constituents —
-at time of writing). NSE has changed archive paths before without notice; if this URL
-starts 404ing, check https://www.nseindia.com/all-reports for the current path.
+The Nifty 100 / 200 / 500 lists are ranked by free-float market cap, so requesting
+the top-N-by-market-cap universe is just "fetch Nifty 100" (or 200, or 500).
+This avoids the cost of calling yfinance's ticker.info for market caps on all 500
+names just to rank them.
+
+Confidence: high (all three endpoints tested). NSE has changed archive paths
+before without notice; if these URLs start 404ing, check
+https://www.nseindia.com/all-reports for the current path.
 """
 
 import io
 import requests
 import pandas as pd
 
-NIFTY500_URL = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv"
-
-# Fallback mirror (same data, different publisher — NSE Indices Ltd's own index site).
-# Kept as a fallback only; NSE archives is the primary source of truth.
-NIFTY500_URL_FALLBACK = "https://www.niftyindices.com/IndexConstituent/ind_nifty500list.csv"
+NIFTY_INDEX_URLS = {
+    100: (
+        "https://nsearchives.nseindia.com/content/indices/ind_nifty100list.csv",
+        "https://www.niftyindices.com/IndexConstituent/ind_nifty100list.csv",
+    ),
+    200: (
+        "https://nsearchives.nseindia.com/content/indices/ind_nifty200list.csv",
+        "https://www.niftyindices.com/IndexConstituent/ind_nifty200list.csv",
+    ),
+    500: (
+        "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv",
+        "https://www.niftyindices.com/IndexConstituent/ind_nifty500list.csv",
+    ),
+}
 
 HEADERS = {
     "User-Agent": (
@@ -31,13 +46,9 @@ HEADERS = {
 }
 
 
-def fetch_nifty500(timeout: int = 15) -> pd.DataFrame:
-    """
-    Returns a DataFrame with columns: company_name, industry, symbol, series, isin, yf_ticker
-    yf_ticker is the yfinance-compatible ticker (SYMBOL.NS).
-    """
+def _fetch_csv(urls: tuple, timeout: int) -> pd.DataFrame:
     last_err = None
-    for url in (NIFTY500_URL, NIFTY500_URL_FALLBACK):
+    for url in urls:
         try:
             resp = requests.get(url, headers=HEADERS, timeout=timeout)
             resp.raise_for_status()
@@ -55,11 +66,38 @@ def fetch_nifty500(timeout: int = 15) -> pd.DataFrame:
         except Exception as e:
             last_err = e
             continue
-    raise RuntimeError(f"Failed to fetch Nifty 500 list from both sources. Last error: {last_err}")
+    raise RuntimeError(f"Failed to fetch NSE index list from {urls}. Last error: {last_err}")
+
+
+def fetch_nifty500(timeout: int = 15) -> pd.DataFrame:
+    """Fetch the Nifty 500 constituents (top 500 by free-float market cap)."""
+    return _fetch_csv(NIFTY_INDEX_URLS[500], timeout)
+
+
+def fetch_nifty200(timeout: int = 15) -> pd.DataFrame:
+    """Fetch the Nifty 200 constituents (top 200 by free-float market cap)."""
+    return _fetch_csv(NIFTY_INDEX_URLS[200], timeout)
+
+
+def fetch_nifty100(timeout: int = 15) -> pd.DataFrame:
+    """Fetch the Nifty 100 constituents (top 100 by free-float market cap)."""
+    return _fetch_csv(NIFTY_INDEX_URLS[100], timeout)
+
+
+def fetch_universe(top_n: int = 500, timeout: int = 15) -> pd.DataFrame:
+    """
+    Fetch an NSE index constituent list for the requested top-N-by-market-cap tier.
+
+    Valid `top_n` values: 100, 200, 500. Anything else falls back to 500.
+
+    Returns a DataFrame with columns: company_name, industry, symbol, series, isin, yf_ticker
+    """
+    if top_n not in NIFTY_INDEX_URLS:
+        top_n = 500
+    return _fetch_csv(NIFTY_INDEX_URLS[top_n], timeout)
 
 
 if __name__ == "__main__":
-    universe = fetch_nifty500()
-    print(f"Fetched {len(universe)} constituents")
-    print(universe.head())
-    universe.to_csv("/home/claude/swing_scanner/nifty500_universe.csv", index=False)
+    for n in (100, 200, 500):
+        u = fetch_universe(top_n=n)
+        print(f"Nifty {n}: {len(u)} constituents (first: {u['symbol'].iloc[0]})")

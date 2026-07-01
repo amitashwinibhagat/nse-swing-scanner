@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.1.0 — Top-N universe + parallel scan
+
+### Changed
+
+- Default universe is now the **Nifty 100** (top 100 by free-float market cap) instead of the full Nifty 500.
+  The top 100 covers the names that swing traders actually watch and gives the
+  best signal-to-noise. Use `--top-n 500` for the full list when needed.
+- Scanner is now **multi-threaded** via `ThreadPoolExecutor` (default 8 workers).
+  yfinance releases the GIL during HTTP I/O, so this is effective without
+  switching to multiprocessing. Typical Nifty 100 cold-cache runtime: ~1-3
+  minutes (was ~30 minutes single-threaded on Nifty 500).
+- Workflow now invokes `python scanner.py --top-n 100 --workers 8 --sleep 0.2`.
+
+### Added
+
+- New `fetch_universe(top_n)` and per-index fetchers `fetch_nifty100`,
+  `fetch_nifty200`, `fetch_nifty500` in `universe.py`.
+- New CLI flags `--top-n {100,200,500}` and `--workers N`.
+- Per-stock work factored into `_evaluate_one_stock` for testability.
+- Progress logging every 25 stocks with elapsed time, rate, and ETA.
+- `KeyboardInterrupt` cleanly cancels the worker pool.
+- 6 new tests for top-N selection and the parallel path.
+
 ## 1.0.0 — Public launch
 
 Initial public release. Closes the free-data feature gaps documented in

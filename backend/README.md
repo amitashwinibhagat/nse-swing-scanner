@@ -42,19 +42,29 @@ cd backend
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
-# Full scan (~20-35 min on a warm cache)
+# Default: Nifty 100 (top 100 by market cap), 8 workers, ~1-3 min cold / ~30-60 sec warm
 .venv/bin/python scanner.py
 
+# Wider universe (top 200 or 500)
+.venv/bin/python scanner.py --top-n 500 --workers 12
+
 # Smoke scan (5 stocks, skip slow sources)
-.venv/bin/python scanner.py --sample 5 --sleep 0 \
+.venv/bin/python scanner.py --top-n 100 --sample 5 --sleep 0 \
   --skip-holdings --skip-corporate-actions \
   --output /tmp/scan.json
 ```
 
 ## CLI flags
 
-- `--sample N` — limit universe to first N stocks (omit for full 500).
-- `--sleep SECS` — yfinance call delay (rate-limit courtesy). Default 0.3.
+- `--top-n {100,200,500}` — universe tier by free-float market cap. 100 is
+  the default and gives the best signal-to-noise for a swing-trade list
+  (~1-3 min scan, 8 workers). Use 500 only when you want the full Nifty 500.
+- `--workers N` — thread-pool size for per-stock evaluation. Default 8.
+  yfinance releases the GIL during HTTP I/O so this is effective. Bump to
+  12-16 on a fast connection; drop to 4 if you hit yfinance rate limits.
+- `--sample N` — cap the universe to the first N stocks (after `--top-n`).
+- `--sleep SECS` — yfinance call delay (rate-limit courtesy). Default 0.3
+  for serial; the GitHub Actions workflow uses 0.2 with `--workers 8`.
 - `--output PATH` — output JSON path. Default
   `../frontend/public/data/latest_scan.json`.
 - `--skip-holdings` — skip the Screener scrape. Drops the holdings hard

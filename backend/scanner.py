@@ -27,13 +27,15 @@ import datetime
 import json
 import math
 import os
+import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 import numpy as np
 import pandas as pd
 
-from universe import fetch_nifty500
+from universe import fetch_universe
 from technicals import compute_technicals, compute_nifty50_context
 from fscore import compute_fscore, approx_5y_avg_pe
 
@@ -50,6 +52,8 @@ from settings import (
     DRAWDOWN_UPPER_PCT,
     RSI_LOWER,
     RSI_UPPER,
+    UNIVERSE_DEFAULT_TOP_N,
+    UNIVERSE_DEFAULT_WORKERS,
     WEIGHTS,
 )
 
@@ -369,20 +373,99 @@ def evaluate_stock(
 # ---------------------------------------------------------------------------
 # Batch orchestration
 # ---------------------------------------------------------------------------
+def _evaluate_one_stock(
+    rdict: dict,
+    sleep_between_calls: float,
+    surveillance_payload: dict,
+    bhavcopy_payload: dict,
+    skip_holdings: bool,
+    skip_corporate_actions: bool,
+) -> dict:
+    """
+    Per-stock worker: fetches holdings + corp-actions for this symbol, then
+    runs evaluate_stock. Returns the merged row dict (or an exception row).
+
+    Designed to be called from a thread pool — it does NOT share mutable state
+    with other workers.
+    """
+    symbol = rdict["symbol"]
+
+    if not skip_holdings:
+        try:
+            h = fetch_holdings(symbol)
+            rdict["holdings_status"] = h.get("status")
+            rdict["holdings_source"] = h.get("source")
+            rdict["holdings_data"] = h.get("data") or {}
+        except Exception as e:
+            rdict["holdings_status"] = "source_failed"
+            rdict["holdings_source"] = "screener.in"
+            rdict["holdings_data"] = {}
+            rdict["holdings_error"] = str(e)
+    else:
+        rdict["holdings_status"] = "missing"
+        rdict["holdings_data"] = {}
+
+    if not skip_corporate_actions:
+        try:
+            ca = fetch_corporate_actions(symbol)
+            rdict["corporate_actions_status"] = ca.get("status")
+            rdict["corporate_actions_data"] = ca.get("data") or {}
+        except Exception as e:
+            rdict["corporate_actions_status"] = "source_failed"
+            rdict["corporate_actions_data"] = {}
+            rdict["corporate_actions_error"] = str(e)
+    else:
+        rdict["corporate_actions_status"] = "missing"
+        rdict["corporate_actions_data"] = {}
+
+    try:
+        return evaluate_stock(
+            rdict,
+            sleep_between_calls=sleep_between_calls,
+            surveillance_payload=surveillance_payload,
+            bhavcopy_payload=bhavcopy_payload,
+        )
+    except Exception as e:
+        return {
+            **rdict,
+            "gate_pass": False,
+            "gate_fail_reason": f"exception: {e}",
+        }
+
+
 def run_scan(
+    top_n: int = UNIVERSE_DEFAULT_TOP_N,
     sample_size: Optional[int] = None,
     sleep_between_calls: float = 0.3,
+    workers: int = UNIVERSE_DEFAULT_WORKERS,
     skip_holdings: bool = False,
     skip_corporate_actions: bool = False,
 ) -> pd.DataFrame:
     """
-    Fetch universe + shared external data, then evaluate each stock.
+    Fetch universe + shared external data, then evaluate each stock in parallel.
+
+    Args:
+        top_n: 100, 200, or 500 — selects the NSE index list (ranked by
+            free-float market cap). Defaults to 100 (Nifty 100) for fast scans.
+        sample_size: optional integer cap on the universe (after top_n is applied).
+            Useful for testing.
+        sleep_between_calls: per-yfinance-call courtesy delay (seconds).
+        workers: number of threads for the per-stock worker pool. yfinance releases
+            the GIL during HTTP I/O so this is effective. 8 is a safe default;
+            bump to 16 if your network is fast and yfinance/Screener aren't
+            rate-limiting.
+        skip_holdings / skip_corporate_actions: bypass slow per-stock fetches.
     """
-    universe = fetch_nifty500()
+    universe = fetch_universe(top_n=top_n)
     if sample_size:
         universe = universe.head(sample_size)
 
-    # Shared external data: fetched once for the whole scan.
+    n = len(universe)
+    workers = max(1, min(workers, n))
+    print(f"Universe: Nifty {top_n} ({n} stocks); workers={workers}")
+
+    # Shared external data: fetched once for the whole scan (these don't depend
+    # on the worker pool — they're not per-stock).
     print(f"Fetching shared data: surveillance, bhavcopy, nifty50…")
     surveillance_payload = fetch_surveillance_list()
     print(f"  surveillance: status={surveillance_payload['status']}")
@@ -393,43 +476,57 @@ def run_scan(
 
     market_index_pct = nifty.get("index_pct_from_ema200")
 
-    rows = []
-    for i, r in universe.iterrows():
+    # Build the input dicts for each stock
+    inputs = []
+    for _, r in universe.iterrows():
         rdict = r.to_dict()
         rdict["market_index_pct_from_ema200"] = market_index_pct
+        inputs.append(rdict)
 
-        # Per-symbol external data
-        if not skip_holdings:
-            h = fetch_holdings(rdict["symbol"])
-            rdict["holdings_status"] = h.get("status")
-            rdict["holdings_source"] = h.get("source")
-            rdict["holdings_data"] = h.get("data") or {}
-        else:
-            rdict["holdings_status"] = "missing"
-            rdict["holdings_data"] = {}
-
-        if not skip_corporate_actions:
-            ca = fetch_corporate_actions(rdict["symbol"])
-            rdict["corporate_actions_status"] = ca.get("status")
-            rdict["corporate_actions_data"] = ca.get("data") or {}
-        else:
-            rdict["corporate_actions_status"] = "missing"
-            rdict["corporate_actions_data"] = {}
-
-        try:
-            rows.append(evaluate_stock(
+    # Per-stock evaluation in parallel
+    rows = []
+    completed = 0
+    start = time.time()
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            pool.submit(
+                _evaluate_one_stock,
                 rdict,
-                sleep_between_calls=sleep_between_calls,
-                surveillance_payload=surveillance_payload,
-                bhavcopy_payload=bhavcopy_payload,
-            ))
-        except Exception as e:
-            rows.append({
-                **rdict,
-                "gate_pass": False,
-                "gate_fail_reason": f"exception: {e}",
-            })
+                sleep_between_calls,
+                surveillance_payload,
+                bhavcopy_payload,
+                skip_holdings,
+                skip_corporate_actions,
+            ): rdict["symbol"]
+            for rdict in inputs
+        }
+        try:
+            for fut in as_completed(futures):
+                symbol = futures[fut]
+                try:
+                    rows.append(fut.result())
+                except Exception as e:
+                    # Should not happen — _evaluate_one_stock catches internally —
+                    # but be defensive so a buggy worker never kills the whole scan.
+                    rows.append({
+                        "symbol": symbol,
+                        "gate_pass": False,
+                        "gate_fail_reason": f"worker_exception: {e}",
+                    })
+                completed += 1
+                if completed % 25 == 0 or completed == n:
+                    elapsed = time.time() - start
+                    rate = completed / elapsed if elapsed > 0 else 0
+                    eta = (n - completed) / rate if rate > 0 else 0
+                    print(f"  {completed}/{n} stocks evaluated ({elapsed:.1f}s, {rate:.1f}/s, eta {eta:.0f}s)")
+        except KeyboardInterrupt:
+            print("\nInterrupted — cancelling remaining workers…")
+            for f in futures:
+                f.cancel()
+            pool.shutdown(wait=False, cancel_futures=True)
+            raise
 
+    print(f"Per-stock evaluation complete in {time.time()-start:.1f}s")
     df = pd.DataFrame(rows)
     return df
 
@@ -577,10 +674,16 @@ def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="NSE swing-trade scanner")
+    parser.add_argument("--top-n", type=int, default=UNIVERSE_DEFAULT_TOP_N,
+                         choices=[100, 200, 500],
+                         help="Universe tier by free-float market cap: 100, 200, or 500. "
+                              "100 = Nifty 100 (fastest), 500 = Nifty 500 (full universe).")
     parser.add_argument("--sample", type=int, default=None,
-                         help="Limit universe to first N stocks (omit for full Nifty 500 run)")
+                         help="Limit universe to first N stocks (after --top-n is applied)")
     parser.add_argument("--sleep", type=float, default=0.3,
                          help="Seconds to sleep between yfinance calls (rate-limit courtesy)")
+    parser.add_argument("--workers", type=int, default=UNIVERSE_DEFAULT_WORKERS,
+                         help="Thread-pool size for per-stock evaluation (default 8)")
     parser.add_argument("--output", type=str, default="../frontend/public/data/latest_scan.json",
                          help="Path to write the JSON contract for the frontend")
     parser.add_argument("--skip-holdings", action="store_true",
@@ -589,11 +692,14 @@ if __name__ == "__main__":
                          help="Skip NSE corporate-actions fetch (faster, drops corp-action gate)")
     args = parser.parse_args()
 
-    print(f"Starting scan: sample={args.sample or 'FULL (500)'}, sleep={args.sleep}s")
+    print(f"Starting scan: top_n={args.top_n}, sample={args.sample or 'ALL'}, "
+          f"sleep={args.sleep}s, workers={args.workers}")
     start = time.time()
     df = run_scan(
+        top_n=args.top_n,
         sample_size=args.sample,
         sleep_between_calls=args.sleep,
+        workers=args.workers,
         skip_holdings=args.skip_holdings,
         skip_corporate_actions=args.skip_corporate_actions,
     )
