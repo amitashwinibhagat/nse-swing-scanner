@@ -122,18 +122,34 @@ npm run dev   # http://localhost:5173
 
 ## Limitations (read this)
 
+- **NSE bhavcopy is now paywalled behind Akamai.** As of mid-2026,
+  NSE's `nsearchives.nseindia.com` archive no longer hosts daily
+  equity bhavcopy CSVs, and `www.nseindia.com/api/historical-data/*`
+  requires a JS-computed `_abck` cookie that plain HTTP clients can't
+  produce. The scanner reports `delivery_source_status: source_failed`
+  for nearly every stock. The GitHub Actions workflow uses
+  `--lenient-external-gates` so the delivery gate passes on
+  `source_failed` rather than blocking all output; the source status
+  is still visible in the row badge. To re-enable strict delivery
+  gating, drop the flag — but expect ~0 gate-passes unless you wire up
+  Playwright or a paid data feed. Documented in `docs/methodology.md`.
 - **Free data sources are fragile.** NSE, BSE, and Screener.in do not
   publish stable public APIs. If any source changes its URL structure,
   the scanner reports `source_failed` or `flag_only` rather than crashing
-  — and the corresponding hard gate fails-closed. The dashboard shows the
-  source status per row, and the GitHub Action will surface persistent
-  failures.
+  — and the corresponding hard gate fails-closed by default. The
+  dashboard shows the source status per row, and the GitHub Action will
+  surface persistent failures.
 - **ADR-listed names (INFY, WIPRO, IBN, HDB, RDY, etc.)** have a known
   yfinance bug where diluted EPS is returned in USD while the price is in
   INR, producing corrupted P/E ratios. `fscore.py` cross-checks against
   `t.info['trailingPE']` and refuses to return a value when they diverge
   by more than 3x. Affected names show a blank P/E in the table — that's
   the system working, not a bug.
+- **yfinance trailing-NaN row handling.** yfinance sometimes returns the
+  most recent trading session with all-NaN OHLCV (incomplete feed). The
+  scanner drops trailing NaN rows and uses the last complete session as
+  the "current" reference. Tested in
+  `backend/tests/test_technicals_nan_rows.py`.
 - **Earnings surprise (last 2Q)** is **not a hard gate.** It is deferred to
   Phase 2. There is no clean free source for Indian-stock consensus
   estimates, and the scanner will not pretend to have screened on data

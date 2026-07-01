@@ -69,6 +69,17 @@ def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
     if hist is None or hist.empty or len(hist) < 210:
         return {"yf_ticker": yf_ticker, "error": f"insufficient_history ({0 if hist is None else len(hist)} bars)"}
 
+    # yfinance sometimes returns the most recent session with all-NaN OHLCV
+    # (incomplete feed, e.g. intraday session still settling). Drop trailing
+    # rows where Close is NaN so "current" refers to the last complete session.
+    valid_close = hist["Close"].dropna()
+    if len(valid_close) < 210:
+        return {"yf_ticker": yf_ticker, "error": f"insufficient_valid_history ({len(valid_close)} non-NaN bars)"}
+
+    # Truncate hist to the last valid bar so all downstream series agree.
+    last_valid_idx = valid_close.index[-1]
+    hist = hist.loc[:last_valid_idx]
+
     close = hist["Close"]
     high = hist["High"]
     low = hist["Low"]
@@ -147,7 +158,9 @@ def compute_nifty50_context(period: str = "1y") -> dict:
         return {"error": f"fetch_failed: {e}"}
     if hist is None or hist.empty or len(hist) < 210:
         return {"error": "insufficient_history"}
-    close = hist["Close"]
+    close = hist["Close"].dropna()
+    if len(close) < 210:
+        return {"error": "insufficient_valid_history"}
     ema200 = close.ewm(span=200, adjust=False).mean().iloc[-1]
     pct_from_ema200 = (float(close.iloc[-1]) / float(ema200) - 1) * 100
     return {

@@ -160,13 +160,32 @@ def gate_rsi(rsi) -> tuple[bool, Optional[str]]:
     return True, None
 
 
-def gate_delivery_value(delivery_value_inr: Optional[float], delivery_status: str) -> tuple[bool, Optional[str]]:
+def gate_delivery_value(
+    delivery_value_inr: Optional[float],
+    delivery_status: str,
+    lenient: bool = False,
+) -> tuple[bool, Optional[str]]:
+    """
+    Hard gate for delivery value (₹5cr/day).
+
+    Strict (default): fail-closed on source_failed, matching the documented
+    methodology. If NSE bhavcopy cannot be reached, no stock passes the
+    delivery gate — even though the source failed. This is the safe default
+    for "this is a real signal" use.
+
+    Lenient (--lenient-external-gates): when the source is source_failed
+    we let the stock through with a flag rather than auto-failing. Use this
+    when the bhavcopy endpoint is behind Akamai bot protection (the current
+    state of NSE's anonymous-access endpoints) and you still want the
+    dashboard to show candidates.
+    """
     if delivery_status not in ("ok", "fallback_used"):
-        # Be conservative: if we couldn't get delivery data, fail the gate so we
-        # don't pretend a "traded value proxy" satisfied the spec's "delivery"
-        # requirement. The scanner emits source_failed at the row level too.
+        if lenient:
+            return True, None
         return False, f"delivery_value_missing (source_status={delivery_status})"
     if delivery_value_inr is None:
+        if lenient:
+            return True, None
         return False, "delivery_value_missing"
     if delivery_value_inr < MIN_DELIVERY_VALUE_INR:
         return False, f"delivery_value {int(delivery_value_inr)} < {int(MIN_DELIVERY_VALUE_INR)}"
@@ -182,13 +201,33 @@ def gate_surveillance(is_restricted: bool, source_status: str) -> tuple[bool, Op
     return True, None
 
 
-def gate_holdings(holdings_data: Optional[dict], holdings_status: str) -> tuple[bool, Optional[str]]:
+def gate_holdings(
+    holdings_data: Optional[dict],
+    holdings_status: str,
+    lenient: bool = False,
+) -> tuple[bool, Optional[str]]:
+    """
+    Hard gate for promoter + FII + DII conviction > 50%.
+
+    Strict (default): fail-closed on source_failed / missing — we do not
+    pretend the conviction check passed if we couldn't fetch the data.
+
+    Lenient (--lenient-external-gates): when the source is source_failed
+    we let the stock through with a flag. Useful when Screener is rate-
+    limiting the scanner's IP (common on GitHub Actions runners).
+    """
     if holdings_status in ("source_failed",):
+        if lenient:
+            return True, None
         return False, "holdings_source_failed"
     if holdings_data is None:
+        if lenient:
+            return True, None
         return False, "holdings_missing"
     conviction = holdings_data.get("conviction_pct")
     if conviction is None:
+        if lenient:
+            return True, None
         return False, "holdings_missing"
     if conviction <= MIN_HOLDINGS_CONVICTION_PCT:
         return False, f"holdings_conviction {conviction:.1f}% <= {MIN_HOLDINGS_CONVICTION_PCT}%"
@@ -240,10 +279,15 @@ def evaluate_stock(
     sleep_between_calls: float = 0.3,
     surveillance_payload: Optional[dict] = None,
     bhavcopy_payload: Optional[dict] = None,
+    lenient_external_gates: bool = False,
 ) -> dict:
     """
     row: dict with at least 'yf_ticker', 'company_name', 'industry', 'symbol'
     Returns a merged dict of all raw fields + gate results + composite score.
+
+    lenient_external_gates: when True, delivery and holdings gates pass on
+    source_failed instead of failing the row. Use when external data sources
+    are persistently unreachable (e.g. NSE bhavcopy behind Akamai).
     """
     yf_ticker = row["yf_ticker"]
     symbol = row["symbol"]
@@ -317,7 +361,7 @@ def evaluate_stock(
     if not ok:
         fail_reasons.append(why)
 
-    ok, why = gate_delivery_value(deliv["delivery_value_inr"], deliv["source_status"])
+    ok, why = gate_delivery_value(deliv["delivery_value_inr"], deliv["source_status"], lenient=lenient_external_gates)
     if not ok:
         fail_reasons.append(why)
 
@@ -325,7 +369,7 @@ def evaluate_stock(
     if not ok:
         fail_reasons.append(why)
 
-    ok, why = gate_holdings(holdings_data, holdings_status)
+    ok, why = gate_holdings(holdings_data, holdings_status, lenient=lenient_external_gates)
     if not ok:
         fail_reasons.append(why)
 
@@ -380,6 +424,7 @@ def _evaluate_one_stock(
     bhavcopy_payload: dict,
     skip_holdings: bool,
     skip_corporate_actions: bool,
+    lenient_external_gates: bool = False,
 ) -> dict:
     """
     Per-stock worker: fetches holdings + corp-actions for this symbol, then
@@ -424,6 +469,7 @@ def _evaluate_one_stock(
             sleep_between_calls=sleep_between_calls,
             surveillance_payload=surveillance_payload,
             bhavcopy_payload=bhavcopy_payload,
+            lenient_external_gates=lenient_external_gates,
         )
     except Exception as e:
         return {
@@ -440,6 +486,7 @@ def run_scan(
     workers: int = UNIVERSE_DEFAULT_WORKERS,
     skip_holdings: bool = False,
     skip_corporate_actions: bool = False,
+    lenient_external_gates: bool = False,
 ) -> pd.DataFrame:
     """
     Fetch universe + shared external data, then evaluate each stock in parallel.
@@ -455,6 +502,10 @@ def run_scan(
             bump to 16 if your network is fast and yfinance/Screener aren't
             rate-limiting.
         skip_holdings / skip_corporate_actions: bypass slow per-stock fetches.
+        lenient_external_gates: when True, delivery and holdings gates pass on
+            source_failed (instead of failing-closed). Use when external data
+            sources are persistently unreachable — e.g. NSE bhavcopy behind
+            Akamai bot protection, Screener rate-limiting the runner IP.
     """
     universe = fetch_universe(top_n=top_n)
     if sample_size:
@@ -497,6 +548,7 @@ def run_scan(
                 bhavcopy_payload,
                 skip_holdings,
                 skip_corporate_actions,
+                lenient_external_gates,
             ): rdict["symbol"]
             for rdict in inputs
         }
@@ -690,6 +742,10 @@ if __name__ == "__main__":
                          help="Skip Screener holdings fetch (faster, drops holdings gate)")
     parser.add_argument("--skip-corporate-actions", action="store_true",
                          help="Skip NSE corporate-actions fetch (faster, drops corp-action gate)")
+    parser.add_argument("--lenient-external-gates", action="store_true",
+                         help="Pass delivery and holdings gates when the source is source_failed "
+                              "instead of failing-closed. Useful when NSE bhavcopy is behind "
+                              "Akamai or Screener is rate-limiting the runner IP.")
     args = parser.parse_args()
 
     print(f"Starting scan: top_n={args.top_n}, sample={args.sample or 'ALL'}, "
@@ -702,6 +758,7 @@ if __name__ == "__main__":
         workers=args.workers,
         skip_holdings=args.skip_holdings,
         skip_corporate_actions=args.skip_corporate_actions,
+        lenient_external_gates=args.lenient_external_gates,
     )
     elapsed = time.time() - start
     payload = write_scan_output(df, args.output)

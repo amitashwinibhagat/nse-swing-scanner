@@ -78,6 +78,28 @@ def test_gate_delivery_source_failed_fails_closed():
     assert "source_failed" in why
 
 
+def test_gate_delivery_source_failed_lenient_passes():
+    """Lenient mode lets the delivery gate pass on source_failed."""
+    ok, why = gate_delivery_value(1_000_000_000, "source_failed", lenient=True)
+    assert ok
+    assert why is None
+
+
+def test_gate_delivery_missing_lenient_passes():
+    """Lenient mode passes when delivery_value_inr is None and status is also missing/failed."""
+    ok, why = gate_delivery_value(None, "source_failed", lenient=True)
+    assert ok and why is None
+    ok, why = gate_delivery_value(None, "missing", lenient=True)
+    assert ok and why is None
+
+
+def test_gate_delivery_strict_still_rejects_low_value_in_lenient_mode():
+    """Lenient mode does NOT relax the actual ≥₹5cr threshold; only the missing-source case."""
+    ok, why = gate_delivery_value(MIN_DELIVERY_VALUE_INR - 1, "ok", lenient=True)
+    assert not ok
+    assert "delivery_value" in why
+
+
 def test_gate_surveillance_clean():
     ok, why = gate_surveillance(False, "ok")
     assert ok and why is None
@@ -108,6 +130,23 @@ def test_gate_holdings_too_low():
 def test_gate_holdings_source_failed_fails_closed():
     ok, why = gate_holdings({"conviction_pct": 80.0}, "source_failed")
     assert not ok
+
+
+def test_gate_holdings_source_failed_lenient_passes():
+    ok, why = gate_holdings({"conviction_pct": 80.0}, "source_failed", lenient=True)
+    assert ok and why is None
+
+
+def test_gate_holdings_missing_lenient_passes():
+    ok, why = gate_holdings(None, "missing", lenient=True)
+    assert ok and why is None
+
+
+def test_gate_holdings_strict_still_rejects_low_conviction_in_lenient_mode():
+    """Lenient mode does NOT relax the actual >50% conviction check; only the missing-source case."""
+    ok, why = gate_holdings({"conviction_pct": 30.0}, "ok", lenient=True)
+    assert not ok
+    assert "conviction" in why
 
 
 def test_gate_corporate_actions_no_action():

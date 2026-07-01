@@ -71,6 +71,12 @@ python3 -m venv .venv
   gate and `conviction_holding` sub-score.
 - `--skip-corporate-actions` — skip the NSE corp-actions probe. Drops
   the corporate-actions hard gate.
+- `--lenient-external-gates` — pass delivery and holdings gates when the
+  source is `source_failed` instead of failing-closed. Useful when NSE
+  bhavcopy is behind Akamai bot protection (the current state of NSE's
+  anonymous-access endpoints) or Screener rate-limits the runner IP. The
+  source status is still surfaced in the JSON and UI badge so you can
+  tell which gates were actually verified.
 
 ## Hard gates (all fail-closed)
 
