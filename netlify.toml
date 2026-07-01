@@ -1,7 +1,7 @@
 [build]
   base = "frontend"
   command = "npm run build"
-  publish = "frontend/dist"
+  publish = "dist"
 
 [[redirects]]
   # SPA fallback - any path that doesn't resolve to a real file (e.g. a
