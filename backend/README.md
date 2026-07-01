@@ -42,23 +42,24 @@ cd backend
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
-# Default: Nifty 100 (top 100 by market cap), 8 workers, ~1-3 min cold / ~30-60 sec warm
+# Default: Nifty 200 (top 200 by market cap), 8 workers, ~3-5 min cold / ~1-2 min warm
 .venv/bin/python scanner.py
 
-# Wider universe (top 200 or 500)
-.venv/bin/python scanner.py --top-n 500 --workers 12
+# Wider or narrower universe
+.venv/bin/python scanner.py --top-n 500 --workers 12   # full Nifty 500
+.venv/bin/python scanner.py --top-n 100 --workers 8    # top 100 only
 
 # Smoke scan (5 stocks, skip slow sources)
-.venv/bin/python scanner.py --top-n 100 --sample 5 --sleep 0 \
+.venv/bin/python scanner.py --top-n 200 --sample 5 --sleep 0 \
   --skip-holdings --skip-corporate-actions \
   --output /tmp/scan.json
 ```
 
 ## CLI flags
 
-- `--top-n {100,200,500}` — universe tier by free-float market cap. 100 is
-  the default and gives the best signal-to-noise for a swing-trade list
-  (~1-3 min scan, 8 workers). Use 500 only when you want the full Nifty 500.
+- `--top-n {100,200,500}` — universe tier by free-float market cap. 200 is
+  the default — a good balance of signal breadth and scan runtime. Use 100
+  for the fastest scan or 500 for the full Nifty 500.
 - `--workers N` — thread-pool size for per-stock evaluation. Default 8.
   yfinance releases the GIL during HTTP I/O so this is effective. Bump to
   12-16 on a fast connection; drop to 4 if you hit yfinance rate limits.

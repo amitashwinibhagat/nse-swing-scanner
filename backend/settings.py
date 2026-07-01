@@ -5,7 +5,7 @@ adjusted without touching scanner.py / module code.
 """
 
 # Universe
-UNIVERSE_DEFAULT_TOP_N = 100                # default top-N-by-market-cap tier (Nifty 100/200/500)
+UNIVERSE_DEFAULT_TOP_N = 200                # default top-N-by-market-cap tier (Nifty 100/200/500)
 UNIVERSE_DEFAULT_WORKERS = 8                # default thread-pool size for per-stock evaluation
 UNIVERSE_DEFAULT_SLEEP_BETWEEN_CALLS = 0.3  # seconds, per-yfinance-call courtesy delay
 

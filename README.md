@@ -80,9 +80,10 @@ provided `GITHUB_TOKEN` to commit back to the repo (wired into
 ### 2. Verify the scan Action runs
 
 Go to the Actions tab → "NSE Swing Scan" → **Run workflow** (manual
-trigger). First run takes ~20-35 min for the full universe (Screener
-holdings scraping is the dominant cost; warm caches help). Check that
-`frontend/public/data/latest_scan.json` gets committed afterward.
+trigger). First run takes ~5-8 min for the Nifty 200 universe with
+12 workers (Screener holdings scraping is the dominant cost; warm
+caches help). Check that `frontend/public/data/latest_scan.json`
+gets committed afterward.
 
 ### 3. Verify CI passes
 

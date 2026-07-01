@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.1 — Expand universe to Nifty 200
+
+### Changed
+
+- Default universe bumped from Nifty 100 to **Nifty 200** (top 200 by
+  free-float market cap). The top 200 covers large- and mid-cap names that
+  actually see swing-trade volume, with ~5-8 min cold / ~2-4 min warm
+  runtime at 12 workers.
+- Workflow bumped to `--top-n 200 --workers 12` to compensate for the
+  larger universe.
+
 ## 1.1.0 — Top-N universe + parallel scan
 
 ### Changed
