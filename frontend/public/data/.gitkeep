@@ -1,0 +1,5 @@
+// Placeholder so the directory exists in the build output.
+// On a fresh deploy, the GitHub Actions scan workflow will overwrite this
+// with the real latest_scan.json (committed to main → Netlify auto-deploys).
+// While the first scan is still running, the dashboard will surface a clear
+// "Scan data not found" message via its fetch error path.

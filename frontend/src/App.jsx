@@ -159,6 +159,31 @@ export default function App() {
     );
   }
 
+  if (data && data._placeholder) {
+    return (
+      <div className="app">
+        <header className="ticker-header">
+          <h1>NSE Swing Scanner</h1>
+        </header>
+        <div className="empty-state" role="status" aria-live="polite">
+          <h2>First scan in progress…</h2>
+          <p>
+            The scheduled GitHub Actions scan is still running. The dashboard
+            will populate with results automatically once the scan finishes and
+            commits <code>latest_scan.json</code>. Initial runs take
+            ~20-35 minutes (Screener.in shareholding scraping is the slow
+            part); subsequent scheduled runs are faster thanks to the on-disk
+            cache.
+          </p>
+          <p>
+            You can watch progress on the
+            {" "}<a href="https://github.com/amitashwinibhagat/nse-swing-scanner/actions/workflows/scan.yml">Actions tab</a>.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!data) {
     return (
       <div className="app">

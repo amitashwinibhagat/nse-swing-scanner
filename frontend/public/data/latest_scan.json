@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-07-01T00:00:00+00:00",
+  "universe_size": 0,
+  "gate_pass_count": 0,
+  "config": {
+    "min_f_score": 6,
+    "min_delivery_value_inr": 50000000,
+    "min_holdings_conviction_pct": 50,
+    "rsi_window": [25, 40],
+    "drawdown_window": [-40.0, -15.0]
+  },
+  "stocks": [],
+  "_placeholder": true
+}
