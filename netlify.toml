@@ -4,7 +4,11 @@
   publish = "frontend/dist"
 
 [[redirects]]
-  # SPA fallback - all client-side routes resolve to index.html
+  # SPA fallback - any path that doesn't resolve to a real file (e.g. a
+  # future /data/latest_scan.json committed by the GitHub Action) falls
+  # through to index.html. The catch-all only matches when no static file
+  # exists at the path, so the JSON file will be served directly when
+  # present, and the React app will handle the empty state when missing.
   from = "/*"
   to = "/index.html"
   status = 200
