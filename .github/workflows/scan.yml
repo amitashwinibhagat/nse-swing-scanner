@@ -1,0 +1,62 @@
+name: NSE Swing Scan
+
+on:
+  schedule:
+    # Cron is UTC. IST = UTC+5:30.
+    # 09:00 IST pre-market -> 03:30 UTC
+    # 16:00 IST post-market -> 10:30 UTC
+    - cron: "30 3 * * 1-5"
+    - cron: "30 10 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # needed to commit the scan output back to the repo
+
+concurrency:
+  group: nse-swing-scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60   # full 500-stock run measured ~15-25 min; with Screener holdings (cache-warm) ~20-35 min
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache backend cache
+        uses: actions/cache@v4
+        with:
+          path: backend/cache
+          key: nse-swing-cache-${{ github.run_id }}
+          restore-keys: |
+            nse-swing-cache-
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run full scan
+        working-directory: backend
+        run: python scanner.py --sleep 0.3 --output ../frontend/public/data/latest_scan.json
+        # NOTE: no --sample flag -> full Nifty 500 universe.
+        # If NSE/yfinance/Screener rate-limits mid-run, this step will fail and the
+        # workflow stops WITHOUT committing a partial/corrupt file - the
+        # frontend keeps serving the last good scan until the next run.
+
+      - name: Validate JSON contract
+        working-directory: backend
+        run: python -c "import json; p=json.load(open('../frontend/public/data/latest_scan.json')); assert 'generated_at' in p and 'stocks' in p and p['stocks'], 'invalid scan contract'; print('contract ok:', len(p['stocks']), 'stocks')"
+
+      - name: Commit and push updated scan
+        run: |
+          git config user.name "nse-swing-scanner-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add frontend/public/data/latest_scan.json
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push

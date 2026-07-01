@@ -1,0 +1,165 @@
+"""
+technicals.py
+Computes all price/volume-based criteria from yfinance OHLCV data, plus
+ATR(14)-based entry/target/stop and a relative-strength-vs-Nifty-50 adjustment.
+
+Verified live against RELIANCE.NS: yfinance returns ~250 trading days for period="1y",
+sufficient for 200-day EMA, 14-day RSI, and 30-day volume averages.
+
+Confidence: high on the math (standard, well-known formulas). Moderate on yfinance
+data quality for thinly-traded mid/small caps in the Nifty 500 tail — spot-check any
+name you're about to act on against a second source (e.g. NSE's own daily bhavcopy)
+before sizing a real position.
+
+ATR / target / stop: heuristic only. Not backtested. Documented in methodology.md.
+"""
+
+from typing import Optional, Tuple
+
+import numpy as np
+import pandas as pd
+import yfinance as yf
+
+from settings import (
+    ATR_PERIOD,
+    ENTRY_ZONE_ATR_FRACTION,
+    STOP_LOSS_ATR_MULT,
+    TARGET_1_ATR_MULT,
+    TARGET_2_ATR_MULT,
+)
+
+
+NIFTY50_TICKER = "^NSEI"  # Nifty 50 index on yfinance
+
+
+def compute_rsi(close: pd.Series, period: int = 14) -> pd.Series:
+    """Standard Wilder's RSI."""
+    delta = close.diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+    avg_gain = gain.ewm(alpha=1 / period, min_periods=period, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1 / period, min_periods=period, adjust=False).mean()
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
+
+def compute_atr(high: pd.Series, low: pd.Series, close: pd.Series, period: int = 14) -> pd.Series:
+    """Wilder's Average True Range."""
+    prev_close = close.shift(1)
+    tr = pd.concat([
+        (high - low).abs(),
+        (high - prev_close).abs(),
+        (low - prev_close).abs(),
+    ], axis=1).max(axis=1)
+    atr = tr.ewm(alpha=1 / period, min_periods=period, adjust=False).mean()
+    return atr
+
+
+def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
+    """
+    Returns a dict of computed technical fields for one ticker, or a dict with
+    'error' set if data was insufficient/unavailable.
+    """
+    try:
+        hist = yf.Ticker(yf_ticker).history(period=period, auto_adjust=True)
+    except Exception as e:
+        return {"yf_ticker": yf_ticker, "error": f"fetch_failed: {e}"}
+
+    if hist is None or hist.empty or len(hist) < 210:
+        return {"yf_ticker": yf_ticker, "error": f"insufficient_history ({0 if hist is None else len(hist)} bars)"}
+
+    close = hist["Close"]
+    high = hist["High"]
+    low = hist["Low"]
+    volume = hist["Volume"]
+
+    current_price = float(close.iloc[-1])
+    fifty_two_wk_high = float(close.rolling(252, min_periods=100).max().iloc[-1])
+    pct_off_high = (current_price / fifty_two_wk_high - 1) * 100  # negative number
+
+    ema200 = close.ewm(span=200, adjust=False).mean()
+    current_ema200 = float(ema200.iloc[-1])
+    pct_from_ema200 = (current_price / current_ema200 - 1) * 100
+
+    rsi_series = compute_rsi(close, 14)
+    current_rsi = float(rsi_series.iloc[-1])
+
+    atr_series = compute_atr(high, low, close, ATR_PERIOD)
+    current_atr = float(atr_series.iloc[-1]) if not np.isnan(atr_series.iloc[-1]) else None
+
+    # Volume surge
+    avg_vol_30 = float(volume.rolling(30, min_periods=20).mean().iloc[-1])
+    recent = hist.tail(10).copy()
+    recent["is_down"] = recent["Close"] < recent["Open"]
+    down_days = recent[recent["is_down"]]
+    if not down_days.empty:
+        peak_down_volume = float(down_days["Volume"].max())
+    else:
+        peak_down_volume = float(recent["Volume"].max())
+    volume_surge_factor = peak_down_volume / avg_vol_30 if avg_vol_30 > 0 else np.nan
+
+    # Approximate traded-value proxy (NOT delivery value; delivery comes from bhavcopy)
+    adtv_value_inr = avg_vol_30 * current_price
+
+    # ATR-based entry zone / stop / targets
+    entry_low = current_price - ENTRY_ZONE_ATR_FRACTION * (current_atr or 0)
+    entry_high = current_price
+    entry_mid = (entry_low + entry_high) / 2
+    stop_loss = entry_mid - STOP_LOSS_ATR_MULT * (current_atr or 0) if current_atr else None
+    target_1 = entry_mid + TARGET_1_ATR_MULT * (current_atr or 0) if current_atr else None
+    target_2 = entry_mid + TARGET_2_ATR_MULT * (current_atr or 0) if current_atr else None
+    rr1 = ((target_1 - entry_mid) / (entry_mid - stop_loss)) if (target_1 and stop_loss and entry_mid > stop_loss) else None
+    rr2 = ((target_2 - entry_mid) / (entry_mid - stop_loss)) if (target_2 and stop_loss and entry_mid > stop_loss) else None
+
+    return {
+        "yf_ticker": yf_ticker,
+        "current_price": round(current_price, 2),
+        "fifty_two_wk_high": round(fifty_two_wk_high, 2),
+        "pct_off_52wk_high": round(pct_off_high, 2),
+        "ema200": round(current_ema200, 2),
+        "pct_from_ema200": round(pct_from_ema200, 2),
+        "rsi14": round(current_rsi, 2),
+        "atr14": round(current_atr, 2) if current_atr is not None else None,
+        "entry_zone_low": round(entry_low, 2) if current_atr else None,
+        "entry_zone_high": round(entry_high, 2),
+        "stop_loss": round(stop_loss, 2) if stop_loss else None,
+        "target_1": round(target_1, 2) if target_1 else None,
+        "target_2": round(target_2, 2) if target_2 else None,
+        "risk_reward_target_1": round(rr1, 2) if rr1 else None,
+        "risk_reward_target_2": round(rr2, 2) if rr2 else None,
+        "avg_vol_30d": round(avg_vol_30, 0),
+        "peak_down_day_volume_10d": round(peak_down_volume, 0),
+        "volume_surge_factor": round(volume_surge_factor, 2) if not np.isnan(volume_surge_factor) else None,
+        "adtv_value_inr_approx": round(adtv_value_inr, 0),
+        "error": None,
+    }
+
+
+def compute_nifty50_context(period: str = "1y") -> dict:
+    """
+    Fetch Nifty 50 index data once per scan and return its 200EMA + distance.
+    Used for the relative-strength-vs-market adjustment (a soft factor, not a gate).
+    """
+    try:
+        hist = yf.Ticker(NIFTY50_TICKER).history(period=period, auto_adjust=True)
+    except Exception as e:
+        return {"error": f"fetch_failed: {e}"}
+    if hist is None or hist.empty or len(hist) < 210:
+        return {"error": "insufficient_history"}
+    close = hist["Close"]
+    ema200 = close.ewm(span=200, adjust=False).mean().iloc[-1]
+    pct_from_ema200 = (float(close.iloc[-1]) / float(ema200) - 1) * 100
+    return {
+        "index_symbol": "NIFTY50",
+        "index_last": round(float(close.iloc[-1]), 2),
+        "index_ema200": round(float(ema200), 2),
+        "index_pct_from_ema200": round(pct_from_ema200, 2),
+        "error": None,
+    }
+
+
+if __name__ == "__main__":
+    for t in ["RELIANCE.NS", "TATAMOTORS.NS", "INFY.NS"]:
+        print(compute_technicals(t))
+    print(compute_nifty50_context())
