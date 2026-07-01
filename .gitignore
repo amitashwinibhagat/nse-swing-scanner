@@ -7,3 +7,6 @@ __pycache__/
 backend/cache/
 backend/.venv/
 .venv/
+
+# Local Netlify folder
+.netlify

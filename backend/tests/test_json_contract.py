@@ -1,5 +1,7 @@
 """Tests for the JSON output contract writer."""
+import datetime
 import json
+import math
 import os
 import tempfile
 
@@ -7,7 +9,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from scanner import to_json_records, write_scan_output
+from scanner import to_json_records, write_scan_output, _json_safe
 
 
 def _make_df():
@@ -92,3 +94,103 @@ def test_write_scan_output_writes_valid_json(tmp_path):
     with open(out) as f:
         reloaded = json.load(f)
     assert reloaded["universe_size"] == 1
+
+
+# --- NaN / Infinity / exotic-type regression tests -------------------------
+
+def test_json_safe_handles_python_nan():
+    assert _json_safe(float("nan")) is None
+
+
+def test_json_safe_handles_python_inf():
+    assert _json_safe(float("inf")) is None
+    assert _json_safe(float("-inf")) is None
+
+
+def test_json_safe_handles_numpy_nan():
+    assert _json_safe(np.nan) is None
+
+
+def test_json_safe_handles_numpy_inf():
+    assert _json_safe(np.inf) is None
+    assert _json_safe(-np.inf) is None
+
+
+def test_json_safe_passes_through_finite_floats():
+    assert _json_safe(3.14) == 3.14
+    assert _json_safe(0.0) == 0.0
+    assert _json_safe(-1.5) == -1.5
+
+
+def test_json_safe_passes_through_numpy_floats():
+    assert _json_safe(np.float64(2.71)) == 2.71
+
+
+def test_json_safe_coerces_numpy_integers():
+    assert _json_safe(np.int64(42)) == 42
+    assert isinstance(_json_safe(np.int64(42)), int)
+
+
+def test_json_safe_decodes_bytes():
+    assert _json_safe(b"hello") == "hello"
+
+
+def test_json_safe_converts_sets_to_lists():
+    out = _json_safe({1, 2, 3})
+    assert isinstance(out, list)
+    assert sorted(out) == [1, 2, 3]
+
+
+def test_json_safe_converts_pandas_timestamp():
+    ts = pd.Timestamp("2026-07-01T12:00:00")
+    assert _json_safe(ts) == "2026-07-01T12:00:00"
+
+
+def test_json_safe_converts_datetime():
+    dt = datetime.datetime(2026, 7, 1, 12, 0, 0)
+    assert _json_safe(dt) == "2026-07-01T12:00:00"
+
+
+def test_json_safe_recurses_into_nested_dict():
+    src = {"a": float("nan"), "b": {"c": float("inf")}, "d": [{"e": float("nan")}]}
+    assert _json_safe(src) == {"a": None, "b": {"c": None}, "d": [{"e": None}]}
+
+
+def test_to_json_records_handles_nan_and_inf_in_row():
+    """Regression: a row with NaN/Inf in any field must produce JSON-safe output."""
+    row = _make_df().iloc[0].to_dict()
+    row["tech_pct_off_52wk_high"] = float("nan")
+    row["tech_volume_surge_factor"] = float("inf")
+    row["tech_rsi14"] = -float("inf")
+    row["fscore_f_score"] = float("nan")
+    row["sub_scores"] = {"valuation_compression": float("nan"), "oversold_positioning": float("inf")}
+    df = pd.DataFrame([row])
+    records = to_json_records(df)
+    # Must serialise cleanly with allow_nan=False
+    s = json.dumps(records)
+    assert "NaN" not in s
+    assert "Infinity" not in s
+    # NaN/Inf should become None
+    assert records[0]["pct_off_52wk_high"] is None
+    assert records[0]["volume_surge_factor"] is None
+    assert records[0]["rsi14"] is None
+    assert records[0]["f_score"] is None
+    assert records[0]["sub_scores"]["valuation_compression"] is None
+    assert records[0]["sub_scores"]["oversold_positioning"] is None
+
+
+def test_write_scan_output_handles_nan_and_inf(tmp_path):
+    """Regression for the live failure: NaN/Inf in any field must not break
+    write_scan_output, even with allow_nan=False."""
+    row = _make_df().iloc[0].to_dict()
+    row["tech_pct_off_52wk_high"] = float("nan")
+    row["tech_volume_surge_factor"] = float("inf")
+    df = pd.DataFrame([row])
+    out = tmp_path / "scan.json"
+    payload = write_scan_output(df, str(out))
+    # Reload and confirm no NaN/Inf tokens leaked through
+    with open(out) as f:
+        reloaded = json.load(f)
+    assert reloaded["universe_size"] == 1
+    assert reloaded["stocks"][0]["pct_off_52wk_high"] is None
+    assert reloaded["stocks"][0]["volume_surge_factor"] is None

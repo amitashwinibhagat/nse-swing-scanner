@@ -25,6 +25,7 @@ the output before trusting a row.
 import argparse
 import datetime
 import json
+import math
 import os
 import time
 from typing import Optional
@@ -437,19 +438,46 @@ def run_scan(
 # JSON output
 # ---------------------------------------------------------------------------
 def _json_safe(v):
+    """
+    Recursively coerce values to JSON-safe Python primitives.
+
+    - NaN and +/-Inf -> None (JSON has no representation for these and
+      json.dump(allow_nan=False) will otherwise raise ValueError).
+    - numpy scalars -> native Python scalars.
+    - bytes -> decoded as utf-8 with replacement.
+    - sets -> lists (not JSON-serialisable).
+    - pandas.Timestamp -> ISO string.
+    """
     if v is None:
         return None
+    if isinstance(v, float):
+        if math.isnan(v) or math.isinf(v):
+            return None
+        return v
     if isinstance(v, (np.integer,)):
         return int(v)
     if isinstance(v, (np.floating,)):
-        return None if np.isnan(v) else float(v)
-    if isinstance(v, float) and np.isnan(v):
-        return None
+        f = float(v)
+        if math.isnan(f) or math.isinf(f):
+            return None
+        return f
     if isinstance(v, (np.bool_, bool)):
         return bool(v)
+    if isinstance(v, (bytes, bytearray)):
+        try:
+            return v.decode("utf-8")
+        except Exception:
+            return v.decode("utf-8", errors="replace")
+    if isinstance(v, (pd.Timestamp, datetime.datetime, datetime.date)):
+        try:
+            return v.isoformat()
+        except Exception:
+            return str(v)
     if isinstance(v, dict):
-        return {k: _json_safe(val) for k, val in v.items()}
+        return {str(k): _json_safe(val) for k, val in v.items()}
     if isinstance(v, (list, tuple)):
+        return [_json_safe(x) for x in v]
+    if isinstance(v, set):
         return [_json_safe(x) for x in v]
     return v
 
@@ -535,6 +563,10 @@ def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
         },
         "stocks": sorted(records, key=lambda r: (r["swing_score"] is None, -(r["swing_score"] or 0))),
     }
+    # Belt-and-suspenders: sanitize the entire payload once more so any value
+    # that slipped past to_json_records (e.g. raw float('inf') in a gate field
+    # added by an external source) is also coerced to None before write.
+    payload = _json_safe(payload)
     outdir = os.path.dirname(output_path)
     if outdir:
         os.makedirs(outdir, exist_ok=True)
