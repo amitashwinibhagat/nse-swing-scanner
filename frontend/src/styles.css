@@ -126,6 +126,63 @@ body {
   margin-bottom: 16px;
 }
 
+/* --- Admin controls (?admin=1) --- */
+.admin-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: var(--bg-raised);
+  border: 1px dashed var(--text-faint);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.admin-button {
+  background: var(--amber-dim);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.admin-button.secondary {
+  background: transparent;
+  border-color: var(--text-faint);
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.admin-button:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.admin-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-status {
+  color: var(--green);
+}
+
+.admin-status a {
+  color: var(--amber);
+  text-decoration: underline;
+}
+
+.admin-error {
+  color: var(--brick);
+}
+
 /* --- Controls --- */
 .controls {
   display: flex;

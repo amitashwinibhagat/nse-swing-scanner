@@ -103,6 +103,42 @@ Cron in `scan.yml` is **09:00 and 16:00 IST on weekdays** (UTC `30 3 * * 1-5`
 and `30 10 * * 1-5`). GitHub Actions cron can drift by a few minutes under
 load — treat these as "approximately," not to-the-second.
 
+### 6. (Optional) Owner-only on-demand scan trigger
+
+The dashboard exposes a hidden **Run scan now** button when the URL contains
+`?admin=1` (e.g. `https://nse-swing-scanner.netlify.app/?admin=1`). It calls
+a server-side Netlify Function that proxies GitHub's `workflow_dispatch`
+endpoint, so the GitHub PAT never ships to the browser.
+
+Required Netlify env vars (set on the project's **Site settings → Environment
+variables**, not in `netlify.toml`):
+
+| Var | Purpose |
+|---|---|
+| `SCAN_TRIGGER_SECRET` | Random 32-byte hex passphrase the browser sends as a bearer token. Prompted once and stored in `localStorage`. |
+| `GITHUB_DISPATCH_TOKEN` | Fine-grained GitHub PAT scoped to this repo with **Actions: read and write**. Classic PATs with `repo` scope also work. |
+
+Generate a passphrase locally:
+
+```bash
+openssl rand -hex 32
+```
+
+Behavior:
+
+- First click prompts for `SCAN_TRIGGER_SECRET`, then stores it locally. A
+  client-side cooldown disables the button for 10 minutes after each
+  successful trigger. The `Forget admin secret` link clears `localStorage`.
+- The function returns `202` on success and the UI shows a link to the
+  GitHub Actions run. Refreshing the page does **not** trigger a scan —
+  only the button does.
+- The workflow's `concurrency.cancel-in-progress: false` setting means
+  duplicate triggers (scheduled + admin, or two admins) queue rather than
+  cancel a running scan.
+
+This is owner-only. Public visitors see no admin UI; even if they guess
+`?admin=1`, they still need the secret.
+
 ## Local development
 
 ```bash

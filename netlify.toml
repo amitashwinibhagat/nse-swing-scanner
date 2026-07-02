@@ -3,6 +3,9 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  directory = "netlify/functions"
+
 [[redirects]]
   # SPA fallback - any path that doesn't resolve to a real file (e.g. a
   # future /data/latest_scan.json committed by the GitHub Action) falls

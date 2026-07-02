@@ -17,6 +17,11 @@ const COLUMNS = [
 ];
 
 const STALE_HOURS = 18;
+const ADMIN_COOLDOWN_MS = 10 * 60 * 1000;
+const ADMIN_SECRET_LS_KEY = "nseSwingAdminSecret";
+const ADMIN_LAST_TRIGGER_LS_KEY = "nseSwingLastTriggerAt";
+const ACTIONS_URL =
+  "https://github.com/amitashwinibhagat/nse-swing-scanner/actions/workflows/scan.yml";
 
 function fmt(v, digits = 2, suffix = "") {
   if (v === null || v === undefined) return <span className="na">—</span>;
@@ -93,6 +98,23 @@ export default function App() {
   const [sortDir, setSortDir] = useState("desc");
   const [expanded, setExpanded] = useState(null);
 
+  const isAdmin =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("admin") === "1";
+
+  const [adminSecret, setAdminSecret] = useState(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(ADMIN_SECRET_LS_KEY) || null;
+  });
+  const [lastTriggerAt, setLastTriggerAt] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const v = localStorage.getItem(ADMIN_LAST_TRIGGER_LS_KEY);
+    return v ? Number(v) : null;
+  });
+  const [triggerBusy, setTriggerBusy] = useState(false);
+  const [triggerStatus, setTriggerStatus] = useState(null);
+  const [triggerError, setTriggerError] = useState(null);
+
   useEffect(() => {
     fetch("/data/latest_scan.json")
       .then((res) => {
@@ -141,6 +163,70 @@ export default function App() {
       e.preventDefault();
       setExpanded(expanded === symbol ? null : symbol);
     }
+  }
+
+  function cooldownRemainingMs() {
+    if (!lastTriggerAt) return 0;
+    const elapsed = Date.now() - lastTriggerAt;
+    return Math.max(0, ADMIN_COOLDOWN_MS - elapsed);
+  }
+
+  function fmtCooldown(ms) {
+    const min = Math.ceil(ms / 60000);
+    return `${min} min`;
+  }
+
+  async function runScanNow() {
+    setTriggerError(null);
+    setTriggerStatus(null);
+
+    const remaining = cooldownRemainingMs();
+    if (remaining > 0) {
+      setTriggerError(`Cooldown active — try again in ${fmtCooldown(remaining)}.`);
+      return;
+    }
+
+    let secret = adminSecret;
+    if (!secret) {
+      const entered = window.prompt("Admin scan secret");
+      if (!entered) return;
+      secret = entered.trim();
+      localStorage.setItem(ADMIN_SECRET_LS_KEY, secret);
+      setAdminSecret(secret);
+    }
+
+    setTriggerBusy(true);
+    try {
+      const res = await fetch("/.netlify/functions/trigger-scan", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${secret}` },
+      });
+      if (res.status === 401) {
+        localStorage.removeItem(ADMIN_SECRET_LS_KEY);
+        setAdminSecret(null);
+        setTriggerError("Invalid admin secret. Stored secret cleared.");
+        return;
+      }
+      if (res.status === 202) {
+        const now = Date.now();
+        localStorage.setItem(ADMIN_LAST_TRIGGER_LS_KEY, String(now));
+        setLastTriggerAt(now);
+        setTriggerStatus("queued");
+        return;
+      }
+      setTriggerError("Scan trigger failed. Check Netlify function logs.");
+    } catch (e) {
+      setTriggerError(`Scan trigger failed: ${e.message}`);
+    } finally {
+      setTriggerBusy(false);
+    }
+  }
+
+  function forgetAdminSecret() {
+    localStorage.removeItem(ADMIN_SECRET_LS_KEY);
+    setAdminSecret(null);
+    setTriggerError(null);
+    setTriggerStatus(null);
   }
 
   if (error) {
@@ -230,6 +316,46 @@ export default function App() {
         <div className="stale-banner" role="status">
           Scan data is older than {STALE_HOURS} hours. The scheduled GitHub Action
           may have failed — check the Actions tab.
+        </div>
+      )}
+
+      {isAdmin && (
+        <div className="admin-controls" role="region" aria-label="Admin controls">
+          <button
+            className="admin-button"
+            onClick={runScanNow}
+            disabled={triggerBusy || cooldownRemainingMs() > 0}
+            aria-busy={triggerBusy}
+          >
+            {triggerBusy ? "Queuing…" : "Run scan now"}
+          </button>
+          {adminSecret && (
+            <button
+              className="admin-button secondary"
+              onClick={forgetAdminSecret}
+              title="Clear the locally stored admin secret"
+            >
+              Forget admin secret
+            </button>
+          )}
+          {cooldownRemainingMs() > 0 && (
+            <span className="admin-status">
+              Cooldown: {fmtCooldown(cooldownRemainingMs())} remaining
+            </span>
+          )}
+          {triggerStatus === "queued" && (
+            <span className="admin-status">
+              Scan queued/running. Typical runtime is 20-35 minutes. Watch
+              progress on{" "}
+              <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
+                GitHub Actions
+              </a>
+              .
+            </span>
+          )}
+          {triggerError && (
+            <span className="admin-error" role="alert">{triggerError}</span>
+          )}
         </div>
       )}
 
