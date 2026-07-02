@@ -163,9 +163,19 @@ export default function App() {
   const [sortDir, setSortDir] = useState("desc");
   const [expanded, setExpanded] = useState(null);
 
-  const isAdmin =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("admin") === "1";
+  // Admin UI is rendered when either:
+  //   - the URL has ?admin=1 (or ?admin=true) as a query string, OR
+  //   - the path is /admin or /admin/ (with optional trailing slash).
+  // The path form is friendlier to type/bookmark; the query-string form
+  // remains supported and is what the README documents.
+  const isAdmin = (() => {
+    if (typeof window === "undefined") return false;
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("admin");
+    if (q === "1" || q === "true") return true;
+    const path = window.location.pathname.replace(/\/+$/, "");
+    return path === "/admin" || path.endsWith("/admin");
+  })();
 
   const [adminSecret, setAdminSecret] = useState(() => {
     if (typeof window === "undefined") return null;
