@@ -669,6 +669,18 @@ export default function App() {
         See <code>docs/methodology.md</code> and the Limitations section in
         the README for the full list of assumptions and source fragility.
       </div>
+
+      <div className="byline">
+        An experimental product of{" "}
+        <a
+          href="https://www.datadab.com"
+          target="_blank"
+          rel="noreferrer"
+        >
+          DataDab LLP
+        </a>
+        .
+      </div>
     </div>
   );
 }
