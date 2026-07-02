@@ -1,5 +1,25 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
+import Kpi from "./components/Kpi.jsx";
+import SegmentedControl from "./components/SegmentedControl.jsx";
 import SubscoreBars from "./components/SubscoreBars.jsx";
+
+function IconSearch() {
+  return (
+    <svg className="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <circle cx="9" cy="9" r="6" />
+      <path d="m13.5 13.5 3 3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconDownload() {
+  return (
+    <svg className="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <path d="M10 3v10m0 0 4-4m-4 4-4-4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 15v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 const COLUMNS = [
   { key: "symbol", label: "Stock" },
@@ -285,30 +305,68 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="ticker-header">
-        <h1>NSE Swing Scanner</h1>
-        <div className="ticker-meta">
-          <div className="ticker-stat">
-            <span className="value">{data.universe_size}</span>
-            <span className="label">Scanned</span>
+      <header className="hero">
+        <div className="hero-top">
+          <div className="hero-title">
+            <h1>NSE Swing Scanner</h1>
+            <p className="hero-sub">
+              {data.universe_size}-stock universe · 7 hard gates · Free data, transparent scoring
+            </p>
           </div>
-          <div className="ticker-stat pass">
-            <span className="value">{data.gate_pass_count}</span>
-            <span className="label">Passed gates</span>
+          <div className="kpi-row">
+            <Kpi label="Universe" value={data.universe_size} />
+            <Kpi
+              label="Gate-passed"
+              value={data.gate_pass_count}
+              delta={`${((data.gate_pass_count / data.universe_size) * 100).toFixed(1)}% of universe`}
+              accent="success"
+            />
+            <Kpi
+              label={stale ? `Stale (>${STALE_HOURS}h)` : "Last scan"}
+              value={`${generatedAt.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })} · ${generatedAt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })} IST`}
+              accent={stale ? "danger" : "accent"}
+            />
           </div>
-          <div className={`ticker-stat ${stale ? "stale" : ""}`}>
-            <span className="value">
-              {generatedAt.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
-              {" · "}
-              {generatedAt.toLocaleTimeString("en-IN", {
-                hour: "2-digit",
-                minute: "2-digit",
-                timeZone: "Asia/Kolkata",
-              })}{" "}
-              IST
-            </span>
-            <span className="label">{stale ? `Stale (>${STALE_HOURS}h)` : "Last scan"}</span>
-          </div>
+        </div>
+
+        <div className="filter-bar">
+          <label className="search-wrap">
+            <IconSearch />
+            <input
+              id="search"
+              type="text"
+              placeholder="Filter by symbol, company, sector…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                type="button"
+                className="search-clear"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+              >
+                {"×"}
+              </button>
+            )}
+          </label>
+          <SegmentedControl
+            value={filter}
+            onChange={setFilter}
+            ariaLabel="Stock filter"
+            options={[
+              { value: "all", label: `All · ${data.stocks.length}` },
+              { value: "passed", label: `Passed · ${data.gate_pass_count}` },
+            ]}
+          />
+          <button
+            className="export-pill"
+            onClick={() => exportCsv(rows)}
+            title="Export current view as CSV"
+          >
+            <IconDownload />
+            <span>Export CSV</span>
+          </button>
         </div>
       </header>
 
@@ -358,38 +416,6 @@ export default function App() {
           )}
         </div>
       )}
-
-      <div className="controls">
-        <label className="visually-hidden" htmlFor="search">Filter</label>
-        <input
-          id="search"
-          type="text"
-          placeholder="Filter by symbol, company, sector…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button
-          className={filter === "all" ? "active" : ""}
-          onClick={() => setFilter("all")}
-          aria-pressed={filter === "all"}
-        >
-          All ({data.stocks.length})
-        </button>
-        <button
-          className={filter === "passed" ? "active" : ""}
-          onClick={() => setFilter("passed")}
-          aria-pressed={filter === "passed"}
-        >
-          Gate-passed only ({data.gate_pass_count})
-        </button>
-        <button
-          className="export"
-          onClick={() => exportCsv(rows)}
-          title="Export current view as CSV"
-        >
-          Export CSV
-        </button>
-      </div>
 
       {rows.length === 0 ? (
         <div className="empty-state">
