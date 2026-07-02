@@ -2,6 +2,10 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import Kpi from "./components/Kpi.jsx";
 import SegmentedControl from "./components/SegmentedControl.jsx";
 import SubscoreBars from "./components/SubscoreBars.jsx";
+import StockCard from "./components/StockCard.jsx";
+import DetailDrawer from "./components/DetailDrawer.jsx";
+import { SkeletonGrid } from "./components/Skeleton.jsx";
+import Rationale from "./components/Rationale.jsx";
 
 function IconSearch() {
   return (
@@ -20,6 +24,47 @@ function IconDownload() {
     </svg>
   );
 }
+
+function IconGrid() {
+  return (
+    <svg className="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <rect x="3"  y="3"  width="6" height="6" rx="1.2" />
+      <rect x="11" y="3"  width="6" height="6" rx="1.2" />
+      <rect x="3"  y="11" width="6" height="6" rx="1.2" />
+      <rect x="11" y="11" width="6" height="6" rx="1.2" />
+    </svg>
+  );
+}
+
+function IconTable() {
+  return (
+    <svg className="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <rect x="3" y="4" width="14" height="12" rx="1.2" />
+      <path d="M3 9h14" />
+      <path d="M9 4v12" />
+    </svg>
+  );
+}
+
+function IconSun() {
+  return (
+    <svg className="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+      <circle cx="10" cy="10" r="3" />
+      <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.2 4.2l1.5 1.5M14.3 14.3l1.5 1.5M4.2 15.8l1.5-1.5M14.3 5.7l1.5-1.5" />
+    </svg>
+  );
+}
+
+function IconMoon() {
+  return (
+    <svg className="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <path d="M16.5 12.5A6.5 6.5 0 0 1 7.5 3.5a6.5 6.5 0 1 0 9 9Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const THEME_LS_KEY = "nseSwingTheme";
+const VIEW_LS_KEY = "nseSwingViewMode";
 
 const COLUMNS = [
   { key: "symbol", label: "Stock" },
@@ -126,6 +171,23 @@ export default function App() {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(ADMIN_SECRET_LS_KEY) || null;
   });
+
+  // Theme: dark default; respects localStorage, falls back to system pref
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") return "dark";
+    const stored = localStorage.getItem(THEME_LS_KEY);
+    if (stored === "dark" || stored === "light") return stored;
+    return window.matchMedia("(prefers-color-scheme: light)").matches
+      ? "light"
+      : "dark";
+  });
+
+  // View mode: cards default; persisted
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window === "undefined") return "cards";
+    const stored = localStorage.getItem(VIEW_LS_KEY);
+    return stored === "cards" || stored === "table" ? stored : "cards";
+  });
   const [lastTriggerAt, setLastTriggerAt] = useState(() => {
     if (typeof window === "undefined") return null;
     const v = localStorage.getItem(ADMIN_LAST_TRIGGER_LS_KEY);
@@ -144,6 +206,15 @@ export default function App() {
       .then(setData)
       .catch((e) => setError(e.message));
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem(THEME_LS_KEY, theme); } catch {}
+  }, [theme]);
+
+  useEffect(() => {
+    try { localStorage.setItem(VIEW_LS_KEY, viewMode); } catch {}
+  }, [viewMode]);
 
   const rows = useMemo(() => {
     if (!data) return [];
@@ -293,9 +364,15 @@ export default function App() {
   if (!data) {
     return (
       <div className="app">
-        <div className="empty-state" role="status" aria-live="polite">
-          <h2>Loading latest scan…</h2>
-        </div>
+        <header className="hero">
+          <div className="hero-top">
+            <div className="hero-title">
+              <h1>NSE Swing Scanner</h1>
+              <p className="hero-sub">Loading latest scan…</p>
+            </div>
+          </div>
+        </header>
+        <SkeletonGrid n={6} />
       </div>
     );
   }
@@ -359,6 +436,37 @@ export default function App() {
               { value: "passed", label: `Passed · ${data.gate_pass_count}` },
             ]}
           />
+          <div className="icon-group">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            >
+              {theme === "dark" ? <IconSun /> : <IconMoon />}
+            </button>
+            <div className="view-toggle" role="group" aria-label="View mode">
+              <button
+                type="button"
+                aria-pressed={viewMode === "cards"}
+                onClick={() => setViewMode("cards")}
+                title="Card view"
+                aria-label="Card view"
+              >
+                <IconGrid />
+              </button>
+              <button
+                type="button"
+                aria-pressed={viewMode === "table"}
+                onClick={() => setViewMode("table")}
+                title="Table view"
+                aria-label="Table view"
+              >
+                <IconTable />
+              </button>
+            </div>
+          </div>
           <button
             className="export-pill"
             onClick={() => exportCsv(rows)}
@@ -422,6 +530,28 @@ export default function App() {
           <h2>No stocks match</h2>
           <p>Try clearing the filter or search term.</p>
         </div>
+      ) : viewMode === "cards" ? (
+        <>
+          <div className="stock-grid">
+            {rows.map((s) => (
+              <StockCard
+                key={s.symbol}
+                stock={s}
+                expanded={expanded === s.symbol}
+                onToggle={() => setExpanded(expanded === s.symbol ? null : s.symbol)}
+              />
+            ))}
+          </div>
+          {expanded && (() => {
+            const s = rows.find((r) => r.symbol === expanded);
+            return s ? (
+              <DetailDrawer
+                stock={s}
+                onClose={() => setExpanded(null)}
+              />
+            ) : null;
+          })()}
+        </>
       ) : (
         <table className="scan-table">
           <thead>
@@ -528,6 +658,8 @@ export default function App() {
           </tbody>
         </table>
       )}
+
+      <Rationale />
 
       <div className="footer-note">
         Screening layer only — not investment advice, not a buy/sell signal.
