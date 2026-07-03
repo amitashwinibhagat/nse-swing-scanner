@@ -246,6 +246,7 @@ body {
 }
 
 .kpi.kpi-success .kpi-value { color: var(--success); }
+.kpi.kpi-warning .kpi-value { color: var(--warning); }
 .kpi.kpi-danger  .kpi-value { color: var(--danger); }
 .kpi.kpi-accent  .kpi-value { color: var(--accent-bright); }
 

@@ -18,6 +18,11 @@ jobs:
       - name: Install backend deps
         working-directory: backend
         run: pip install -r requirements.txt
+      - name: Check cron consistency (scan.yml vs WINDOWS)
+        working-directory: backend
+        # Fails fast if the YAML cron entries drift from the WINDOWS list
+        # baked into the "Write scan_status.json" step.
+        run: python scripts/check_cron_consistency.py
       - name: Run pytest
         working-directory: backend
         run: pytest -q

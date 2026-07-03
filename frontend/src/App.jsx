@@ -65,6 +65,7 @@ function IconMoon() {
 
 const THEME_LS_KEY = "nseSwingTheme";
 const VIEW_LS_KEY = "nseSwingViewMode";
+const SCAN_STATUS_URL = "/data/scan_status.json";
 
 const COLUMNS = [
   { key: "symbol", label: "Stock" },
@@ -119,6 +120,31 @@ function hoursSince(iso) {
   return (Date.now() - t) / (1000 * 60 * 60);
 }
 
+function fmtRelativeAge(iso) {
+  if (!iso) return "";
+  const ms = Date.now() - new Date(iso).getTime();
+  const min = Math.max(0, Math.round(ms / 60000));
+  if (min < 1) return "just now";
+  if (min < 60) return `${min} min ago`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `${h} h ago`;
+  const d = Math.round(h / 24);
+  return `${d} d ago`;
+}
+
+function fmtDrift(status) {
+  if (!status || status.drift_minutes == null) return "";
+  if (status.drift_minutes === 0) return "on schedule";
+  return `${status.drift_minutes} min late`;
+}
+
+function freshnessAccent(iso) {
+  const h = hoursSince(iso);
+  if (h < 14) return "success";
+  if (h < 20) return "warning";
+  return "danger";
+}
+
 function exportCsv(rows, filename = "nse_swing_scan.csv") {
   if (!rows.length) return;
   const cols = [
@@ -157,6 +183,7 @@ function exportCsv(rows, filename = "nse_swing_scan.csv") {
 export default function App() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const [scanStatus, setScanStatus] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all"); // all | passed
   const [sortKey, setSortKey] = useState("swing_score");
@@ -215,6 +242,21 @@ export default function App() {
       })
       .then(setData)
       .catch((e) => setError(e.message));
+  }, []);
+
+  useEffect(() => {
+    fetch(SCAN_STATUS_URL, { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((s) => {
+        if (s && s.generated_at) setScanStatus(s);
+      })
+      .catch(() => {
+        // scan_status.json is best-effort; missing/invalid falls back to
+        // deriving freshness from latest_scan.json's generated_at.
+      });
   }, []);
 
   useEffect(() => {
@@ -390,6 +432,16 @@ export default function App() {
   const generatedAt = new Date(data.generated_at);
   const stale = hoursSince(data.generated_at) > STALE_HOURS;
 
+  const relativeAge = fmtRelativeAge(data.generated_at);
+  const driftNote = fmtDrift(scanStatus);
+  const driftSuffix = scanStatus && scanStatus.scheduled_window_utc
+    ? ` (${scanStatus.scheduled_window_utc} UTC)`
+    : "";
+  const freshnessDelta = [
+    relativeAge,
+    driftNote ? `• ${driftNote}${driftSuffix}` : "",
+  ].filter(Boolean).join(" ");
+
   return (
     <div className="app">
       <header className="hero">
@@ -409,9 +461,10 @@ export default function App() {
               accent="success"
             />
             <Kpi
-              label={stale ? `Stale (>${STALE_HOURS}h)` : "Last scan"}
+              label="Last scan"
               value={`${generatedAt.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })} · ${generatedAt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })} IST`}
-              accent={stale ? "danger" : "accent"}
+              delta={freshnessDelta || undefined}
+              accent={freshnessAccent(data.generated_at)}
             />
           </div>
         </div>
@@ -491,7 +544,11 @@ export default function App() {
       {stale && (
         <div className="stale-banner" role="status">
           Scan data is older than {STALE_HOURS} hours. The scheduled GitHub Action
-          may have failed — check the Actions tab.
+          may have failed — check the{" "}
+          <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
+            Actions tab
+          </a>
+          .
         </div>
       )}
 

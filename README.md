@@ -80,10 +80,10 @@ provided `GITHUB_TOKEN` to commit back to the repo (wired into
 ### 2. Verify the scan Action runs
 
 Go to the Actions tab → "NSE Swing Scan" → **Run workflow** (manual
-trigger). First run takes ~5-8 min for the Nifty 200 universe with
-12 workers (Screener holdings scraping is the dominant cost; warm
-caches help). Check that `frontend/public/data/latest_scan.json`
-gets committed afterward.
+trigger). First run takes ~5-7 min cold-cache for the full Nifty 500
+universe with 12 workers (Screener holdings scraping is the dominant
+cost; warm yfinance caches make subsequent runs ~30-90 s). Check that
+`frontend/public/data/latest_scan.json` gets committed afterward.
 
 ### 3. Verify CI passes
 
@@ -100,8 +100,11 @@ build on every push and PR. Both must be green before merging.
 ### 5. Confirm the schedule
 
 Cron in `scan.yml` is **09:00 and 16:00 IST on weekdays** (UTC `30 3 * * 1-5`
-and `30 10 * * 1-5`). GitHub Actions cron can drift by a few minutes under
-load — treat these as "approximately," not to-the-second.
+and `30 10 * * 1-5`). GitHub Actions cron is best-effort and can drift by
+several minutes under load — treat these as "approximately," not
+to-the-second. The "Last scan" KPI on the dashboard now shows the
+relative age (e.g. `12 min ago`) and a drift indicator
+(`• 17 min late vs schedule`) so any drift is visible at a glance.
 
 ### 6. (Optional) Owner-only on-demand scan trigger
 

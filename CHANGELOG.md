@@ -1,5 +1,89 @@
 # Changelog
 
+## 1.1.3 — Expand universe to Nifty 500 with ~5–7 min cold-cache runtime
+
+### Changed
+
+- Workflow `--top-n 200` → `--top-n 500`: full Nifty 500 universe, up from
+  top 200. Coverage now includes mid/small-cap names that actually drive
+  swing-trade volume.
+- Drift calculation in the "Write scan_status.json" step now picks the
+  scheduled window whose HH:MM is closest to `now`'s wall-clock (circular
+  minute-distance). Replaces the previous `max(past)` heuristic which
+  misattributed multi-hour-delayed crons to the wrong slot.
+
+### Added
+
+- yfinance result caching: `compute_technicals`, `compute_fscore`,
+  `approx_5y_avg_pe`, and `compute_nifty50_context` now read/write
+  on-disk JSON caches keyed on ticker symbol with 12 h TTL (24 h for
+  fundamentals). Warm-cache scans complete in ~30-90 s instead of 3-5 min.
+  Tests bypass the cache via the `NSE_SWING_NO_CACHE=1` env var (set
+  automatically in `backend/tests/conftest.py`).
+- `UNIVERSE_DEFAULT_TOP_N = 500` in `backend/settings.py`.
+- `YF_CACHE_TTL_SECONDS` (12 h) and `YF_FUNDAMENTAL_CACHE_TTL_SECONDS`
+  (24 h) in `backend/settings.py`.
+- Frontend drift pill now surfaces `scheduled_window_utc` so the user can
+  see which scheduled slot the run was attributed to
+  (e.g. `12 min ago • 17 min late (03:30 UTC)`).
+- `Write scan_status.json` and `Commit and push updated scan` workflow
+  steps now both gate on `if: success()`, preventing `scan_status.json`
+  from lagging `latest_scan.json` if the Write step fails.
+- Regression tests in `backend/tests/test_cache.py` that exercise the
+  cache wrapper paths with `NSE_SWING_NO_CACHE` unset, catching the
+  NameError-on-missing-import class of bug.
+
+### Performance (projected, not yet measured)
+
+- Cold-cache Nifty 500 scan with `workers=12, sleep=0.2`: **~5-7 min**
+  (vs ~12-20 min projected for 500 stocks with the old 200-stock
+  config). The yfinance cache is the main speedup — per-stock cost drops
+  from ~6 s (cold) to ~0.4 s (warm).
+- Warm-cache scan (same day, second run): **~30-90 s** (vs ~5-10 min).
+
+### Fixed
+
+- `backend/fscore.py`: `approx_5y_avg_pe` now imports
+  `YF_CACHE_TTL_SECONDS` (was missing, caused `NameError` at runtime
+  in production; masked by `NSE_SWING_NO_CACHE=1` in tests).
+
+### Known limitations
+
+- 12 h TTL on price-derived fields (current_price, 52W high, ATR, ADTV)
+  is unsafe across stock splits / demergers. The cached scalars will
+  reflect the pre-split snapshot for up to 12 h after a corporate action.
+  Documented; revisit if NSE-listed splits become more frequent.
+- `--workers 16 / --sleep 0.1` was tried and reverted to the safer
+  `12 / 0.2` config after empirical rate-limit concerns (Screener.in
+  HTML scrape + yfinance burst on a shared GH Actions egress IP).
+- Multi-hour cron delays can still misattribute the scheduled window in
+  `scan_status.json` (GitHub Actions does not expose which cron
+  expression fired). The closest-clock-time heuristic handles small/medium
+  drift; very-large drifts (rare) may surface a misleading window.
+
+## 1.1.2 — Live freshness indicator + tighter edge cache
+
+### Added
+
+- `frontend/public/data/scan_status.json`, committed alongside
+  `latest_scan.json` by `.github/workflows/scan.yml`. Contains
+  `generated_at`, `triggered_at`, `commit_sha`, `run_id`, `trigger`
+  (`schedule` | `workflow_dispatch`), `scheduled_window_utc`,
+  `scheduled_cron`, and `drift_minutes` (for scheduled runs).
+- "Last scan" KPI on the dashboard now shows relative age
+  (e.g. `12 min ago`) and a drift indicator
+  (e.g. `• 17 min late vs schedule`). Accent colour: green < 14 h,
+  amber 14–20 h, red > 20 h. Falls back gracefully when
+  `scan_status.json` is unavailable.
+- Stale-data banner now links to the GitHub Actions tab.
+
+### Changed
+
+- `netlify.toml`: `/data/*` cache-control tightened from
+  `public, max-age=300, stale-while-revalidate=600` to
+  `public, max-age=60, must-revalidate`. Perceived staleness drops
+  from ~15 min to ~60 s after a successful scan push.
+
 ## 1.1.1 — Expand universe to Nifty 200
 
 ### Changed

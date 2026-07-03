@@ -5,7 +5,7 @@ adjusted without touching scanner.py / module code.
 """
 
 # Universe
-UNIVERSE_DEFAULT_TOP_N = 200                # default top-N-by-market-cap tier (Nifty 100/200/500)
+UNIVERSE_DEFAULT_TOP_N = 500                # default top-N-by-market-cap tier (Nifty 100/200/500)
 UNIVERSE_DEFAULT_WORKERS = 8                # default thread-pool size for per-stock evaluation
 UNIVERSE_DEFAULT_SLEEP_BETWEEN_CALLS = 0.3  # seconds, per-yfinance-call courtesy delay
 
@@ -42,6 +42,8 @@ HOLDINGS_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30 * 3   # ~90 days (quarterly-ish)
 BHAVCOPY_CACHE_TTL_SECONDS = 60 * 60 * 12            # half a day
 SURVEILLANCE_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7    # weekly
 CORPORATE_ACTIONS_CACHE_TTL_SECONDS = 60 * 60 * 12   # half a day
+YF_CACHE_TTL_SECONDS = 60 * 60 * 12                 # 12 h for yfinance-derived fields (price-dependent)
+YF_FUNDAMENTAL_CACHE_TTL_SECONDS = 60 * 60 * 24     # 24 h for F-score (balance-sheet-quarterly)
 
 # Stale-data threshold for the UI (hours)
 STALE_DATA_HOURS = 18

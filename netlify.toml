@@ -28,4 +28,7 @@
 [[headers]]
   for = "/data/*"
   [headers.values]
-    Cache-Control = "public, max-age=300, stale-while-revalidate=600"
+    # Scan push cadence is <= 12 h. 60 s edge TTL keeps perceived staleness
+    # <= 60 s after a successful rebuild (down from 5-15 min) so the dashboard
+    # reflects the latest committed scan almost immediately.
+    Cache-Control = "public, max-age=60, must-revalidate"

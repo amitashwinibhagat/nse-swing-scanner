@@ -40,6 +40,9 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
+from cache import cached_call
+from settings import YF_CACHE_TTL_SECONDS, YF_FUNDAMENTAL_CACHE_TTL_SECONDS
+
 
 def _safe_get(df: pd.DataFrame, row_names, col) -> float:
     """Try multiple possible row-label spellings (yfinance labels drift across versions)."""
@@ -53,7 +56,8 @@ def _safe_get(df: pd.DataFrame, row_names, col) -> float:
     return np.nan
 
 
-def compute_fscore(yf_ticker: str) -> dict:
+def _compute_fscore_impl(yf_ticker: str) -> dict:
+    """Implementation behind the cached_call wrapper. See compute_fscore."""
     t = yf.Ticker(yf_ticker)
     try:
         fin = t.financials          # annual income statement
@@ -138,11 +142,18 @@ def compute_fscore(yf_ticker: str) -> dict:
     }
 
 
-def approx_5y_avg_pe(yf_ticker: str) -> dict:
-    """
-    Coarse 5Y-average P/E: pairs each fiscal year-end annual EPS with the closing
-    price nearest that date. LOW-MODERATE confidence — see module docstring.
-    """
+def compute_fscore(yf_ticker: str) -> dict:
+    """Self-computed Piotroski F-Score. Cached on disk for YF_FUNDAMENTAL_CACHE_TTL_SECONDS (24 h)."""
+    return cached_call(
+        f"fscore:{yf_ticker}",
+        YF_FUNDAMENTAL_CACHE_TTL_SECONDS,
+        _compute_fscore_impl,
+        yf_ticker,
+    )
+
+
+def _approx_5y_avg_pe_impl(yf_ticker: str) -> dict:
+    """Implementation behind the cached_call wrapper. See approx_5y_avg_pe."""
     t = yf.Ticker(yf_ticker)
     try:
         fin = t.financials
@@ -203,6 +214,20 @@ def approx_5y_avg_pe(yf_ticker: str) -> dict:
         "trailing_pe_check": round(trailing_pe, 2) if trailing_pe else None,
         "error": None,
     }
+
+
+def approx_5y_avg_pe(yf_ticker: str) -> dict:
+    """
+    Coarse 5Y-average P/E: pairs each fiscal year-end annual EPS with the closing
+    price nearest that date. LOW-MODERATE confidence — see module docstring.
+    Cached on disk for YF_CACHE_TTL_SECONDS (12 h) — price-derived output.
+    """
+    return cached_call(
+        f"pe5y:{yf_ticker}",
+        YF_CACHE_TTL_SECONDS,
+        _approx_5y_avg_pe_impl,
+        yf_ticker,
+    )
 
 
 if __name__ == "__main__":

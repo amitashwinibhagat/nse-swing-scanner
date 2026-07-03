@@ -1,0 +1,11 @@
+{
+  "generated_at": null,
+  "triggered_at": null,
+  "commit_sha": null,
+  "run_id": null,
+  "trigger": null,
+  "scheduled_window_utc": null,
+  "scheduled_cron": "30 3 * * 1-5, 30 10 * * 1-5",
+  "drift_minutes": null,
+  "note": "first scan pending — replaced on the next GitHub Actions scan run"
+}

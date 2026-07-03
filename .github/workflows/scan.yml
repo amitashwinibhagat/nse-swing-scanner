@@ -19,7 +19,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # Nifty 100 with 8 workers cold-cache ~5-8 min; warm-cache ~1-3 min
+    timeout-minutes: 30   # Nifty 500 with 12 workers: cold-cache ~5-7 min, warm-cache ~30-90 s. 30 min leaves comfortable headroom for retry cascades.
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,9 +42,14 @@ jobs:
 
       - name: Run full scan
         working-directory: backend
-        run: python scanner.py --top-n 200 --workers 12 --sleep 0.2 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
-        # Nifty 200 (top 200 by market cap) with 12 parallel workers.
-        # Cold cache: ~5-8 min. Warm cache: ~2-4 min.
+        run: python scanner.py --top-n 500 --workers 12 --sleep 0.2 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
+        # Nifty 500 (top 500 by free-float market cap) with 12 parallel workers.
+        # Tuned conservatively to stay under Screener.in / yfinance rate-limit
+        # ceilings on a shared GitHub Actions egress IP. The yfinance result
+        # cache (12 h for price-derived, 24 h for fundamentals) is the main
+        # speedup that keeps the scan within ~5 min cold-cache:
+        #   - Cold cache (first run of the day, weekend-cleared): ~5-7 min.
+        #   - Warm cache (subsequent runs): ~30-90 s (cache hits).
         # --lenient-external-gates: lets delivery/holdings pass when their
         # source is source_failed (NSE bhavcopy is behind Akamai bot
         # protection, Screener sometimes rate-limits the runner IP). The
@@ -57,11 +62,102 @@ jobs:
         working-directory: backend
         run: python -c "import json; p=json.load(open('../frontend/public/data/latest_scan.json')); assert 'generated_at' in p and 'stocks' in p and p['stocks'], 'invalid scan contract'; print('contract ok:', len(p['stocks']), 'stocks')"
 
+      - name: Write scan_status.json
+        # Always run after a successful scan (skip on scan failure). Internal
+        # errors are caught and surfaced as warnings — the file is best-effort
+        # metadata and the frontend gracefully degrades if it's missing.
+        if: success()
+        working-directory: backend
+        env:
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_SHA: ${{ github.sha }}
+          GH_RUN_ID: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json, datetime, os, sys, traceback
+
+          # Single source of truth for the schedule. MUST match `on.schedule`
+          # above. Adding a new window requires editing only this list — both
+          # `scheduled_cron` (JSON output) and the drift candidates are derived.
+          WINDOWS = [(3, 30), (10, 30)]   # (hour_utc, minute_utc)
+
+          try:
+              event = os.environ["GH_EVENT_NAME"]
+              scan = json.load(open("../frontend/public/data/latest_scan.json"))
+              now = datetime.datetime.now(datetime.timezone.utc)
+              triggered_at = now.isoformat()
+
+              scheduled_window_utc = None
+              drift_minutes = None
+              if event == "schedule":
+                  today = now.date()
+
+                  def clock_minute_delta(a, b):
+                      # Circular distance in minutes between two wall-clock HH:MM values.
+                      a_m = a.hour * 60 + a.minute
+                      b_m = b.hour * 60 + b.minute
+                      return min(abs(a_m - b_m), 1440 - abs(a_m - b_m))
+
+                  cands = []
+                  for h, m in WINDOWS:
+                      label = f"{h:02d}:{m:02d}"
+                      cands.append((datetime.datetime.combine(today, datetime.time(h, m), tzinfo=datetime.timezone.utc), label))
+                  # Only the LAST scheduled window of yesterday belongs in the
+                  # candidates list. Yesterday's earlier window (e.g. 03:30
+                  # when the schedule is [03:30, 10:30]) is too far back to
+                  # plausibly be "the most recent past cron" and including
+                  # it causes the clock-distance heuristic to misattribute
+                  # scans in the 00:00 - last-window-of-WINDOWS UTC window.
+                  last_h, last_m = WINDOWS[-1]
+                  cands.append((
+                      datetime.datetime.combine(today - datetime.timedelta(days=1), datetime.time(last_h, last_m), tzinfo=datetime.timezone.utc),
+                      f"{last_h:02d}:{last_m:02d}",
+                  ))
+                  past = [(dt, label) for dt, label in cands if dt <= now]
+                  if past:
+                      # Pick the past scheduled window whose HH:MM is closest to
+                      # now's wall-clock HH:MM. Handles on-time and small-drift
+                      # cases correctly. For multi-hour cron delays (rare), the
+                      # misattributed window is documented as a known limitation:
+                      # GitHub Actions does not expose which cron expression fired.
+                      chosen, scheduled_window_utc = min(
+                          past, key=lambda p: clock_minute_delta(now, p[0]),
+                      )
+                      drift_minutes = int((now - chosen).total_seconds() // 60)
+
+              scheduled_cron = ", ".join(f"{m} {h} * * 1-5" for h, m in WINDOWS)
+              status = {
+                  "generated_at": scan["generated_at"],
+                  "triggered_at": triggered_at,
+                  "commit_sha": os.environ["GH_SHA"],
+                  "run_id": os.environ["GH_RUN_ID"],
+                  "trigger": event,
+                  "scheduled_window_utc": scheduled_window_utc,
+                  "scheduled_cron": scheduled_cron,
+                  "drift_minutes": drift_minutes,
+              }
+              with open("../frontend/public/data/scan_status.json", "w") as f:
+                  json.dump(status, f, indent=2)
+              print("scan_status.json:", status)
+          except Exception as e:
+              # Don't fail the workflow over a status-metadata write — the
+              # scan itself succeeded and latest_scan.json is the load-bearing
+              # artifact. Frontend gracefully degrades when scan_status.json
+              # is absent or stale.
+              print(f"::warning::scan_status.json write failed: {e}")
+              traceback.print_exc()
+              sys.exit(0)
+          PY
+
       - name: Commit and push updated scan
+        if: success()   # require scan step to succeed; Write scan_status.json is best-effort and won't block this
         run: |
           git config user.name "nse-swing-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
+          # Add whatever files exist. scan_status.json is best-effort; if it
+          # wasn't written, `git add` skips that path with a non-fatal warning.
           git add frontend/public/data/latest_scan.json
+          git add frontend/public/data/scan_status.json || true
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "Scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push

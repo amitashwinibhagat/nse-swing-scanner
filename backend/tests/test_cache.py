@@ -3,10 +3,15 @@ import json
 import os
 import tempfile
 import time
+from unittest.mock import patch
 
+import numpy as np
+import pandas as pd
 import pytest
 
 from cache import read_cache, write_cache, clear_cache
+import fscore
+import technicals
 
 
 def test_write_read_roundtrip(tmp_path):
@@ -45,3 +50,135 @@ def test_clear_cache(tmp_path):
     n = clear_cache(cache_dir=str(tmp_path))
     assert n == 2
     assert read_cache("a:1", cache_dir=str(tmp_path)) is None
+
+
+# ---------------------------------------------------------------------------
+# Regression: yfinance cache wrappers must import all referenced TTL constants.
+#
+# Background: a 1.1.3 change added on-disk caching to compute_fscore and
+# approx_5y_avg_pe in backend/fscore.py. The wrapper in approx_5y_avg_pe
+# referenced YF_CACHE_TTL_SECONDS but only YF_FUNDAMENTAL_CACHE_TTL_SECONDS
+# was imported, raising NameError at runtime in production. conftest.py sets
+# NSE_SWING_NO_CACHE=1 to bypass the cache branch in tests, so this was
+# uncaught by the existing 76-test suite.
+#
+# These tests exercise the cache wrapper paths directly (NSE_SWING_NO_CACHE
+# unset) and assert no NameError on import / symbol resolution. They also
+# write a fixture to the on-disk cache so we can assert cache reads work.
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def _cache_enabled(monkeypatch):
+    """Enable the on-disk cache for the wrapped compute_* functions."""
+    monkeypatch.delenv("NSE_SWING_NO_CACHE", raising=False)
+    # Note: we deliberately write to the real backend/cache/ directory
+    # because the wrappers call read_cache/write_cache with their default
+    # cache_dir (a module-level constant that's bound at function-definition
+    # time, so we can't redirect it here without invasive patching). The
+    # fixture data is overwritten on the next real run.
+    yield
+    # Best-effort cleanup of the entries this fixture wrote.
+    from cache import cache_path, DEFAULT_CACHE_DIR
+    for key in (
+        "tech:RELIANCE.NS:1y", "tech:^NSEI:1y",
+        "fscore:RELIANCE.NS",
+        "pe5y:RELIANCE.NS",
+        "tech:TCS.NS:1y",
+    ):
+        try:
+            p = cache_path(DEFAULT_CACHE_DIR, key)
+            if os.path.exists(p):
+                os.remove(p)
+        except Exception:
+            pass
+
+
+def _fake_history(n=260, trailing_nan=0):
+    """Synthetic yfinance .history() output with optional trailing NaN bars."""
+    dates = pd.date_range("2025-01-01", periods=n, freq="B")
+    np.random.seed(7)
+    prices = 100 + np.cumsum(np.random.normal(0, 1, n))
+    df = pd.DataFrame({
+        "Open": prices + np.random.normal(0, 0.5, n),
+        "High": prices + np.abs(np.random.normal(0, 1, n)),
+        "Low": prices - np.abs(np.random.normal(0, 1, n)),
+        "Close": prices,
+        "Volume": np.random.randint(1_000_000, 5_000_000, n).astype(float),
+    }, index=dates)
+    if trailing_nan:
+        df.iloc[-trailing_nan:, 0:5] = np.nan
+    return df
+
+
+def test_compute_technicals_cache_wrapper_resolves_all_constants(_cache_enabled):
+    """compute_technicals must not raise NameError when cache is enabled."""
+    hist = _fake_history()
+    with patch.object(technicals.yf, "Ticker") as fake_ticker:
+        fake_ticker.return_value.history.return_value = hist
+        result = technicals.compute_technicals("RELIANCE.NS")
+    assert result["error"] is None
+    assert "current_price" in result
+
+
+def test_compute_nifty50_context_cache_wrapper_resolves_all_constants(_cache_enabled):
+    """compute_nifty50_context must not raise NameError when cache is enabled."""
+    hist = _fake_history()
+    with patch.object(technicals.yf, "Ticker") as fake_ticker:
+        fake_ticker.return_value.history.return_value = hist
+        result = technicals.compute_nifty50_context()
+    assert result["error"] is None
+
+
+def test_compute_fscore_cache_wrapper_resolves_all_constants(_cache_enabled):
+    """compute_fscore must not raise NameError when cache is enabled."""
+    fake_df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+    with patch.object(fscore.yf, "Ticker") as fake_ticker:
+        t = fake_ticker.return_value
+        t.financials = fake_df
+        t.balance_sheet = fake_df
+        t.cashflow = fake_df
+        result = fscore.compute_fscore("RELIANCE.NS")
+    # Two-column frame isn't enough for fscore (needs >=2 fiscal years), but
+    # the wrapper must not NameError before that check.
+    assert "error" in result
+
+
+def test_approx_5y_avg_pe_cache_wrapper_resolves_all_constants(_cache_enabled):
+    """approx_5y_avg_pe must not raise NameError when cache is enabled.
+
+    This is the regression case from the 1.1.3 review: fscore.py referenced
+    YF_CACHE_TTL_SECONDS without importing it, causing NameError at runtime.
+    """
+    hist = _fake_history(n=260 * 6)
+    fy_dates = pd.to_datetime(["2023-03-31", "2024-03-31", "2025-03-31"])
+    fake_fin = pd.DataFrame(
+        [[10.0, 12.0, 14.0]],
+        index=["Diluted EPS"],
+        columns=fy_dates,
+    )
+    with patch.object(fscore.yf, "Ticker") as fake_ticker:
+        t = fake_ticker.return_value
+        t.financials = fake_fin
+        t.history.return_value = hist
+        t.info.get.return_value = 25.0  # trailingPE
+        result = fscore.approx_5y_avg_pe("RELIANCE.NS")
+    # Whatever the value, the function must have run without NameError.
+    assert "avg_pe_5y" in result or result.get("error") not in (None, "")
+
+
+def test_cache_wrapper_writes_and_replays(_cache_enabled):
+    """A successful compute_technicals call must populate the cache so the
+    next call returns without invoking yfinance."""
+    hist = _fake_history()
+    with patch.object(technicals.yf, "Ticker") as fake_ticker:
+        fake_ticker.return_value.history.return_value = hist
+        first = technicals.compute_technicals("TCS.NS")
+
+    # Second call: yf.Ticker should NOT be invoked if the cache hit short-
+    # circuits before the yfinance call.
+    with patch.object(technicals.yf, "Ticker") as fake_ticker:
+        fake_ticker.return_value.history.side_effect = AssertionError("yfinance should not be called on cache hit")
+        second = technicals.compute_technicals("TCS.NS")
+
+    assert first == second

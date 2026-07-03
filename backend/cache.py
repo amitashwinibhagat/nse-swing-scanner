@@ -17,10 +17,17 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional, TypeVar
 
 DEFAULT_CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache")
 Path(DEFAULT_CACHE_DIR).mkdir(parents=True, exist_ok=True)
+
+# Single bypass flag read by `cached_call`. Tests set this in conftest.py so
+# compute_* and fetch_* helpers exercise the live yfinance / Screener / NSE
+# code paths instead of short-circuiting on stale cache.
+NO_CACHE_ENV_VAR = "NSE_SWING_NO_CACHE"
+
+T = TypeVar("T")
 
 
 def _safe_key(key: str) -> str:
@@ -70,3 +77,37 @@ def clear_cache(cache_dir: str = DEFAULT_CACHE_DIR) -> int:
             except OSError:
                 pass
     return n
+
+
+def cached_call(
+    key: str,
+    ttl_seconds: int,
+    fn: Callable[..., T],
+    *args,
+    cache_dir: str = DEFAULT_CACHE_DIR,
+    **kwargs,
+) -> T:
+    """
+    Cache-aside wrapper. On a hit, returns the cached value. On a miss, calls
+    `fn(*args, **kwargs)`, writes the result to disk, and returns it.
+
+    Bypassed (always calls fn) when the `NSE_SWING_NO_CACHE` env var is set to
+    a truthy value — used by tests to exercise the live code paths.
+
+    Centralising the env-var check + read-then-write pattern here means new
+    cached functions don't need to copy the boilerplate, and the bypass flag
+    has exactly one read site (here).
+    """
+    if not os.environ.get(NO_CACHE_ENV_VAR):
+        cached = read_cache(key, cache_dir=cache_dir, max_age_seconds=ttl_seconds)
+        if cached is not None:
+            return cached
+    result = fn(*args, **kwargs)
+    if not os.environ.get(NO_CACHE_ENV_VAR):
+        try:
+            write_cache(key, result, cache_dir=cache_dir)
+        except (OSError, TypeError):
+            # Cache write failure must not break the caller. On-disk cache
+            # is best-effort; the next call will simply recompute.
+            pass
+    return result

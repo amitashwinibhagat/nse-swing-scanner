@@ -26,7 +26,9 @@ from settings import (
     STOP_LOSS_ATR_MULT,
     TARGET_1_ATR_MULT,
     TARGET_2_ATR_MULT,
+    YF_CACHE_TTL_SECONDS,
 )
+from cache import cached_call
 
 
 NIFTY50_TICKER = "^NSEI"  # Nifty 50 index on yfinance
@@ -56,11 +58,8 @@ def compute_atr(high: pd.Series, low: pd.Series, close: pd.Series, period: int =
     return atr
 
 
-def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
-    """
-    Returns a dict of computed technical fields for one ticker, or a dict with
-    'error' set if data was insufficient/unavailable.
-    """
+def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
+    """Implementation behind the cached_call wrapper. See compute_technicals."""
     try:
         hist = yf.Ticker(yf_ticker).history(period=period, auto_adjust=True)
     except Exception as e:
@@ -147,11 +146,23 @@ def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
     }
 
 
-def compute_nifty50_context(period: str = "1y") -> dict:
+def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
     """
-    Fetch Nifty 50 index data once per scan and return its 200EMA + distance.
-    Used for the relative-strength-vs-market adjustment (a soft factor, not a gate).
+    Returns a dict of computed technical fields for one ticker, or a dict with
+    'error' set if data was insufficient/unavailable. Results are cached on
+    disk for YF_CACHE_TTL_SECONDS (12 h) keyed on (ticker, period).
     """
+    return cached_call(
+        f"tech:{yf_ticker}:{period}",
+        YF_CACHE_TTL_SECONDS,
+        _compute_technicals_impl,
+        yf_ticker,
+        period,
+    )
+
+
+def _compute_nifty50_context_impl(period: str = "1y") -> dict:
+    """Implementation behind the cached_call wrapper. See compute_nifty50_context."""
     try:
         hist = yf.Ticker(NIFTY50_TICKER).history(period=period, auto_adjust=True)
     except Exception as e:
@@ -170,6 +181,20 @@ def compute_nifty50_context(period: str = "1y") -> dict:
         "index_pct_from_ema200": round(pct_from_ema200, 2),
         "error": None,
     }
+
+
+def compute_nifty50_context(period: str = "1y") -> dict:
+    """
+    Fetch Nifty 50 index data once per scan and return its 200EMA + distance.
+    Used for the relative-strength-vs-market adjustment (a soft factor, not a gate).
+    Results cached on disk for YF_CACHE_TTL_SECONDS (12 h).
+    """
+    return cached_call(
+        f"tech:{NIFTY50_TICKER}:{period}",
+        YF_CACHE_TTL_SECONDS,
+        _compute_nifty50_context_impl,
+        period,
+    )
 
 
 if __name__ == "__main__":
