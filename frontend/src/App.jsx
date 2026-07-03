@@ -742,8 +742,8 @@ export default function App() {
         Not SEBI-registered research. Free data sources: yfinance (price),
         NSE bhavcopy (delivery), Screener.in (holdings), NSE corporate filings.
         Spot-check any candidate against the source provider before acting.
-        See <code>docs/methodology.md</code> and the Limitations section in
-        the README for the full list of assumptions and source fragility.
+        See the <a href="/methodology.html">Methodology page</a> for the full
+        list of assumptions, scoring formula, and source fragility.
       </div>
 
       <div className="byline">

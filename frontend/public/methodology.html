@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Full methodology, data sources, scoring formula, and limitations for the NSE Swing Scanner." />
+  <title>Methodology · NSE Swing Scanner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --surface-0: #08090c;
+      --surface-1: #0f1115;
+      --surface-2: #161922;
+      --surface-glass: rgba(15, 17, 21, 0.82);
+      --surface-glass-2: rgba(8, 9, 12, 0.72);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text: #ece9e2;
+      --text-dim: #9ba3af;
+      --text-faint: #5b6470;
+      --accent: #a78bfa;
+      --accent-bright: #c4b5fd;
+      --accent-dim: rgba(167, 139, 250, 0.12);
+      --success: #4ade80;
+      --success-dim: rgba(74, 222, 128, 0.14);
+      --danger: #f87171;
+      --danger-dim: rgba(248, 113, 113, 0.14);
+      --warning: #fbbf24;
+      --warning-dim: rgba(251, 191, 36, 0.14);
+      --info: #60a5fa;
+      --info-dim: rgba(96, 165, 250, 0.12);
+      --t-display: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+      --t-h1: 1.6rem;
+      --t-h2: 1.35rem;
+      --t-h3: 1.15rem;
+      --t-body: 0.95rem;
+      --t-meta: 0.85rem;
+      --t-micro: 0.75rem;
+      --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+      --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
+      --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-pill: 999px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --font-display: "Fraunces", Georgia, serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+      --font-body: "Inter", -apple-system, sans-serif;
+    }
+
+    [data-theme="light"] {
+      --surface-0: #f6f6f8;
+      --surface-1: #ffffff;
+      --surface-2: #eef0f4;
+      --surface-glass: rgba(255, 255, 255, 0.86);
+      --surface-glass-2: rgba(246, 246, 248, 0.78);
+      --border-subtle: rgba(15, 23, 42, 0.08);
+      --border: rgba(15, 23, 42, 0.14);
+      --border-strong: rgba(15, 23, 42, 0.22);
+      --text: #0f172a;
+      --text-dim: #475569;
+      --text-faint: #94a3b8;
+      --accent: #7c3aed;
+      --accent-bright: #5b21b6;
+      --accent-dim: rgba(124, 58, 237, 0.08);
+      --success: #16a34a;
+      --success-dim: rgba(22, 163, 74, 0.10);
+      --danger: #dc2626;
+      --danger-dim: rgba(220, 38, 38, 0.10);
+      --warning: #d97706;
+      --warning-dim: rgba(217, 119, 6, 0.10);
+      --info: #2563eb;
+      --info-dim: rgba(37, 99, 235, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    html { background: var(--surface-0); scroll-behavior: smooth; }
+    body {
+      background:
+        radial-gradient(1200px 700px at 85% -10%, var(--accent-dim), transparent 60%),
+        radial-gradient(900px 500px at -10% 30%, var(--success-dim), transparent 60%),
+        var(--surface-0);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: var(--t-body);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--sp-5) var(--sp-5) var(--sp-8);
+    }
+
+    /* Top nav */
+    .topnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      margin-bottom: var(--sp-6);
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--surface-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      position: sticky;
+      top: var(--sp-3);
+      z-index: 50;
+    }
+    .topnav-left { display: flex; align-items: center; gap: var(--sp-3); }
+    .topnav-logo {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text);
+      display: inline-flex; align-items: center; gap: var(--sp-2);
+    }
+    .topnav-back {
+      font-family: var(--font-mono);
+      font-size: var(--t-meta);
+      color: var(--text-dim);
+    }
+    .topnav-back:hover { color: var(--accent); }
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: var(--r-pill);
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      cursor: pointer;
+      transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+    }
+    .theme-toggle:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+    .theme-toggle svg { width: 18px; height: 18px; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: var(--sp-7) var(--sp-5);
+      margin-bottom: var(--sp-7);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      background: var(--surface-glass);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      backdrop-filter: blur(16px) saturate(150%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px 300px at 50% 0%, var(--accent-dim), transparent 60%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--font-mono);
+      font-size: var(--t-micro);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent-bright);
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      border-radius: var(--r-pill);
+      padding: var(--sp-1) var(--sp-3);
+      margin-bottom: var(--sp-4);
+      position: relative;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: var(--t-display);
+      font-weight: 600;
+      margin: 0 0 var(--sp-3);
+      line-height: 1.1;
+      position: relative;
+    }
+    .hero p {
+      color: var(--text-dim);
+      max-width: 640px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+      position: relative;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+      padding: var(--sp-5);
+      margin-bottom: var(--sp-7);
+    }
+    .toc h2 {
+      font-family: var(--font-display);
+      font-size: var(--t-h3);
+      margin: 0 0 var(--sp-4);
+    }
+    .toc ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--sp-2) var(--sp-4);
+    }
+    .toc li a {
+      display: block;
+      color: var(--text-dim);
+      font-size: var(--t-meta);
+      padding: var(--sp-2) 0;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: color 150ms, padding-left 150ms;
+    }
+    .toc li a:hover { color: var(--text); padding-left: var(--sp-2); text-decoration: none; }
+
+    /* Sections */
+    section { margin-bottom: var(--sp-7); }
+    h2 {
+      font-family: var(--font-display);
+      font-size: var(--t-h1);
+      font-weight: 600;
+      margin: 0 0 var(--sp-4);
+      line-height: 1.2;
+    }
+    h3 {
+      font-family: var(--font-display);
+      font-size: var(--t-h2);
+      font-weight: 600;
+      margin: var(--sp-6) 0 var(--sp-3);
+      color: var(--text);
+    }
+    h4 {
+      font-size: var(--t-h3);
+      font-weight: 600;
+      margin: var(--sp-5) 0 var(--sp-3);
+      color: var(--text);
+    }
+    p, li { color: var(--text-dim); }
+    ul, ol { padding-left: var(--sp-5); margin: var(--sp-3) 0; }
+    li { margin-bottom: var(--sp-2); }
+
+    /* Cards / callouts */
+    .card {
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+      padding: var(--sp-5);
+      margin: var(--sp-4) 0;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--sp-4);
+      margin: var(--sp-4) 0;
+    }
+    .card h4 { margin-top: 0; }
+    .card .meta { font-family: var(--font-mono); font-size: var(--t-micro); color: var(--text-faint); margin-top: var(--sp-2); }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-dim);
+      padding: var(--sp-4) var(--sp-5);
+      border-radius: 0 var(--r-md) var(--r-md) 0;
+      margin: var(--sp-4) 0;
+    }
+    .callout.danger { border-left-color: var(--danger); background: var(--danger-dim); }
+    .callout.warning { border-left-color: var(--warning); background: var(--warning-dim); }
+    .callout.success { border-left-color: var(--success); background: var(--success-dim); }
+    .callout.info { border-left-color: var(--info); background: var(--info-dim); }
+    .callout p { margin: 0; color: var(--text); }
+    .callout p + p { margin-top: var(--sp-2); }
+    .callout-title { font-weight: 600; color: var(--text); margin-bottom: var(--sp-2); display: block; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin: var(--sp-4) 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--t-meta);
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-md);
+      overflow: hidden;
+    }
+    th, td {
+      padding: var(--sp-3) var(--sp-4);
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: top;
+    }
+    th {
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-2);
+      font-family: var(--font-mono);
+      font-size: var(--t-micro);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    tr:last-child td { border-bottom: none; }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--surface-2);
+      padding: 0.1em 0.4em;
+      border-radius: var(--r-sm);
+      color: var(--accent-bright);
+    }
+
+    /* Badges / pills */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: var(--t-micro);
+      padding: 0.15em 0.6em;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .badge.ok { background: var(--success-dim); color: var(--success); border-color: var(--success); }
+    .badge.missing { background: var(--surface-2); color: var(--text-dim); }
+    .badge.source_failed { background: var(--danger-dim); color: var(--danger); border-color: var(--danger); }
+    .badge.fallback_used { background: var(--warning-dim); color: var(--warning); border-color: var(--warning); }
+    .badge.flag_only { background: var(--info-dim); color: var(--info); border-color: var(--info); }
+    .badge.na { background: var(--surface-2); color: var(--text-faint); }
+
+    .pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: var(--t-micro);
+      color: var(--text-dim);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: var(--sp-1) var(--sp-3);
+      border-radius: var(--r-pill);
+      margin: 0 var(--sp-2) var(--sp-2) 0;
+    }
+
+    /* Formula box */
+    .formula {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--sp-4) var(--sp-5);
+      font-family: var(--font-mono);
+      font-size: var(--t-meta);
+      color: var(--text);
+      overflow-x: auto;
+      margin: var(--sp-4) 0;
+    }
+
+    /* Footer */
+    .page-footer {
+      margin-top: var(--sp-8);
+      padding-top: var(--sp-6);
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+      color: var(--text-faint);
+      font-size: var(--t-meta);
+    }
+    .page-footer p { margin: var(--sp-2) 0; color: var(--text-faint); }
+    .page-footer a { color: var(--text-dim); }
+
+    /* Utilities */
+    .muted { color: var(--text-dim); }
+    .text-center { text-align: center; }
+    .mt-0 { margin-top: 0; }
+    .mb-2 { margin-bottom: var(--sp-2); }
+    .mb-4 { margin-bottom: var(--sp-4); }
+
+    @media (max-width: 640px) {
+      .page { padding: var(--sp-4) var(--sp-4) var(--sp-6); }
+      .hero { padding: var(--sp-6) var(--sp-4); }
+      .card-grid { grid-template-columns: 1fr; }
+      .toc ul { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="topnav" aria-label="Primary">
+      <div class="topnav-left">
+        <a href="/" class="topnav-logo" aria-label="Back to dashboard">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M12 4 6 10l6 6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          NSE Swing Scanner
+        </a>
+      </div>
+      <a href="/" class="topnav-back">← Back to dashboard</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="moonIcon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <path d="M16.5 12.5A6.5 6.5 0 0 1 7.5 3.5a6.5 6.5 0 1 0 9 9Z"/>
+        </svg>
+        <svg id="sunIcon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" style="display:none;">
+          <circle cx="10" cy="10" r="3"/>
+          <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.2 4.2l1.5 1.5M14.3 14.3l1.5 1.5M4.2 15.8l1.5-1.5M14.3 5.7l1.5-1.5"/>
+        </svg>
+      </button>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+        Transparent by design
+      </div>
+      <h1>Methodology, Sources &amp; Limitations</h1>
+      <p>
+        Everything that goes into the NSE Swing Scanner: the hard gates, the
+        scoring formula, the data sources and fallbacks, the source-status
+        policy, and the known limitations. Read this before changing filters or
+        interpreting results.
+      </p>
+    </header>
+
+    <nav class="toc" aria-label="Table of contents">
+      <h2>Contents</h2>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#hard-gates">Hard gates</a></li>
+        <li><a href="#soft-score">Soft score</a></li>
+        <li><a href="#atr-plan">ATR-based targets</a></li>
+        <li><a href="#source-status">Source-status policy</a></li>
+        <li><a href="#data-sources">Data sources &amp; fallbacks</a></li>
+        <li><a href="#cache">Cache policy</a></li>
+        <li><a href="#monitoring">Monitoring &amp; reliability</a></li>
+        <li><a href="#limitations">Limitations</a></li>
+        <li><a href="#what-this-is-not">What this is not</a></li>
+      </ul>
+    </nav>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>
+        The scanner evaluates the Nifty 500 universe twice a day on weekdays
+        (09:00 and 16:00 IST). It runs inside GitHub Actions, writes a JSON file,
+        and a static React frontend on Netlify reads that file. There is no API
+        or database at runtime — the contract is a single committed JSON file.
+      </p>
+      <p>The pipeline is:</p>
+      <ol>
+        <li><strong>Universe</strong> — Nifty 500 from NSE archives.</li>
+        <li><strong>Per-stock price/volume</strong> — yfinance <code>Ticker.history(period="1y")</code>.</li>
+        <li><strong>Per-stock fundamentals</strong> — yfinance financials and balance sheet.</li>
+        <li><strong>Per-stock external sources</strong> — NSE bhavcopy (delivery), Screener.in (holdings), NSE corporate actions, NSE/BSE surveillance (T-group / GSM / suspension).</li>
+        <li><strong>Shared market context</strong> — Nifty 50 vs its 200-day EMA (relative-strength factor).</li>
+        <li><strong>Hard gates</strong> — explicit pass/fail criteria, fail-closed.</li>
+        <li><strong>Soft score</strong> — weighted 0–100 ranking for stocks that pass the hard gates.</li>
+        <li><strong>Output</strong> — JSON contract at <code>/data/latest_scan.json</code>.</li>
+      </ol>
+      <div class="callout info">
+        <span class="callout-title">Why this architecture</span>
+        <p>
+          Netlify Functions cannot run the scan: synchronous functions cap at 60 s,
+          scheduled functions at 30 s, and background functions at 15 min with no
+          persistent process. A full Nifty 500 scan takes 15–25 min
+          single-threaded. GitHub Actions is the only free, no-server place that
+          fits the workload.
+        </p>
+      </div>
+    </section>
+
+    <section id="hard-gates">
+      <h2>Hard gates</h2>
+      <p>
+        Every hard gate returns <code>passed: bool</code> and a <code>reason: str</code>.
+        A stock is shown as <span class="badge ok">PASS</span> only if <em>all</em>
+        gates pass. If a source fails, the gate that depends on it fails-closed
+        by default, and the row is marked with the corresponding source status.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Gate</th>
+              <th>Criterion</th>
+              <th>Source</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>gate_f_score</code></td>
+              <td>Piotroski F-Score ≥ MIN_F_SCORE</td>
+              <td>yfinance</td>
+              <td>6</td>
+            </tr>
+            <tr>
+              <td><code>gate_drawdown</code></td>
+              <td>-40% ≤ pct off 52W high ≤ -15%</td>
+              <td>yfinance</td>
+              <td>-40 / -15</td>
+            </tr>
+            <tr>
+              <td><code>gate_rsi</code></td>
+              <td>25 ≤ RSI(14) ≤ 40</td>
+              <td>yfinance</td>
+              <td>25 / 40</td>
+            </tr>
+            <tr>
+              <td><code>gate_delivery_value</code></td>
+              <td>Latest-day delivery value ≥ ₹5 cr</td>
+              <td>NSE bhavcopy</td>
+              <td>₹5,00,00,000</td>
+            </tr>
+            <tr>
+              <td><code>gate_surveillance</code></td>
+              <td>Not in T-group / GSM / suspension</td>
+              <td>NSE → BSE → flag-only</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>gate_holdings</code></td>
+              <td>Promoter + FII + DII > 50%</td>
+              <td>Screener.in</td>
+              <td>50%</td>
+            </tr>
+            <tr>
+              <td><code>gate_corporate_actions</code></td>
+              <td>No excluded action in next 30 days</td>
+              <td>NSE corporate actions</td>
+              <td>30 days</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Gate details</h3>
+      <div class="card-grid">
+        <div class="card">
+          <h4>F-Score</h4>
+          <p>Piotroski F-Score from yfinance financials. A score of 6+ is required; the original spec suggested 7+, but the live threshold is 6 to avoid over-filtering noisy free data.</p>
+          <div class="meta">backend/fscore.py</div>
+        </div>
+        <div class="card">
+          <h4>Drawdown</h4>
+          <p>Percent off the 52-week high. The scanner looks for stocks that have corrected between 15% and 40% from their highs — deep enough to suggest value, not so deep that the trend is broken.</p>
+          <div class="meta">pct_off_52wk_high</div>
+        </div>
+        <div class="card">
+          <h4>RSI</h4>
+          <p>RSI(14) between 25 and 40. The window is deliberately below neutral to capture oversold-but-not-broken momentum.</p>
+          <div class="meta">backend/technicals.py</div>
+        </div>
+        <div class="card">
+          <h4>Delivery value</h4>
+          <p>Latest-session delivery value must be at least ₹5 crore. When NSE bhavcopy is blocked, the system falls back to a yfinance traded-value proxy (volume × close) and labels it clearly.</p>
+          <div class="meta">backend/bhavcopy.py</div>
+        </div>
+        <div class="card">
+          <h4>Surveillance</h4>
+          <p>Excludes T-group, GSM, and suspended stocks. The scanner checks NSE first, then BSE, then falls back to flag-only (not a pass) if both sources fail.</p>
+          <div class="meta">backend/surveillance.py</div>
+        </div>
+        <div class="card">
+          <h4>Holdings conviction</h4>
+          <p>Promoter + FII + DII shareholding must exceed 50%. Sourced from Screener.in quarterly shareholding patterns.</p>
+          <div class="meta">backend/holdings.py</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="soft-score">
+      <h2>Soft score</h2>
+      <p>
+        For stocks that pass all hard gates, the scanner computes a weighted
+        0–100 soft score. Each sub-score is in [0, 1]. Missing inputs are
+        excluded from the denominator rather than silently zeroed.
+      </p>
+      <div class="formula">
+        base_score = 100 × Σ(weight_i × sub_i) / Σ(weight_i over non-NaN)
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sub-score</th>
+              <th>Source</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Valuation compression</td><td>trailing P/E vs 5-year average P/E</td><td>0.20</td></tr>
+            <tr><td>Oversold positioning</td><td>RSI(14)</td><td>0.15</td></tr>
+            <tr><td>Support proximity</td><td>% from 200-day EMA</td><td>0.15</td></tr>
+            <tr><td>Drawdown sweetspot</td><td>% off 52-week high</td><td>0.10</td></tr>
+            <tr><td>Volume capitulation</td><td>peak down-day volume / 30-day average</td><td>0.10</td></tr>
+            <tr><td>Quality composite</td><td>F-Score</td><td>0.20</td></tr>
+            <tr><td>Conviction holding</td><td>Promoter + FII + DII</td><td>0.10</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Relative-strength factor</h3>
+      <p>
+        A multiplier in [0.70, 1.05] is applied to <code>base_score</code> based
+        on how the stock is behaving relative to the Nifty 50 index:
+      </p>
+      <ul>
+        <li>Stock is ≥ 5 percentage points worse than the index from its 200EMA → penalty (0.85× or 0.70×).</li>
+        <li>Index is correcting and the stock is tracking it closely → small bonus (1.05×).</li>
+        <li>Otherwise → neutral (1.00×).</li>
+      </ul>
+      <div class="formula">
+        swing_score = base_score × relative_strength_factor
+      </div>
+      <p class="muted">
+        The weights are hand-tuned, not backtested. Treat the score as a
+        degree-of-match ranking, not a strategy signal.
+      </p>
+    </section>
+
+    <section id="atr-plan">
+      <h2>ATR-based targets</h2>
+      <p>
+        The detail panel shows an ATR(14)-based plan for each candidate. These
+        are heuristic levels, not backtested, and replace the earlier
+        Fibonacci 61.8% targets which were oversized for a 15–30 day swing
+        window.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Level</th><th>Formula</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Entry zone</td><td>current price − 0.5 × ATR(14) to current price</td></tr>
+            <tr><td>Stop loss</td><td>entry midpoint − 1.0 × ATR(14)</td></tr>
+            <tr><td>Target 1</td><td>entry midpoint + 1.5 × ATR(14)</td></tr>
+            <tr><td>Target 2</td><td>entry midpoint + 2.5 × ATR(14)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Risk-reward ratios are computed against the stop loss. The entry zone is
+        a range, not a single price, to account for slippage and intraday
+        volatility.
+      </p>
+    </section>
+
+    <section id="source-status">
+      <h2>Source-status policy</h2>
+      <p>
+        Every external fetch returns a standard <code>source_status</code>
+        envelope with the fields <code>status</code>, <code>source</code>,
+        <code>as_of</code>, <code>data</code>, and <code>error</code>. The status
+        is surfaced in the dashboard per row so you can see which inputs are
+        reliable and which are not.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Status</th><th>Meaning</th><th>Gate impact</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="badge ok">ok</span></td><td>Source returned usable data.</td><td>Gate evaluates normally.</td></tr>
+            <tr><td><span class="badge missing">missing</span></td><td>Source is reachable, but no record for this symbol/date.</td><td>Treated as missing input, not a failure.</td></tr>
+            <tr><td><span class="badge source_failed">source_failed</span></td><td>Source was unreachable or returned an error.</td><td>Gate fails-closed by default.</td></tr>
+            <tr><td><span class="badge fallback_used">fallback_used</span></td><td>Primary source failed; secondary source returned data.</td><td>Gate evaluates with fallback data.</td></tr>
+            <tr><td><span class="badge flag_only">flag_only</span></td><td>Could not confirm; scanner must flag, not auto-pass.</td><td>Gate does not fail, but status is shown.</td></tr>
+            <tr><td><span class="badge na">not_applicable</span></td><td>Source does not apply for this symbol.</td><td>Ignored.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-title">Fail-closed by default</span>
+        <p>
+          Delivery, holdings, and corporate-actions gates fail-closed when the
+          source status is <code>source_failed</code>. Surveillance
+          <code>flag_only</code> does not fail the gate, because we don't know
+          the stock is restricted — we only know we couldn't confirm it.
+        </p>
+      </div>
+    </section>
+
+    <section id="data-sources">
+      <h2>Data sources &amp; fallbacks</h2>
+      <p>
+        Free data sources are fragile. The scanner is built to fail gracefully
+        and report status rather than crash or silently pass gates on bad data.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Source</th><th>Primary</th><th>Fallback 1</th><th>Fallback 2</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Universe CSV</td><td>NSE archives</td><td>niftyindices.com</td><td>fail-closed</td></tr>
+            <tr><td>Shareholding</td><td>Screener.in</td><td>none</td><td>fail-closed</td></tr>
+            <tr><td>Surveillance</td><td>NSE + BSE consolidated</td><td>none</td><td>flag-only</td></tr>
+            <tr><td>Corporate actions</td><td>NSE corporate-actions API</td><td>none</td><td>fail-closed</td></tr>
+            <tr><td>Delivery value</td><td>NSE archives bhavcopy</td><td>yfinance traded-value proxy</td><td>BSE archives</td></tr>
+            <tr><td>Technicals, F-Score, P/E</td><td>yfinance</td><td>none</td><td>fail-closed</td></tr>
+            <tr><td>Nifty 50 context</td><td>yfinance ^NSEI</td><td>none</td><td>fail-closed</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The delivery-value fallback chain</h3>
+      <p>
+        NSE bhavcopy has been behind Akamai since mid-2026, so the scanner
+        usually falls back to a yfinance traded-value proxy: <code>volume ×
+        close</code>. This is typically 2–3× the real delivery value, so the
+        dashboard shows a <span class="badge fallback_used">proxy</span> badge
+        and swaps the label to "Traded val (₹cr)". When NSE returns,
+        <code>delivery_kind</code> becomes <code>actual</code> and the label
+        reverts automatically.
+      </p>
+
+      <div class="callout info">
+        <span class="callout-title">Known data quirk: ADR-listed names</span>
+        <p>
+          INFY, WIPRO, IBN, HDB, RDY, and similar ADR-listed names have a
+          yfinance bug where diluted EPS is returned in USD while the price is in
+          INR. The scanner cross-checks against <code>t.info['trailingPE']</code>
+          and refuses to return a P/E when the two diverge by more than 3×. A
+          blank P/E in the table is the system working, not a bug.
+        </p>
+      </div>
+    </section>
+
+    <section id="cache">
+      <h2>Cache policy</h2>
+      <p>
+        On-disk JSON caches live in <code>backend/cache/</code> and are restored
+        between GitHub Actions runs via <code>actions/cache@v6</code>. The
+        <code>cached_call()</code> helper in <code>backend/cache.py</code> reads
+        the cache first, calls the fetcher on miss, and writes the result back.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Source</th><th>TTL</th><th>Reason</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Shareholding (Screener)</td><td>90 days</td><td>Changes quarterly</td></tr>
+            <tr><td>Bhavcopy rollup</td><td>12 hours</td><td>Daily, rarely changes intraday</td></tr>
+            <tr><td>Surveillance list</td><td>7 days</td><td>Weekly cadence</td></tr>
+            <tr><td>Corporate actions</td><td>12 hours</td><td>Daily refresh</td></tr>
+            <tr><td>yfinance price-derived fields</td><td>12 hours</td><td>Prices, RSI, ATR, etc.</td></tr>
+            <tr><td>yfinance fundamentals</td><td>24 hours</td><td>F-Score inputs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-title">Cache risk around stock splits</span>
+        <p>
+          A 12-hour TTL on price fields is unsafe across stock splits or
+          demergers. Cached scalars reflect the pre-event snapshot for up to
+          12 hours. The scanner handles this gracefully by design, but numbers
+          may look wrong until the cache expires. This is a known trade-off of
+          free data and aggressive caching.
+        </p>
+      </div>
+    </section>
+
+    <section id="monitoring">
+      <h2>Monitoring &amp; reliability</h2>
+      <p>
+        GitHub Actions scheduled workflows are best-effort and have been
+        observed to drift hours late or be silently dropped. The scanner uses
+        two complementary layers on top of the schedule.
+      </p>
+
+      <h3>1. healthchecks.io pings</h3>
+      <p>
+        The scan workflow pings one of two healthchecks.io URLs (one per
+        scheduled slot) at three points: <code>/start</code>, <code>/fail</code>,
+        and the bare URL on success. If no ping arrives within period + grace,
+        healthchecks.io alerts you. No ping means the cron didn't fire;
+        <code>/fail</code> means it fired but errored.
+      </p>
+
+      <h3>2. Watchdog workflow</h3>
+      <p>
+        A separate cron runs every 15 minutes during market hours and checks
+        whether <code>latest_scan.json</code> on <code>main</code> is older than
+        45 minutes. If it is, the watchdog fires
+        <code>gh workflow run scan.yml</code> to kick off a recovery scan. It
+        also pings its own healthchecks.io URL with query parameters so the
+        alert message tells you which slot was missed.
+      </p>
+
+      <div class="callout success">
+        <span class="callout-title">Why the watchdog works as a backstop</span>
+        <p>
+          If the main scan cron drifts but doesn't fully miss, the watchdog's
+          tight 15-minute loop will see the stale JSON and trigger a recovery
+          scan before healthchecks.io would even alert. If the main cron
+          entirely misses, both healthchecks.io and the watchdog serve as
+          redundant alarms.
+        </p>
+      </div>
+    </section>
+
+    <section id="limitations">
+      <h2>Limitations</h2>
+      <ul>
+        <li>
+          <strong>NSE bhavcopy is paywalled behind Akamai.</strong> As of
+          mid-2026, NSE's archive no longer hosts daily equity bhavcopy CSVs,
+          and the historical-data API requires a JS-computed cookie. The
+          scanner reports <code>delivery_source_status: source_failed</code>
+          for most stocks and falls back to a yfinance traded-value proxy.
+        </li>
+        <li>
+          <strong>Free data sources are fragile.</strong> NSE, BSE, and
+          Screener.in do not publish stable public APIs. If any source changes
+          its URL structure, the scanner reports <code>source_failed</code>
+          or <code>flag_only</code> rather than crashing.
+        </li>
+        <li>
+          <strong>ADR-listed names can show corrupted P/E.</strong> yfinance
+          sometimes returns diluted EPS in USD while the price is in INR. The
+          scanner refuses to return a P/E when the two diverge by more than 3×,
+          leaving the field blank.
+        </li>
+        <li>
+          <strong>yfinance trailing-NaN rows.</strong> yfinance occasionally
+          returns the most recent session with all-NaN OHLCV. The scanner
+          drops trailing NaN rows and uses the last complete session as the
+          current reference.
+        </li>
+        <li>
+          <strong>Earnings surprise is not a hard gate.</strong> There is no
+          clean free source for Indian-stock consensus estimates, so the
+          scanner does not screen on data it does not have.
+        </li>
+        <li>
+          <strong>Soft-score weights and F-Score threshold are hand-tuned.</strong>
+          They are not backtested. Treat the score as a ranking, not an edge.
+        </li>
+        <li>
+          <strong>This is not a real-time or intraday system.</strong> The
+          scan runs twice daily. The data is stale within hours of a market
+          session.
+        </li>
+      </ul>
+
+      <h3>Known operational risks</h3>
+      <div class="card-grid">
+        <div class="card">
+          <h4>Rate-limiting mid-scan</h4>
+          <p>The workflow stops before the commit step if a fetcher fails, so the frontend keeps serving the last good scan rather than a partial one.</p>
+        </div>
+        <div class="card">
+          <h4>NSE archive URL changes</h4>
+          <p>Universe fetching already has a fallback to niftyindices.com. If both restructure, the workflow fails loudly.</p>
+        </div>
+        <div class="card">
+          <h4>Corporate actions / delistings</h4>
+          <p>Demonstrated live with Tata Motors' Oct 2025 demerger. The scanner skips failed tickers gracefully rather than crashing the whole run.</p>
+        </div>
+        <div class="card">
+          <h4>Cron drift / silent drops</h4>
+          <p>Observed 3+ hour late runs and missed slots in July 2026. Mitigated by healthchecks.io + watchdog.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="what-this-is-not">
+      <h2>What this is not</h2>
+      <div class="callout danger">
+        <span class="callout-title">Disclaimer</span>
+        <p>
+          This is <strong>not investment advice</strong> and <strong>not
+          SEBI-registered research</strong>. The scanner is a screening layer
+          built on free, often fragile data sources. It is an experimental
+          product of <a href="https://www.datadab.com" target="_blank" rel="noreferrer">DataDab LLP</a>.
+        </p>
+        <p>
+          Always cross-check any candidate stock against authoritative sources
+          (Screener.in, NSE filings, a SEBI-registered advisor) before acting.
+          The score is a degree-of-match ranking, not a buy/sell signal.
+        </p>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <p>
+        <a href="/">← Back to dashboard</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/amitashwinibhagat/nse-swing-scanner" target="_blank" rel="noreferrer">GitHub</a>
+      </p>
+      <p>
+        © 2026 DataDab LLP. Methodology last updated 2026-07-03.
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      const LS_KEY = 'nseSwingTheme';
+      const html = document.documentElement;
+      const moon = document.getElementById('moonIcon');
+      const sun = document.getElementById('sunIcon');
+      const btn = document.getElementById('themeToggle');
+
+      function setTheme(theme) {
+        html.setAttribute('data-theme', theme);
+        try { localStorage.setItem(LS_KEY, theme); } catch {}
+        if (theme === 'dark') {
+          moon.style.display = 'block';
+          sun.style.display = 'none';
+        } else {
+          moon.style.display = 'none';
+          sun.style.display = 'block';
+        }
+      }
+
+      let theme = 'dark';
+      try { theme = localStorage.getItem(LS_KEY) || theme; } catch {}
+      if (!theme || (theme !== 'dark' && theme !== 'light')) {
+        theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      setTheme(theme);
+
+      btn.addEventListener('click', () => {
+        setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>
