@@ -327,6 +327,8 @@ def evaluate_stock(
     result["delivery_value_inr"] = deliv["delivery_value_inr"]
     result["delivery_qty"] = deliv["delivery_qty"]
     result["delivery_pct"] = deliv["delivery_pct"]
+    result["delivery_kind"] = deliv["delivery_kind"]
+    result["delivery_fallback_from"] = deliv["fallback_from"]
     result["delivery_as_of"] = deliv["as_of"]
     result["delivery_source_status"] = deliv["source_status"]
     result["delivery_source"] = deliv["source"]
@@ -520,8 +522,13 @@ def run_scan(
     print(f"Fetching shared data: surveillance, bhavcopy, nifty50…")
     surveillance_payload = fetch_surveillance_list()
     print(f"  surveillance: status={surveillance_payload['status']}")
-    bhavcopy_payload = fetch_bhavcopy()
-    print(f"  bhavcopy: status={bhavcopy_payload['status']} as_of={bhavcopy_payload.get('as_of')}")
+    universe_symbols = universe["symbol"].tolist()
+    universe_yf_tickers = universe["yf_ticker"].tolist()
+    bhavcopy_payload = fetch_bhavcopy(
+        universe_symbols=universe_symbols,
+        universe_yf_tickers=universe_yf_tickers,
+    )
+    print(f"  bhavcopy: status={bhavcopy_payload['status']} source={bhavcopy_payload.get('source')} as_of={bhavcopy_payload.get('as_of')}")
     nifty = compute_nifty50_context()
     print(f"  nifty50: {nifty.get('index_pct_from_ema200')}% from 200EMA")
 
@@ -670,6 +677,8 @@ def to_json_records(df: pd.DataFrame) -> list:
             "delivery_value_inr": _json_safe(r.get("delivery_value_inr")),
             "delivery_qty": _json_safe(r.get("delivery_qty")),
             "delivery_pct": _json_safe(r.get("delivery_pct")),
+            "delivery_kind": r.get("delivery_kind"),
+            "delivery_fallback_from": r.get("delivery_fallback_from"),
             "delivery_as_of": r.get("delivery_as_of"),
             "delivery_source_status": r.get("delivery_source_status"),
             "delivery_source": r.get("delivery_source"),

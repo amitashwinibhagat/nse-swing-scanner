@@ -43,7 +43,7 @@ const TERMS = [
   {
     term: "DEL. VAL (₹cr)",
     body:
-      "Today's delivery value in ₹ crores from NSE bhavcopy. As of mid-2026 the NSE archive is paywalled behind Akamai; with --lenient-external-gates the scanner marks this as source_failed and the gate still passes — the source-status pill in the detail drawer tells you which rows got fresh data vs fell back.",
+      "Today's delivery value in ₹ crores from a multi-provider chain. The scanner tries (1) NSE bhavcopy, (2) yfinance traded-value proxy (volume × close), (3) BSE bhavcopy. When NSE is reachable you get real delivery data; when it's blocked by Akamai, the yfinance proxy reports traded value (typically 2-3× delivery value) and the UI labels it with a 'proxy' badge so you can tell the difference. Traded-value proxy rows automatically pass the ₹5 cr threshold check via --lenient-external-gates.",
   },
   {
     term: "HOLD %",

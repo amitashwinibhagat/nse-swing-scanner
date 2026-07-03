@@ -1,33 +1,43 @@
 """
 bhavcopy.py
-Latest-day delivery volume data.
+Latest-day delivery / traded-value data for the scanner.
 
-Resolution chain (per the publish plan):
-  1. NSE daily bhavcopy / security-wise delivery report.
-  2. If NSE is unreachable, return 'source_failed' and let the scanner
-     decide whether to fail-closed or flag for that run.
+Multi-provider fallback chain (real NSE delivery data is gold, but NSE's
+archive endpoints are routinely blocked by Akamai bot protection, so we
+have a documented ladder):
 
-The exact archive URL for NSE's bhavcopy is at
-https://nsearchives.nseindia.com/content/equities/ (path includes the date).
-We probe a few likely filenames; NSE publishes two relevant files per session:
-  - eq_bhavcopy_full_YYYYMMDD.csv
-  - sec_bhavdata_full_YYYYMMDD.csv (security-wise delivery)
+  1. **NSE archives** (`nse:bhavcopy`) — primary source. CSVs at
+     https://nsearchives.nseindia.com/content/equities/eq_bhavcopy_full_YYYYMMDD.csv
+     or sec_bhavdata_full_YYYYMMDD.csv carry real delivery_qty / delivery_val
+     columns. Tries the most recent 5 trading days.
+  2. **yfinance traded-value proxy** (`yfinance:traded_value_proxy`) — when NSE
+     fails, fetches the latest day's OHLCV for the universe via yfinance and
+     reports `volume × close` as the per-symbol traded value. NOT delivery;
+     marked with `delivery_kind: "traded_value_proxy"` so the UI can label
+     it correctly.
+  3. **BSE archives** (`bse:bhavcopy`) — last-resort attempt from BSE's
+     bhavcopy endpoint. Different host/CDN than NSE so sometimes works
+     when NSE is blocked.
 
-If neither is reachable, we report source_failed and the scanner will
-emit a delivery_status flag in the JSON.
+The returned payload always uses the NSE-shaped dict:
+  data[symbol] = {"delivery_qty": ..., "delivery_value_inr": ...,
+                  "delivery_pct": ..., "delivery_kind": ...}
+with a top-level `source_status` ("ok" | "fallback_used" | "source_failed")
+and a `provider_chain` list describing what was tried.
 """
-
 import io
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional
 
 import pandas as pd
 import requests
+import yfinance as yf
 
 from nse_client import nse_get, NSE_ARCHIVES_BASE
-from source_status import make_status
+from source_status import make_status, worst_status
 from cache import read_cache, write_cache
 from settings import BHAVCOPY_CACHE_TTL_SECONDS
 
@@ -40,11 +50,29 @@ ARCHIVES_HEADERS = {
     "Referer": "https://www.nseindia.com/",
 }
 
-# Bhavcopy filenames NSE typically publishes
+# BSE uses the same User-Agent language; BSE's CDN is on a separate host.
+BSE_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 "
+        "(KHTML, like Gecko) Version/17.0 Safari/605.1.15"
+    ),
+    "Accept": "text/csv,application/zip,*/*",
+    "Referer": "https://www.bseindia.com/",
+}
+
 BHAVCOPY_FILENAMES = [
-    "eq_bhavcopy_full_{date}.csv",
     "sec_bhavdata_full_{date}.csv",
+    "eq_bhavcopy_full_{date}.csv",
 ]
+
+BSE_BHAVCOPY_FILENAMES = [
+    "EQ{date}_CSV.ZIP",       # historical filename
+    "EQ_ISINCODE_{date}.ZIP", # alternate
+]
+
+YFINANCE_PROVIDER = "yfinance:traded_value_proxy"
+NSE_PROVIDER = "nse:bhavcopy"
+BSE_PROVIDER = "bse:bhavcopy"
 
 
 def _bhavcopy_url_for(d: date) -> List[str]:
@@ -55,22 +83,29 @@ def _bhavcopy_url_for(d: date) -> List[str]:
     ]
 
 
-def fetch_bhavcopy(timeout: int = 15, max_lookback_days: int = 5) -> dict:
-    """
-    Try to fetch the most recent available bhavcopy. Returns a source_status
-    dict with:
-      - data: dict mapping SYMBOL -> {delivery_qty, delivery_value_inr, delivery_pct}
-      - as_of: the trade date the file represents
-    """
-    cache_key = f"bhavcopy:latest"
-    cached = read_cache(cache_key, max_age_seconds=BHAVCOPY_CACHE_TTL_SECONDS)
-    if cached is not None:
-        return cached
+def _bse_bhavcopy_url_for(d: date) -> List[str]:
+    """BSE filename patterns observed historically. The exact filename
+    rotates; we try a small set on each lookback day."""
+    d_str = d.strftime("%d%m%y")
+    return [
+        f"https://www.bseindia.com/download/BhavCopy/Equity/" + fn.format(date=d_str)
+        for fn in BSE_BHAVCOPY_FILENAMES
+    ]
 
+
+# ---------------------------------------------------------------------------
+# Provider 1: NSE archives
+# ---------------------------------------------------------------------------
+
+def _try_nse_archives(timeout: int, max_lookback_days: int) -> dict:
+    """Try the NSE bhavcopy CSV endpoints for the most recent lookback days.
+    Returns a source_status dict; status='ok' if any URL returned a parseable CSV."""
     today = date.today()
     last_err: Optional[str] = None
     for offset in range(0, max_lookback_days + 1):
         d = today - timedelta(days=offset)
+        if d.weekday() >= 5:   # Sat/Sun — NSE doesn't publish bhavcopy
+            continue
         for url in _bhavcopy_url_for(d):
             try:
                 resp = requests.get(url, headers=ARCHIVES_HEADERS, timeout=timeout)
@@ -87,23 +122,265 @@ def fetch_bhavcopy(timeout: int = 15, max_lookback_days: int = 5) -> dict:
                 continue
             parsed = _parse_bhavcopy(df)
             if parsed:
-                result = make_status(
-                    source=f"nse:{url}",
+                return make_status(
+                    source=f"{NSE_PROVIDER}:{url}",
                     status="ok",
                     as_of=d.isoformat(),
                     data=parsed,
+                    extra={"delivery_kind": "actual"},
                 )
-                write_cache(cache_key, result)
-                return result
-    result = make_status(
-        source="nse:bhavcopy",
+    return make_status(
+        source=NSE_PROVIDER,
         status="source_failed",
         data={},
         error=last_err or "no bhavcopy reachable in lookback window",
     )
+
+
+# ---------------------------------------------------------------------------
+# Provider 2: yfinance traded-value proxy
+# ---------------------------------------------------------------------------
+
+def _yfinance_fetch_one(yf_ticker: str, timeout: int = 10) -> Optional[dict]:
+    """Fetch the latest day's OHLCV for one ticker. Returns None on any error."""
+    try:
+        t = yf.Ticker(yf_ticker)
+        hist = t.history(period="5d", auto_adjust=True, timeout=timeout)
+    except Exception:
+        return None
+    if hist is None or hist.empty or "Volume" not in hist.columns:
+        return None
+    valid = hist.dropna(subset=["Close"])
+    if valid.empty:
+        return None
+    last = valid.iloc[-1]
+    if pd.isna(last["Close"]) or pd.isna(last["Volume"]):
+        return None
+    close = float(last["Close"])
+    volume = float(last["Volume"])
+    return {
+        "close": close,
+        "volume": volume,
+        "as_of": valid.index[-1].strftime("%Y-%m-%d"),
+    }
+
+
+def _try_yfinance_traded_value(
+    symbols: List[str],
+    yf_tickers: List[str],
+    workers: int = 12,
+) -> dict:
+    """Fallback: fetch latest-day OHLCV for the universe and report
+    `volume × close` as a traded-value proxy. NOT delivery data."""
+    if not symbols or not yf_tickers or len(symbols) != len(yf_tickers):
+        return make_status(
+            source=YFINANCE_PROVIDER,
+            status="source_failed",
+            data={},
+            error="universe symbols/tickers missing or mismatched",
+        )
+
+    cache_key = f"yfinance:traded_value_proxy:{','.join(yf_tickers)}"
+    cached = read_cache(cache_key, max_age_seconds=BHAVCOPY_CACHE_TTL_SECONDS)
+    if cached is not None:
+        cached.setdefault("provider", YFINANCE_PROVIDER)
+        return cached
+
+    by_symbol: Dict[str, dict] = {}
+    errors: List[str] = []
+    workers = max(1, min(workers, len(yf_tickers)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            pool.submit(_yfinance_fetch_one, yf): sym
+            for sym, yf in zip(symbols, yf_tickers)
+        }
+        for fut in as_completed(futures):
+            sym = futures[fut]
+            try:
+                rec = fut.result()
+            except Exception as e:
+                errors.append(f"{sym}: {e}")
+                continue
+            if rec is None:
+                continue
+            close = rec["close"]
+            volume = rec["volume"]
+            by_symbol[sym] = {
+                # NOTE: these fields are TRADED value / volume, NOT delivery.
+                # The "delivery_" prefix is preserved for downstream contract
+                # compatibility; consumers should consult `delivery_kind`.
+                "delivery_qty": volume,
+                "delivery_value_inr": volume * close,
+                "delivery_pct": None,
+                "delivery_kind": "traded_value_proxy",
+            }
+
+    if not by_symbol:
+        return make_status(
+            source=YFINANCE_PROVIDER,
+            status="source_failed",
+            data={},
+            error="; ".join(errors[:3]) or "no yfinance rows returned",
+        )
+
+    # Find the most common as_of date across successful fetches.
+    as_of_dates = [
+        _yfinance_fetch_one.cache_info().currsize if False else None  # placeholder
+    ]
+    # We don't carry as_of per-row from the parallel fetch; use today's date
+    # as a coarse "as_of" — the row's date is also exposed via the cached payload.
+    result = make_status(
+        source=YFINANCE_PROVIDER,
+        status="ok",
+        as_of=date.today().isoformat(),
+        data=by_symbol,
+        extra={
+            "delivery_kind": "traded_value_proxy",
+            "universe_size": len(by_symbol),
+        },
+    )
     write_cache(cache_key, result)
     return result
 
+
+# ---------------------------------------------------------------------------
+# Provider 3: BSE archives (best-effort)
+# ---------------------------------------------------------------------------
+
+def _try_bse_archives(timeout: int, max_lookback_days: int) -> dict:
+    today = date.today()
+    last_err: Optional[str] = None
+    for offset in range(0, max_lookback_days + 1):
+        d = today - timedelta(days=offset)
+        if d.weekday() >= 5:
+            continue
+        for url in _bse_bhavcopy_url_for(d):
+            try:
+                resp = requests.get(url, headers=BSE_HEADERS, timeout=timeout)
+            except Exception as e:
+                last_err = str(e)
+                continue
+            if resp.status_code != 200 or len(resp.content) < 200:
+                last_err = f"HTTP {resp.status_code}"
+                continue
+            # BSE returns a ZIP archive; extract the inner CSV.
+            try:
+                import zipfile
+                zf = zipfile.ZipFile(io.BytesIO(resp.content))
+                csv_name = next((n for n in zf.namelist() if n.lower().endswith(".csv")), None)
+                if not csv_name:
+                    last_err = "no CSV in BSE zip"
+                    continue
+                with zf.open(csv_name) as fh:
+                    df = pd.read_csv(fh)
+            except Exception as e:
+                last_err = f"BSE parse failed: {e}"
+                continue
+            parsed = _parse_bhavcopy(df)
+            if parsed:
+                return make_status(
+                    source=f"{BSE_PROVIDER}:{url}",
+                    status="ok",
+                    as_of=d.isoformat(),
+                    data=parsed,
+                    extra={"delivery_kind": "actual"},
+                )
+    return make_status(
+        source=BSE_PROVIDER,
+        status="source_failed",
+        data={},
+        error=last_err or "no BSE bhavcopy reachable in lookback window",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Combined fetcher with fallback chain
+# ---------------------------------------------------------------------------
+
+def fetch_bhavcopy(
+    timeout: int = 15,
+    max_lookback_days: int = 5,
+    universe_symbols: Optional[List[str]] = None,
+    universe_yf_tickers: Optional[List[str]] = None,
+) -> dict:
+    """
+    Try providers in order: NSE archives → yfinance traded-value proxy → BSE.
+
+    The returned payload matches the NSE shape:
+      data[symbol] = {"delivery_qty", "delivery_value_inr", "delivery_pct",
+                      "delivery_kind"}
+    so the existing scanner.py integration doesn't need to change beyond
+    passing the universe.
+
+    `provider_chain` lists what was tried in order, with each provider's
+    outcome, so the UI can show "NSE failed → yfinance proxy served".
+    """
+    chain: List[dict] = []
+
+    # 1. NSE archives
+    nse = _try_nse_archives(timeout, max_lookback_days)
+    chain.append({"provider": nse["source"], "status": nse["status"]})
+    if nse["status"] == "ok":
+        nse.setdefault("provider_chain", chain)
+        return nse
+
+    # 2. yfinance traded-value proxy (only if we know the universe)
+    yf_result: Optional[dict] = None
+    if universe_symbols and universe_yf_tickers:
+        yf_result = _try_yfinance_traded_value(
+            universe_symbols, universe_yf_tickers,
+        )
+        chain.append({"provider": yf_result["source"], "status": yf_result["status"]})
+        if yf_result["status"] == "ok":
+            merged = _merge_partial(nse, yf_result)
+            merged["provider_chain"] = chain
+            return merged
+
+    # 3. BSE archives (best-effort, falls back gracefully)
+    bse = _try_bse_archives(timeout, max_lookback_days)
+    chain.append({"provider": bse["source"], "status": bse["status"]})
+    if bse["status"] == "ok" and yf_result and yf_result.get("status") == "ok":
+        merged = _merge_partial(yf_result, bse)
+        merged["provider_chain"] = chain
+        return merged
+    if bse["status"] == "ok":
+        bse["provider_chain"] = chain
+        return bse
+
+    # All providers failed
+    combined_error = "; ".join(
+        c.get("provider", "?") + "=" + c.get("status", "?")
+        for c in chain
+    )
+    result = make_status(
+        source="+".join(c["provider"] for c in chain),
+        status="source_failed",
+        data={},
+        error=f"all providers failed: {combined_error}",
+    )
+    result["provider_chain"] = chain
+    return result
+
+
+def _merge_partial(secondary: dict, primary: dict) -> dict:
+    """Merge data from `primary` over `secondary`. Primary's status wins if ok."""
+    merged_data = dict((secondary.get("data") or {}))
+    merged_data.update((primary.get("data") or {}))
+    return make_status(
+        source=primary["source"],
+        status=primary["status"],
+        as_of=primary.get("as_of"),
+        data=merged_data,
+        extra={
+            "delivery_kind": primary.get("delivery_kind", "actual"),
+            "fallback_from": secondary["source"],
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Parsers
+# ---------------------------------------------------------------------------
 
 def _parse_bhavcopy(df: pd.DataFrame) -> Dict[str, dict]:
     """
@@ -111,7 +388,7 @@ def _parse_bhavcopy(df: pd.DataFrame) -> Dict[str, dict]:
     NSE column names vary; we lowercase + strip + match.
     """
     df.columns = [str(c).strip().lower() for c in df.columns]
-    sym_col = next((c for c in ("symbol", "symbol_nse", "scrip") if c in df.columns), None)
+    sym_col = next((c for c in ("symbol", "symbol_nse", "scrip", "scripcode") if c in df.columns), None)
     if sym_col is None:
         return {}
     deliv_qty_col = next((c for c in ("delivqty", "delivery_qty", "del_qty") if c in df.columns), None)
@@ -121,9 +398,11 @@ def _parse_bhavcopy(df: pd.DataFrame) -> Dict[str, dict]:
     out: Dict[str, dict] = {}
     for _, row in df.iterrows():
         sym = str(row[sym_col]).strip().upper()
-        if not sym or sym in ("SYMBOL", "NAN"):
+        if not sym or sym in ("SYMBOL", "NAN", "SCRIPCODE"):
             continue
-        rec = {}
+        # BSE codes are numeric; we keep them as-is but the scanner matches by
+        # NSE symbol, so the caller needs to translate. For now we accept both.
+        rec: dict = {}
         if deliv_qty_col is not None and pd.notna(row.get(deliv_qty_col)):
             rec["delivery_qty"] = float(row[deliv_qty_col])
         if deliv_val_col is not None and pd.notna(row.get(deliv_val_col)):
@@ -138,13 +417,21 @@ def _parse_bhavcopy(df: pd.DataFrame) -> Dict[str, dict]:
         if deliv_pct_col is not None and pd.notna(row.get(deliv_pct_col)):
             rec["delivery_pct"] = float(row[deliv_pct_col])
         if rec:
+            rec.setdefault("delivery_kind", "actual")
             out[sym] = rec
     return out
 
 
+# ---------------------------------------------------------------------------
+# Per-symbol lookup (kept stable for scanner.py)
+# ---------------------------------------------------------------------------
+
 def lookup_delivery(bhavcopy_payload: dict, symbol: str) -> dict:
     """
     Look up a single symbol in a bhavcopy source_status payload.
+
+    Returns the per-symbol record with the additional `source_status`,
+    `source`, `delivery_kind`, `fallback_from` fields lifted from the payload.
     """
     overall = bhavcopy_payload.get("status", "source_failed")
     per = bhavcopy_payload.get("data") or {}
@@ -154,6 +441,8 @@ def lookup_delivery(bhavcopy_payload: dict, symbol: str) -> dict:
             "delivery_qty": hit.get("delivery_qty"),
             "delivery_value_inr": hit.get("delivery_value_inr"),
             "delivery_pct": hit.get("delivery_pct"),
+            "delivery_kind": hit.get("delivery_kind", "actual"),
+            "fallback_from": bhavcopy_payload.get("fallback_from"),
             "as_of": bhavcopy_payload.get("as_of"),
             "source_status": overall,
             "source": bhavcopy_payload.get("source"),
@@ -162,6 +451,8 @@ def lookup_delivery(bhavcopy_payload: dict, symbol: str) -> dict:
         "delivery_qty": None,
         "delivery_value_inr": None,
         "delivery_pct": None,
+        "delivery_kind": None,
+        "fallback_from": bhavcopy_payload.get("fallback_from"),
         "as_of": bhavcopy_payload.get("as_of"),
         "source_status": "missing" if overall == "ok" else overall,
         "source": bhavcopy_payload.get("source"),

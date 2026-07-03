@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.1.5 — Multi-provider delivery data with yfinance traded-value proxy
+
+### Changed
+
+- `backend/bhavcopy.py`: replaced single-source NSE fetch with a
+  three-provider fallback chain. When NSE bhavcopy is blocked by Akamai
+  (the persistent state since mid-2026), the scanner now reports
+  real-looking data from yfinance's daily OHLCV (`volume × close`) as a
+  traded-value proxy, and BSE archives as a last resort.
+
+### Added
+
+- `delivery_kind` field on each stock's record. Values:
+  - `"actual"` — real delivery data from NSE or BSE bhavcopy
+  - `"traded_value_proxy"` — fallback proxy from yfinance (volume × close;
+    typically 2-3× real delivery value because it includes intraday trades)
+- `delivery_fallback_from` field naming the original source the proxy
+  replaced (e.g. `"nse:bhavcopy"`).
+- Frontend proxy badge: rows with `delivery_kind == "traded_value_proxy"`
+  display a yellow `proxy` chip next to the value, with a tooltip
+  explaining the source. The label switches from "Delivery (₹cr)" to
+  "Traded val (₹cr)" so the column header is honest about the data.
+- `provider_chain` list in the bhavcopy source_status payload, recording
+  which providers were tried and their outcomes.
+
+### Trade-off
+
+The ₹5 cr delivery gate uses the proxy value when NSE is unreachable,
+which is approximately 2-3× the real delivery threshold. So rows that
+fail the real NSE gate would have passed the proxy gate. The badge in
+the UI makes this visible. When NSE returns, the gate tightens back to
+real delivery data automatically.
+
 ## 1.1.4 — Bump GitHub Actions to drop Node 20 deprecation warning
 
 ### Changed

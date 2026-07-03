@@ -110,7 +110,7 @@ def test_run_scan_uses_thread_pool(monkeypatch):
         call_log.append("fetch_surveillance_list")
         return stubs["fetch_surveillance_list"]
 
-    def fake_fetch_bhavcopy():
+    def fake_fetch_bhavcopy(*, universe_symbols=None, universe_yf_tickers=None):
         call_log.append("fetch_bhavcopy")
         return stubs["fetch_bhavcopy"]
 
@@ -161,7 +161,7 @@ def test_run_scan_workers_capped_to_universe_size(monkeypatch):
 
     monkeypatch.setattr(scanner, "fetch_universe", lambda *a, **k: fake_universe)
     monkeypatch.setattr(scanner, "fetch_surveillance_list", lambda: stubs["fetch_surveillance_list"])
-    monkeypatch.setattr(scanner, "fetch_bhavcopy", lambda: stubs["fetch_bhavcopy"])
+    monkeypatch.setattr(scanner, "fetch_bhavcopy", lambda *, universe_symbols=None, universe_yf_tickers=None: stubs["fetch_bhavcopy"])
     monkeypatch.setattr(scanner, "compute_nifty50_context", lambda: stubs["compute_nifty50_context"])
     monkeypatch.setattr(scanner, "fetch_holdings", lambda s: stubs["fetch_holdings"])
     monkeypatch.setattr(scanner, "fetch_corporate_actions", lambda s: stubs["fetch_corporate_actions"])
@@ -179,7 +179,7 @@ def test_run_scan_worker_exception_does_not_kill_scan(monkeypatch):
 
     monkeypatch.setattr(scanner, "fetch_universe", lambda *a, **k: fake_universe)
     monkeypatch.setattr(scanner, "fetch_surveillance_list", lambda: stubs["fetch_surveillance_list"])
-    monkeypatch.setattr(scanner, "fetch_bhavcopy", lambda: stubs["fetch_bhavcopy"])
+    monkeypatch.setattr(scanner, "fetch_bhavcopy", lambda *, universe_symbols=None, universe_yf_tickers=None: stubs["fetch_bhavcopy"])
     monkeypatch.setattr(scanner, "compute_nifty50_context", lambda: stubs["compute_nifty50_context"])
     monkeypatch.setattr(scanner, "fetch_holdings", lambda s: stubs["fetch_holdings"])
     monkeypatch.setattr(scanner, "fetch_corporate_actions", lambda s: stubs["fetch_corporate_actions"])

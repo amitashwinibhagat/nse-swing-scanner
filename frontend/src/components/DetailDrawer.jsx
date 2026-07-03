@@ -110,7 +110,14 @@ export default function DetailDrawer({ stock, onClose }) {
                   <b>{stock.f_score ?? "—"}/9</b>
                 </li>
                 <li>
-                  <span>Delivery (₹cr)</span>
+                  <span>
+                    {stock.delivery_kind === "traded_value_proxy" ? "Traded val (₹cr)" : "Delivery (₹cr)"}
+                    {stock.delivery_kind === "traded_value_proxy" && (
+                      <span className="proxy-badge" title={`Source: ${stock.delivery_source || "yfinance proxy"}. This is total traded value (volume × close), NOT delivery volume — NSE bhavcopy was unreachable so yfinance served as a proxy.`}>
+                        proxy
+                      </span>
+                    )}
+                  </span>
                   <b>{fmtCr(stock.delivery_value_inr)}</b>
                 </li>
                 <li>

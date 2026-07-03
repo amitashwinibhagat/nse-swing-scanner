@@ -152,7 +152,7 @@ function exportCsv(rows, filename = "nse_swing_scan.csv") {
     "current_price", "pct_off_52wk_high", "rsi14", "atr14",
     "entry_zone_low", "entry_zone_high", "stop_loss", "target_1", "target_2",
     "risk_reward_target_1", "risk_reward_target_2",
-    "delivery_value_inr", "delivery_qty", "delivery_pct", "delivery_as_of",
+    "delivery_value_inr", "delivery_qty", "delivery_pct", "delivery_as_of", "delivery_kind", "delivery_source", "delivery_source_status",
     "surveillance_is_restricted", "surveillance_restriction_type", "surveillance_source_status",
     "holdings_promoter_pct", "holdings_fii_pct", "holdings_dii_pct", "holdings_conviction_pct",
     "pending_corporate_action", "f_score", "trailing_pe", "avg_pe_5y", "gate_fail_reason",
@@ -667,7 +667,10 @@ export default function App() {
                   <td>{fmt(s.rsi14, 1)}</td>
                   <td>{fmtPrice(s.target_1)}</td>
                   <td>{fmtPrice(s.stop_loss)}</td>
-                  <td>{fmtCr(s.delivery_value_inr)}</td>
+                  <td title={s.delivery_kind === "traded_value_proxy" ? "Traded-value proxy: volume × close from yfinance (NSE bhavcopy unreachable)" : "NSE delivery value"}>
+                    {fmtCr(s.delivery_value_inr)}
+                    {s.delivery_kind === "traded_value_proxy" && <span className="proxy-badge"> proxy</span>}
+                  </td>
                   <td>{fmt(s.holdings_conviction_pct, 1, "%")}</td>
                   <td>{s.f_score ?? <span className="na">—</span>}/9</td>
                   <td>
@@ -685,7 +688,13 @@ export default function App() {
                             <h4>Hard gates</h4>
                             <ul className="kv">
                               <li><span>F-Score</span><b>{s.f_score ?? "—"}/9</b></li>
-                              <li><span>Delivery (₹cr)</span><b>{fmtCr(s.delivery_value_inr)}</b></li>
+                              <li>
+                                <span>
+                                  {s.delivery_kind === "traded_value_proxy" ? "Traded val (₹cr)" : "Delivery (₹cr)"}
+                                  {s.delivery_kind === "traded_value_proxy" && <span className="proxy-badge">proxy</span>}
+                                </span>
+                                <b>{fmtCr(s.delivery_value_inr)}</b>
+                              </li>
                               <li><span>Holdings conviction</span><b>{fmt(s.holdings_conviction_pct, 1, "%")}</b></li>
                               <li><span>T-group / suspension</span><b>{s.surveillance_is_restricted ? `YES (${s.surveillance_restriction_type})` : "no"}</b></li>
                               <li><span>Pending corporate action</span><b>{s.pending_corporate_action ? "YES" : "no"}</b></li>
