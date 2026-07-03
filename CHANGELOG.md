@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.1.6 — Cron drift monitoring: healthchecks.io pings + watchdog workflow
+
+### Added
+
+- `.github/workflows/scan.yml`: three new ping steps that hit a
+  healthchecks.io URL at `/start`, `/fail`, and the success endpoint.
+  Optional via `HEALTHCHECK_PING_URL` repo secret; absent → no-op with
+  `::notice::` log.
+- `.github/workflows/watchdog.yml`: redundant cron that runs every 15
+  min during market hours (01:00–11:30 UTC). Checks `latest_scan.json`
+  age on `main` and, if stale >45 min, fires `gh workflow run scan.yml`
+  for self-recovery. Pings its own healthchecks.io URL with `?stale=`
+  and `?age_min=` query params so alerts carry context.
+- README § "Monitoring (healthchecks.io + watchdog)" with the full
+  one-time setup procedure.
+
+### Why
+
+GitHub Actions scheduled cron is best-effort. The 16:00 IST (10:30 UTC)
+cron on 2026-07-03 did not fire at all. Recent prior crons drifted
+1h54m–3h18m late. healthchecks.io detects missed/failed runs via
+absent or `/fail` pings; the watchdog provides a redundant backstop
+that can also auto-trigger a recovery scan.
+
+### Operator setup required
+
+1. Sign up at <https://healthchecks.io> (free).
+2. Create two checks for the scan slots (period 12h, grace 4h).
+3. Create one check for the watchdog (period 1h, grace 1h).
+4. Set three GitHub Actions secrets: `HEALTHCHECK_PING_URL`,
+   `HEALTHCHECK_WATCHDOG_URL`. (See README for details.)
+
 ## 1.1.5 — Multi-provider delivery data with yfinance traded-value proxy
 
 ### Changed

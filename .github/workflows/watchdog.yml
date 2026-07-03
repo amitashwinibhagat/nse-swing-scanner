@@ -1,0 +1,98 @@
+name: Watchdog (cron drift detector)
+
+# GitHub Actions scheduled workflows are best-effort and can drift hours
+# or be silently dropped during runner incidents. We saw cron fire 3h+ late
+# on 2026-07-02 / 2026-07-03, and the 16:00 IST cron on 2026-07-03 did
+# not fire at all. This watchdog is a redundant cron (every 15 min during
+# market hours) that:
+#
+#   1. Checks if the latest_scan.json on main is fresh.
+#   2. If stale, fires a `repository_dispatch` event that the scan.yml
+#      workflow can listen to (alternative: a `workflow_dispatch`).
+#   3. Pings healthchecks.io with its own UUID so we get alerted if THIS
+#      cron also drifts — defense in depth against the upstream issue.
+#
+# Recommended healthchecks.io configuration for the watchdog ping:
+#   Period: 1h
+#   Grace:  1h
+#   (i.e. an alert fires if no watchdog ping arrives within 2 hours
+#   during a UTC weekday business window)
+
+on:
+  schedule:
+    # Every 15 min between 01:00 and 11:30 UTC (06:30 - 17:00 IST).
+    # Tight loop catches GH cron drift within the market-day window.
+    - cron: "*/15 1-11 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read   # only needs to read main; scan.yml runs separately
+  actions: write   # to trigger scan.yml via gh workflow run if stale
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check latest_scan.json freshness on main
+        id: check
+        run: |
+          set -e
+          echo "Fetching latest commit for frontend/public/data/latest_scan.json…"
+          latest=$(curl -fsSL \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/commits?path=frontend/public/data/latest_scan.json&per_page=1" \
+            | jq -r '.[0].commit.committer.date // empty')
+
+          if [ -z "$latest" ]; then
+            echo "::error::No scan commit found on main — first scan has not yet landed."
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "age_min=9999" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Latest scan committed at: $latest"
+          # GNU date on the runner handles ISO-8601 directly.
+          latest_ts=$(date -d "$latest" +%s)
+          now_ts=$(date -u +%s)
+          age_min=$(( (now_ts - latest_ts) / 60 ))
+          echo "Age: ${age_min} minutes"
+
+          # Threshold: 45 min covers the worst expected scan duration
+          # (cold-cache ~5-7 min + drift ~30 min) with margin.
+          if [ "$age_min" -gt 45 ]; then
+            echo "STALE — triggering scan.yml workflow_dispatch."
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "FRESH — no action."
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "age_min=$age_min" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger scan.yml workflow if stale
+        if: steps.check.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run scan.yml \
+            --repo "${{ github.repository }}" \
+            --ref main
+          echo "Triggered scan.yml. New run will appear in Actions shortly."
+
+      - name: Ping healthchecks.io (watchdog status)
+        if: always()
+        env:
+          STALE: ${{ steps.check.outputs.stale || 'unknown' }}
+          AGE_MIN: ${{ steps.check.outputs.age_min || 'unknown' }}
+        continue-on-error: true
+        run: |
+          if [ -n "${{ secrets.HEALTHCHECK_WATCHDOG_URL }}" ]; then
+            url="${{ secrets.HEALTHCHECK_WATCHDOG_URL }}"
+            # Append query string so healthchecks.io logs the watchdog state.
+            ping_url="${url}?stale=${STALE}&age_min=${AGE_MIN}"
+            curl -fsS -m 10 --retry 3 "$ping_url" \
+              || echo "::warning::healthchecks.io watchdog ping failed"
+          else
+            echo "::notice::HEALTHCHECK_WATCHDOG_URL secret not set; skipping watchdog ping."
+          fi

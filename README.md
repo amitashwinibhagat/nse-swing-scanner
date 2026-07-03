@@ -5,6 +5,12 @@ the scan twice daily and commits the results; Netlify serves a static React
 frontend that reads them. No servers to run, no secrets to manage, $0 hosting
 cost.
 
+> **Reliability note:** GitHub Actions scheduled workflows are **best-effort**
+> and have been observed to drift hours late or be silently dropped during
+> runner incidents. The 16:00 IST cron on 2026-07-03 did not fire at all.
+> See **§ Monitoring (healthchecks.io + watchdog)** below for the alerting
+> and self-recovery layer.
+
 > **Not investment advice. Not SEBI-registered research.** Always
 > cross-check any candidate stock against authoritative sources
 > (Screener.in, NSE filings, a SEBI-registered advisor) before acting.
@@ -213,6 +219,84 @@ npm run dev   # http://localhost:5173
 - **Corporate actions / delistings mid-universe**: demonstrated live
   (Tata Motors' Oct 2025 demerger broke the old ticker). The scanner
   skips failed tickers gracefully rather than crashing the whole run.
+- **GitHub Actions cron drift / silent drops**: observed 3+ hour late
+  runs and missed slots in 2026-07. Mitigated by the monitoring layer
+  below.
+
+## Monitoring (healthchecks.io + watchdog)
+
+GitHub Actions cron is best-effort. To detect missed runs and self-recover,
+we layer two complementary mechanisms on top of the schedule.
+
+### 1. healthchecks.io pings in `.github/workflows/scan.yml`
+
+The scan workflow pings a healthchecks.io URL at three points:
+
+| Step | URL | When |
+|---|---|---|
+| Scan started | `/{HEALTHCHECK_PING_URL}/start` | First step (after checkout) |
+| Scan failed | `/{HEALTHCHECK_PING_URL}/fail` | Any step in the job failed |
+| Scan succeeded | `/{HEALTHCHECK_PING_URL}` | Job completed without error |
+
+If no ping arrives within the configured period+grace, healthchecks.io
+emails/Slacks you. **No ping = cron didn't fire. `/fail` ping = cron fired
+but the run errored.**
+
+#### One-time setup
+
+1. Sign up at <https://healthchecks.io> (free tier: 20 checks).
+2. Create **two** checks — one per scheduled slot:
+   - **Morning check** (`09:00 IST = 03:30 UTC`)
+     - Name: `NSE Swing Scan — morning`
+     - Period: `12 hours`, Grace: `4 hours`
+     - Schedule: `03:30 UTC` daily (Mon–Fri)
+   - **Evening check** (`16:00 IST = 10:30 UTC`)
+     - Name: `NSE Swing Scan — evening`
+     - Period: `12 hours`, Grace: `4 hours`
+     - Schedule: `10:30 UTC` daily (Mon–Fri)
+3. Copy each check's UUID URL into a single GitHub secret that points to
+   the morning slot. (When you only have one secret, both crons ping it;
+   healthchecks.io will alert if **either** slot misses. To distinguish
+   morning vs evening, set up two separate secrets — `HEALTHCHECK_PING_URL_MORNING`
+   and `HEALTHCHECK_PING_URL_EVENING` — and wire them into scan.yml. The
+   current single-secret setup is fine for "did anything run today?" detection.)
+4. Configure alert channels (email is on by default; Slack/PagerDuty/Discord
+   integrations are under Integrations → Add).
+5. Set the GitHub Actions secret: repo **Settings → Secrets and variables
+   → Actions → New repository secret**, name `HEALTHCHECK_PING_URL`, value
+   `https://hc-ping.com/{uuid}` (without `/start` or `/fail` — the workflow
+   appends those).
+
+### 2. Watchdog workflow (`.github/workflows/watchdog.yml`)
+
+A redundant cron that runs every 15 minutes during market hours and:
+
+- Checks if `latest_scan.json` on `main` is older than 45 minutes.
+- If stale, fires `gh workflow run scan.yml` to kick off a recovery scan.
+- Pings its own healthchecks.io URL with `?stale=...&age_min=...` query
+  params so the alert message tells you which slot was missed.
+
+Setup: create a third healthchecks.io check, copy its URL into the
+`HEALTHCHECK_WATCHDOG_URL` repo secret.
+
+**Why this works as a backstop:** if the main scan cron drifts but doesn't
+fully miss, the watchdog's tight 15-min loop will see the stale JSON and
+trigger a recovery scan before healthchecks.io would even alert. If the
+main cron entirely misses, both healthchecks.io (no scan ping) and the
+watchdog's own ping serve as redundant alarms.
+
+### 3. Manual recovery
+
+If healthchecks.io alerts you, open the Actions tab and click "Run
+workflow" on `NSE Swing Scan` (or the `Watchdog` workflow) to trigger
+immediately. The recovery scan completes in 30–90 s warm-cache.
+
+### Why not a paid cron service?
+
+You can swap the watchdog for cron-job.org, EasyCron, GitLab CI scheduled
+pipelines, or any external scheduler that POSTs to GitHub's
+`/repos/{owner}/{repo}/dispatches` endpoint. The current watchdog + ping
+stack is free and uses infrastructure you already own.
 
 ## License
 

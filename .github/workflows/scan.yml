@@ -54,9 +54,45 @@ jobs:
         # source is source_failed (NSE bhavcopy is behind Akamai bot
         # protection, Screener sometimes rate-limits the runner IP). The
         # source status is still surfaced in the JSON and UI badge.
-        # If NSE/yfinance/Screener rate-limits mid-run, this step fails and
-        # the workflow stops WITHOUT committing a partial/corrupt file —
-        # the frontend keeps serving the last good scan until the next run.
+# If NSE/yfinance/Screener rate-limits mid-run, this step fails and
+    # the workflow stops WITHOUT committing a partial/corrupt file —
+    # the frontend keeps serving the last good scan until the next run.
+
+      - name: Ping healthchecks.io (scan started)
+        if: ${{ github.event_name == 'schedule' }}
+        # Proves the GitHub cron fired. healthchecks.io resets its "last
+        # ping" timer on any successful ping — including /start — so a
+        # /start ping is informational and an additional success ping
+        # later just keeps the check green.
+        continue-on-error: true
+        run: |
+          if [ -n "${{ secrets.HEALTHCHECK_PING_URL }}" ]; then
+            curl -fsS -m 10 --retry 3 "${{ secrets.HEALTHCHECK_PING_URL }}/start" \
+              || echo "::warning::healthchecks.io start ping failed (will rely on success/fail ping)"
+          else
+            echo "::notice::HEALTHCHECK_PING_URL secret not set; skipping healthchecks.io ping."
+          fi
+
+      - name: Ping healthchecks.io (scan failed)
+        # If any prior step failed, ping /fail so healthchecks.io marks
+        # this slot as red (email/Slack alert).
+        if: failure() && github.event_name == 'schedule'
+        continue-on-error: true
+        run: |
+          if [ -n "${{ secrets.HEALTHCHECK_PING_URL }}" ]; then
+            curl -fsS -m 10 --retry 3 "${{ secrets.HEALTHCHECK_PING_URL }}/fail" \
+              || echo "::warning::healthchecks.io fail ping failed"
+          fi
+
+      - name: Ping healthchecks.io (scan succeeded)
+        if: success() && github.event_name == 'schedule'
+        # Resets the period so the next scheduled slot starts fresh.
+        continue-on-error: true
+        run: |
+          if [ -n "${{ secrets.HEALTHCHECK_PING_URL }}" ]; then
+            curl -fsS -m 10 --retry 3 "${{ secrets.HEALTHCHECK_PING_URL }}" \
+              || echo "::warning::healthchecks.io success ping failed"
+          fi
 
       - name: Validate JSON contract
         working-directory: backend
