@@ -180,7 +180,12 @@ def _try_yfinance_traded_value(
             error="universe symbols/tickers missing or mismatched",
         )
 
-    cache_key = f"yfinance:traded_value_proxy:{','.join(yf_tickers)}"
+    # Hash the joined ticker list so the cache filename stays short for the
+    # Nifty 500 universe (~7000 chars would otherwise exceed most filesystem
+    # filename limits of ~255 bytes).
+    import hashlib
+    universe_hash = hashlib.sha256(",".join(yf_tickers).encode("utf-8")).hexdigest()[:16]
+    cache_key = f"yfproxy:{universe_hash}"
     cached = read_cache(cache_key, max_age_seconds=BHAVCOPY_CACHE_TTL_SECONDS)
     if cached is not None:
         cached.setdefault("provider", YFINANCE_PROVIDER)
