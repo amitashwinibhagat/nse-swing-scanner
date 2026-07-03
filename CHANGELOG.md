@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.4 — Bump GitHub Actions to drop Node 20 deprecation warning
+
+### Changed
+
+- `actions/checkout` v4 → v7
+- `actions/cache` v4 → v6
+- `actions/setup-python` v5 → v6
+- `actions/setup-node` v4 → v6
+
+GitHub is deprecating Node 20 on hosted runners; the v4/v5 action pins
+were being forced onto Node 24 and emitting a deprecation warning on
+every workflow run. The bumped versions target Node 24 natively.
+
 ## 1.1.3 — Expand universe to Nifty 500 with ~5–7 min cold-cache runtime
 
 ### Changed

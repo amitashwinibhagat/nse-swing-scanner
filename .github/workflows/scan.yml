@@ -22,15 +22,15 @@ jobs:
     timeout-minutes: 30   # Nifty 500 with 12 workers: cold-cache ~5-7 min, warm-cache ~30-90 s. 30 min leaves comfortable headroom for retry cascades.
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
       - name: Cache backend cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: backend/cache
           key: nse-swing-cache-${{ github.run_id }}
