@@ -64,33 +64,72 @@ jobs:
         # ping" timer on any successful ping — including /start — so a
         # /start ping is informational and an additional success ping
         # later just keeps the check green.
+        #
+        # Two secrets, one per scheduled slot, so healthchecks.io can
+        # alert independently on a missed morning vs missed evening.
+        # github.event.schedule carries the cron expression that fired
+        # (e.g. "30 3 * * 1-5"), so we branch on it to pick the URL.
+        env:
+          MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
+          EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
         continue-on-error: true
         run: |
-          if [ -n "${{ secrets.HEALTHCHECK_PING_URL }}" ]; then
-            curl -fsS -m 10 --retry 3 "${{ secrets.HEALTHCHECK_PING_URL }}/start" \
-              || echo "::warning::healthchecks.io start ping failed (will rely on success/fail ping)"
-          else
-            echo "::notice::HEALTHCHECK_PING_URL secret not set; skipping healthchecks.io ping."
+          set +e
+          case "${{ github.event.schedule }}" in
+            "30 3 * * 1-5")
+              url="$MORNING_URL"
+              label="morning"
+              ;;
+            "30 10 * * 1-5")
+              url="$EVENING_URL"
+              label="evening"
+              ;;
+            *)
+              echo "::notice::unrecognized cron '${{ github.event.schedule }}'; skipping healthchecks.io ping."
+              exit 0
+              ;;
+          esac
+          if [ -z "$url" ]; then
+            echo "::notice::HEALTHCHECK_PING_URL_${label^^} secret not set; skipping healthchecks.io ping."
+            exit 0
           fi
+          curl -fsS -m 10 --retry 3 "${url}/start" \
+            || echo "::warning::healthchecks.io start ping failed (will rely on success/fail ping)"
 
       - name: Ping healthchecks.io (scan failed)
         # If any prior step failed, ping /fail so healthchecks.io marks
         # this slot as red (email/Slack alert).
         if: failure() && github.event_name == 'schedule'
+        env:
+          MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
+          EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
         continue-on-error: true
         run: |
-          if [ -n "${{ secrets.HEALTHCHECK_PING_URL }}" ]; then
-            curl -fsS -m 10 --retry 3 "${{ secrets.HEALTHCHECK_PING_URL }}/fail" \
+          case "${{ github.event.schedule }}" in
+            "30 3 * * 1-5")  url="$MORNING_URL";;
+            "30 10 * * 1-5") url="$EVENING_URL";;
+            *) exit 0;;
+          esac
+          if [ -n "$url" ]; then
+            curl -fsS -m 10 --retry 3 "${url}/fail" \
               || echo "::warning::healthchecks.io fail ping failed"
           fi
 
       - name: Ping healthchecks.io (scan succeeded)
         if: success() && github.event_name == 'schedule'
         # Resets the period so the next scheduled slot starts fresh.
+        env:
+          MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
+          EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
         continue-on-error: true
         run: |
-          if [ -n "${{ secrets.HEALTHCHECK_PING_URL }}" ]; then
-            curl -fsS -m 10 --retry 3 "${{ secrets.HEALTHCHECK_PING_URL }}" \
+          case "${{ github.event.schedule }}" in
+            "30 3 * * 1-5")  url="$MORNING_URL";;
+            "30 10 * * 1-5") url="$EVENING_URL";;
+            *) exit 0;;
+          esac
+          if [ -n "$url" ]; then
+            curl -fsS -m 10 --retry 3 "${url}" \
               || echo "::warning::healthchecks.io success ping failed"
           fi
 

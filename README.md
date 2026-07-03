@@ -230,13 +230,19 @@ we layer two complementary mechanisms on top of the schedule.
 
 ### 1. healthchecks.io pings in `.github/workflows/scan.yml`
 
-The scan workflow pings a healthchecks.io URL at three points:
+The scan workflow pings one of two healthchecks.io URLs (one per
+scheduled slot) at three points:
 
 | Step | URL | When |
 |---|---|---|
-| Scan started | `/{HEALTHCHECK_PING_URL}/start` | First step (after checkout) |
-| Scan failed | `/{HEALTHCHECK_PING_URL}/fail` | Any step in the job failed |
-| Scan succeeded | `/{HEALTHCHECK_PING_URL}` | Job completed without error |
+| Scan started | `/{HEALTHCHECK_PING_URL_MORNING}/start` (or `_EVENING`) | First step (after checkout) |
+| Scan failed | `/{HEALTHCHECK_PING_URL_...}/fail` | Any step in the job failed |
+| Scan succeeded | `/{HEALTHCHECK_PING_URL_...}` | Job completed without error |
+
+The cron expression that triggered the run is exposed as
+`github.event.schedule`, so the workflow picks the right URL based on
+whether the morning (`30 3 * * 1-5`) or evening (`30 10 * * 1-5`) cron
+fired.
 
 If no ping arrives within the configured period+grace, healthchecks.io
 emails/Slacks you. **No ping = cron didn't fire. `/fail` ping = cron fired
@@ -248,24 +254,23 @@ but the run errored.**
 2. Create **two** checks — one per scheduled slot:
    - **Morning check** (`09:00 IST = 03:30 UTC`)
      - Name: `NSE Swing Scan — morning`
-     - Period: `12 hours`, Grace: `4 hours`
-     - Schedule: `03:30 UTC` daily (Mon–Fri)
+     - Schedule: Cron `30 3 * * 1-5` (m h dom mon dow)
+     - Time Zone: UTC
+     - Grace Time: `4 hours`
    - **Evening check** (`16:00 IST = 10:30 UTC`)
      - Name: `NSE Swing Scan — evening`
-     - Period: `12 hours`, Grace: `4 hours`
-     - Schedule: `10:30 UTC` daily (Mon–Fri)
-3. Copy each check's UUID URL into a single GitHub secret that points to
-   the morning slot. (When you only have one secret, both crons ping it;
-   healthchecks.io will alert if **either** slot misses. To distinguish
-   morning vs evening, set up two separate secrets — `HEALTHCHECK_PING_URL_MORNING`
-   and `HEALTHCHECK_PING_URL_EVENING` — and wire them into scan.yml. The
-   current single-secret setup is fine for "did anything run today?" detection.)
-4. Configure alert channels (email is on by default; Slack/PagerDuty/Discord
+     - Schedule: Cron `30 10 * * 1-5`
+     - Time Zone: UTC
+     - Grace Time: `4 hours`
+3. Configure alert channels (email is on by default; Slack/PagerDuty/Discord
    integrations are under Integrations → Add).
-5. Set the GitHub Actions secret: repo **Settings → Secrets and variables
-   → Actions → New repository secret**, name `HEALTHCHECK_PING_URL`, value
-   `https://hc-ping.com/{uuid}` (without `/start` or `/fail` — the workflow
-   appends those).
+4. Set two GitHub Actions secrets — repo **Settings → Secrets and
+   variables → Actions → New repository secret**:
+   - `HEALTHCHECK_PING_URL_MORNING` = `https://hc-ping.com/{morning-uuid}`
+   - `HEALTHCHECK_PING_URL_EVENING` = `https://hc-ping.com/{evening-uuid}`
+
+   The workflow appends `/start`, `/fail`, or nothing depending on the
+   step, so paste the URL without those suffixes.
 
 ### 2. Watchdog workflow (`.github/workflows/watchdog.yml`)
 

@@ -6,13 +6,17 @@
 
 - `.github/workflows/scan.yml`: three new ping steps that hit a
   healthchecks.io URL at `/start`, `/fail`, and the success endpoint.
-  Optional via `HEALTHCHECK_PING_URL` repo secret; absent → no-op with
-  `::notice::` log.
+  Optional via `HEALTHCHECK_PING_URL_MORNING` and
+  `HEALTHCHECK_PING_URL_EVENING` repo secrets; absent → no-op with
+  `::notice::` log. The cron expression that triggered the run is read
+  via `github.event.schedule` so the workflow picks the right URL
+  based on morning vs evening slot.
 - `.github/workflows/watchdog.yml`: redundant cron that runs every 15
   min during market hours (01:00–11:30 UTC). Checks `latest_scan.json`
   age on `main` and, if stale >45 min, fires `gh workflow run scan.yml`
-  for self-recovery. Pings its own healthchecks.io URL with `?stale=`
-  and `?age_min=` query params so alerts carry context.
+  for self-recovery. Pings its own healthchecks.io URL via
+  `HEALTHCHECK_WATCHDOG_URL` with `?stale=` and `?age_min=` query
+  params so alerts carry context.
 - README § "Monitoring (healthchecks.io + watchdog)" with the full
   one-time setup procedure.
 
@@ -29,8 +33,9 @@ that can also auto-trigger a recovery scan.
 1. Sign up at <https://healthchecks.io> (free).
 2. Create two checks for the scan slots (period 12h, grace 4h).
 3. Create one check for the watchdog (period 1h, grace 1h).
-4. Set three GitHub Actions secrets: `HEALTHCHECK_PING_URL`,
-   `HEALTHCHECK_WATCHDOG_URL`. (See README for details.)
+4. Set three GitHub Actions secrets: `HEALTHCHECK_PING_URL_MORNING`,
+   `HEALTHCHECK_PING_URL_EVENING`, and `HEALTHCHECK_WATCHDOG_URL`.
+   (See README for details.)
 
 ## 1.1.5 — Multi-provider delivery data with yfinance traded-value proxy
 
