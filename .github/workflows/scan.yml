@@ -115,6 +115,24 @@ jobs:
               || echo "::warning::healthchecks.io fail ping failed"
           fi
 
+      - name: Ping healthchecks.io (scan cancelled)
+        # When the scheduled run is cancelled (typical: GH Actions free-tier
+        # queue timeout — no runner provisioned in 15 min, observed during
+        # the 11:30–13:30 UTC peak), ping the dedicated cancelled URL so the
+        # operator gets an early alert. Gates on schedule only so ad-hoc
+        # workflow_dispatch cancellations stay silent.
+        if: cancelled() && github.event_name == 'schedule'
+        env:
+          CANCELLED_URL: ${{ secrets.HEALTHCHECK_PING_URL_CANCELLED }}
+        continue-on-error: true
+        run: |
+          if [ -z "$CANCELLED_URL" ]; then
+            echo "::notice::HEALTHCHECK_PING_URL_CANCELLED secret not set; skipping cancellation ping."
+            exit 0
+          fi
+          curl -fsS -m 10 --retry 3 "${CANCELLED_URL}/fail" \
+            || echo "::warning::healthchecks.io cancelled ping failed"
+
       - name: Ping healthchecks.io (scan succeeded)
         if: success() && github.event_name == 'schedule'
         # Resets the period so the next scheduled slot starts fresh.

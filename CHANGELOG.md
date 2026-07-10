@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.1.7 — Watchdog window extended + cancellation alert
+
+### Changed
+
+- `.github/workflows/watchdog.yml`: cron window extended from
+  `*/15 1-11` to `*/15 1-13` UTC (06:30–19:00 IST, was 06:30–17:00 IST).
+  Gives the watchdog an automated recovery path for the 16:00 IST
+  evening slot when the 10:30 UTC cron gets cancelled during the GH
+  Actions free-tier runner peak (11:30–13:30 UTC).
+
+### Added
+
+- `.github/workflows/scan.yml`: new `if: cancelled() && event == schedule`
+  step that pings a dedicated `HEALTHCHECK_PING_URL_CANCELLED` healthchecks
+  URL with `/fail` when a scheduled run is cancelled. Operator gets an
+  early alert (email/Slack) before the next watchdog tick, so manual
+  re-trigger via `gh workflow run scan.yml` or the `trigger-scan.js`
+  function can land fresh data within minutes.
+
+### Why
+
+On 2026-07-09 the 10:30 UTC scheduled scan and a follow-up `workflow_dispatch`
+at 11:38 UTC both sat in the GH Actions queue for the full 15 min
+without ever being assigned a runner, then were auto-cancelled. The
+watchdog's previous 11:30 UTC window cutoff meant no automated recovery
+was possible until the next morning's cron. Now the watchdog covers
+the peak-failure window and the operator gets pinged the moment a
+cancellation lands.
+
+### Operator setup required
+
+1. Create a third healthchecks.io check named
+   "NSE Swing Scan — Cancelled" (period 1h, grace 30 min).
+2. Set the resulting URL as the new GitHub repo secret
+   `HEALTHCHECK_PING_URL_CANCELLED`. Absent → no-op with `::notice::`
+   log (matches the existing healthchecks secret pattern).
+
 ## 1.1.6 — Cron drift monitoring: healthchecks.io pings + watchdog workflow
 
 ### Added

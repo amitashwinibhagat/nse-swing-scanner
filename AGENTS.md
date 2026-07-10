@@ -213,6 +213,7 @@ gh run watch $RUN_ID --repo amitashwinibhagat/nse-swing-scanner --exit-status
 |---|---|---|
 | `HEALTHCHECK_PING_URL_MORNING` | scan.yml | `https://hc-ping.com/d31b1ec5-…085f` (09:00 IST cron) |
 | `HEALTHCHECK_PING_URL_EVENING` | scan.yml | `https://hc-ping.com/1e6082f1-…77db` (16:00 IST cron) |
+| `HEALTHCHECK_PING_URL_CANCELLED` | scan.yml | `/fail` ping when a scheduled run is cancelled (GH Actions runner-provisioning failure). Period 1h, grace 30 min recommended. |
 | `HEALTHCHECK_WATCHDOG_URL` | watchdog.yml | Watchdog heartbeat (period 1h, grace 1h) |
 | `NETLIFY_AUTH_TOKEN` | scan.yml | Netlify deploy trigger (optional; auto-deploy via GH integration is preferred) |
 | `NETLIFY_SITE_ID` | scan.yml | Netlify site ID for the above |
@@ -339,7 +340,11 @@ a new cached call with a long key, hash it.
 
 ### `watchdog.yml` (cron drift detector)
 
-- Triggers: `schedule` (cron `*/15 1-11 * * 1-5` UTC, Mon-Fri) + `workflow_dispatch`
+- Triggers: `schedule` (cron `*/15 1-13 * * 1-5` UTC, Mon-Fri) + `workflow_dispatch`
+- Window covers 06:30–19:00 IST; the 1–13 hour range (extended from 1–11
+  in 1.1.7) gives an automated recovery path for the evening slot when
+  the 10:30 UTC cron gets cancelled during the GH Actions free-tier
+  runner peak (11:30–13:30 UTC).
 - Permissions: `contents: read, actions: write` (the latter for `gh workflow run`)
 - Steps:
   1. Check freshness of `latest_scan.json` on `main`
@@ -383,6 +388,7 @@ URL goes into `HEALTHCHECK_WATCHDOG_URL` repo secret.
 |---|---|---|
 | Scan started | `/start` | First step (after checkout) |
 | Scan failed | `/fail` | Any step errored (`if: failure()`) |
+| Scan cancelled | `/fail` (separate URL) | Job was cancelled (`if: cancelled()`, schedule only) |
 | Scan succeeded | (none) | Job completed cleanly |
 
 `continue-on-error: true` on all three so a curl failure can't fail the
@@ -457,19 +463,26 @@ Single source of truth lives in two places, kept in sync by
 ## Known Issues & Limitations
 
 1. **GH Actions cron drift** (1.1.6 mitigation: healthchecks.io + watchdog).
-2. **NSE bhavcopy blocked by Akamai** (1.1.5 mitigation: yfinance proxy).
-3. **12 h price-field TTL unsafe across splits** — would show stale price
+2. **GH Actions free-tier runner scarcity** (1.1.7 mitigation: extended
+   watchdog window 1–13 UTC + cancellation healthchecks ping). During the
+   11:30–13:30 UTC peak the scheduler can fail to provision a runner for
+   scheduled runs; the job sits in the queue for 15 min and is then
+   auto-cancelled. Operationally, the operator gets a cancellation alert
+   and can re-trigger via `gh workflow run scan.yml` or the
+   `trigger-scan.js` function.
+3. **NSE bhavcopy blocked by Akamai** (1.1.5 mitigation: yfinance proxy).
+4. **12 h price-field TTL unsafe across splits** — would show stale price
    for up to 12 h after a 2-for-1 split. Documented in CHANGELOG.
-4. **GitHub Actions secrets require manual setup** — `NETLIFY_AUTH_TOKEN`
+5. **GitHub Actions secrets require manual setup** — `NETLIFY_AUTH_TOKEN`
    + `NETLIFY_SITE_ID` are unset in the repo (visible as `::warning::` in
    the workflow log). Netlify auto-deploys via the GitHub Integration
    webhook, so this is non-critical but the manual-deploy step in the
    workflow is currently a no-op.
-5. **Multi-hour cron delays misattribute `scheduled_window_utc`** in
+6. **Multi-hour cron delays misattribute `scheduled_window_utc`** in
    `scan_status.json`. Closest-clock-time heuristic handles small/medium
    drift; very-large drifts (rare) show the wrong window. Documented
    in CHANGELOG 1.1.6.
-6. **No backtest / paper-trade validation** — the soft score weights
+7. **No backtest / paper-trade validation** — the soft score weights
    are hand-tuned, not backtested. Treat the score as a ranking, not
    an edge.
 

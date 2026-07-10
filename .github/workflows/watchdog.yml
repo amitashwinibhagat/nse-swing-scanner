@@ -20,9 +20,12 @@ name: Watchdog (cron drift detector)
 
 on:
   schedule:
-    # Every 15 min between 01:00 and 11:30 UTC (06:30 - 17:00 IST).
+    # Every 15 min between 01:00 and 13:30 UTC (06:30 - 19:00 IST).
     # Tight loop catches GH cron drift within the market-day window.
-    - cron: "*/15 1-11 * * 1-5"
+    # Extended to 13:00 UTC (since 2026-07) to give an automated recovery
+    # path for the evening slot when the 10:30 UTC cron gets cancelled
+    # during the GH Actions free-tier runner peak (11:30–13:30 UTC).
+    - cron: "*/15 1-13 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
