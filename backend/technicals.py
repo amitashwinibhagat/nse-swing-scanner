@@ -165,10 +165,13 @@ def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
     """
     Returns a dict of computed technical fields for one ticker, or a dict with
     'error' set if data was insufficient/unavailable. Results are cached on
-    disk for YF_CACHE_TTL_SECONDS (12 h) keyed on (ticker, period).
+    disk for YF_CACHE_TTL_SECONDS (12 h) keyed on (ticker, period, schema).
+    Bumping the schema suffix invalidates old cached payloads whose shape would
+    otherwise be silently merged with the new field set (causing missing/null
+    fields in the JSON contract for one full TTL).
     """
     return cached_call(
-        f"tech:{yf_ticker}:{period}",
+        f"tech:{yf_ticker}:{period}:v2",
         YF_CACHE_TTL_SECONDS,
         _compute_technicals_impl,
         yf_ticker,
