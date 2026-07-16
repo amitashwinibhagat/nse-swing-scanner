@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.1.9 — Drop Del. val column from UI
+
+### Why
+
+After the 1.1.8 Liquidity Adequacy gate shipped, the yfinance traded-value
+proxy (`volume × close`) can no longer satisfy any hard gate and is never
+the right answer to the buyer's "is this name liquid?" question. Showing
+it as a "Del. val (₹cr)" column with a `proxy` badge just invited
+"what does proxy mean?" confusion and visual noise on every row.
+
+### Changed
+
+- `frontend/src/App.jsx`, `DetailDrawer.jsx`: removed the **Del. val
+  (₹cr)** column from the table, the CSV export, and the drawer's
+  hard-gates block. The drawer now shows a single
+  **Liquidity / ADV (₹cr)** row with a small `adv` / `delivery_actual`
+  chip on whichever path satisfied the gate.
+- `frontend/src/components/Rationale.jsx`: dropped the DEL. VAL term
+  entirely; rewrote the intro copy to make clear that the bhavcopy
+  delivery signal is optional (only ever tightens the gate, never
+  inflates it).
+- `frontend/src/styles.css`: removed the unused `.proxy-badge` rule.
+
+### Removed (visual only)
+
+- `proxy-badge` HTML — no remaining consumers. The internal `delivery_*`
+  JSON fields stay for traceability.
+
 ## 1.1.8 — Liquidity Adequacy gate (proxy delivery demoted)
 
 ### Why

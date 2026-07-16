@@ -110,21 +110,8 @@ export default function DetailDrawer({ stock, onClose }) {
                   <b>{stock.f_score ?? "—"}/9</b>
                 </li>
                 <li>
-                  <span>ADV (₹cr){stock.liquidity_gate_path === "adv" && <span className="gate-path"> gate</span>}</span>
+                  <span>Liquidity / ADV (₹cr){stock.liquidity_gate_path && <span className="gate-path"> {stock.liquidity_gate_path}</span>}</span>
                   <b>{fmtCr(stock.adv_value_inr)}</b>
-                </li>
-                <li>
-                  <span>
-                    {stock.delivery_kind === "actual"
-                      ? `Delivery (₹cr)${stock.liquidity_gate_path === "delivery_actual" ? " gate" : ""}`
-                      : "Delivery (₹cr)"}
-                    {stock.delivery_kind === "traded_value_proxy" && (
-                      <span className="proxy-badge" title={`Source: ${stock.delivery_source || "yfinance proxy"}. Single-day traded-value proxy: NOT used by the liquidity hard gate. 20d ADV is the gate metric.`}>
-                        proxy
-                      </span>
-                    )}
-                  </span>
-                  <b>{stock.delivery_kind === "actual" ? fmtCr(stock.delivery_value_inr) : "—"}</b>
                 </li>
                 <li>
                   <span>Holdings conviction</span>

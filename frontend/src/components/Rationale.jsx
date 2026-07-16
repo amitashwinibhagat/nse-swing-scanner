@@ -1,6 +1,6 @@
 const RATIONALE = [
   "Twice a day, the GitHub Actions scan runs the universe through seven hard gates and a 0–100 soft score, then commits the result as frontend/public/data/latest_scan.json. This dashboard renders that JSON — it never calls a live API, never touches your data, and never blocks on a backend.",
-  "Three free data sources feed the scan: yfinance for price/action, NSE bhavcopy for delivery, Screener.in for promoter/FII/DII holdings. NSE corporate filings supply the pending-actions screen. All four are best-effort public sources — when any of them changes its URL or rate-limits, the affected gate fails closed and the source-status pill surfaces it row by row.",
+  "Two free data sources feed every always-on signal: yfinance (price, volume, ADV, F-Score, 5y P/E) and Screener.in (promoter/FII/DII holdings). NSE bhavcopy for real delivery and NSE corporate filings for pending-actions remain best-effort and only ever tighten the gate — they cannot, by themselves, inflate PASSes. When any source changes its URL or rate-limits, the affected gate fails closed and the source-status pill surfaces it row by row.",
   "The CSV export captures every field the scanner emits, including sub-scores, ATR(14), entry zone, both R-multiples, holdings breakdown, source status, and the gate-fail reason. Useful for re-scoring in a notebook without re-running the scan.",
 ];
 
@@ -43,12 +43,7 @@ const TERMS = [
   {
     term: "ADV (₹cr)",
     body:
-      "20-session average traded value (volume × close) from yfinance, in ₹ crores. This is the primary metric for the liquidity hard gate: a row PASSes the gate if ADV ≥ ₹10 cr. It is a more reliable proxy for exitability than a single-day traded-value number and is not affected by NSE's Akamai blocks.",
-  },
-  {
-    term: "DEL. VAL (₹cr)",
-    body:
-      "Latest available day's delivery value in ₹ crores from NSE / BSE bhavcopy when reachable. When real delivery is available and ≥ ₹5 cr, that path satisfies the liquidity hard gate. The single-day yfinance traded-value proxy is shown here for transparency but is NOT used by the gate on its own — it is too noisy and previously inflated the PASS list.",
+      "20-session average traded value (volume × close) from yfinance, in ₹ crores. This is the primary metric for the liquidity hard gate: a row PASSes the gate if ADV ≥ ₹10 cr (after a ₹3cr secondary floor guard when the real-delivery path is used). It is computed from a window yfinance returns reliably even when NSE bhavcopy is blocked, so the dashboard stays honest regardless of source availability. The yfinance computed value is hard-clamped at ₹5000cr per symbol to neutralise outliers from session resumption / suspension prints.",
   },
   {
     term: "HOLD %",

@@ -556,23 +556,6 @@ body {
 .src-fallback_used,.src-missing         { color: var(--warning); }
 .src-source_failed,.src-flag_only      { color: var(--danger); }
 
-/* Proxy-data badge (e.g. traded-value proxy from yfinance when NSE bhavcopy
-   is unreachable). Distinct from src-* colors so users can tell at a glance
-   that the value came from a fallback source, not real delivery data. */
-.proxy-badge {
-  display: inline-block;
-  margin-left: 0.4em;
-  padding: 0.05em 0.4em;
-  border-radius: 0.3em;
-  background: rgba(245, 158, 11, 0.18);
-  color: var(--warning);
-  font-size: 0.7em;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  vertical-align: middle;
-  cursor: help;
-}
-
 /* Marker for which metric satisfied the liquidity hard gate
    (delivery_actual vs adv). Visually quieter than the PASS pill so it
    stays a hint, not a status. */

@@ -77,7 +77,6 @@ const COLUMNS = [
   { key: "target_1", label: "T1" },
   { key: "stop_loss", label: "Stop" },
   { key: "adv_value_inr", label: "ADV (₹cr)" },
-  { key: "delivery_value_inr", label: "Del. val (₹cr)" },
   { key: "holdings_conviction_pct", label: "Hold %" },
   { key: "f_score", label: "F-Score" },
   { key: "trailing_pe", label: "P/E (T / 5Y)" },
@@ -153,7 +152,6 @@ function exportCsv(rows, filename = "nse_swing_scan.csv") {
     "current_price", "pct_off_52wk_high", "rsi14", "atr14",
     "entry_zone_low", "entry_zone_high", "stop_loss", "target_1", "target_2",
     "risk_reward_target_1", "risk_reward_target_2",
-    "delivery_value_inr", "delivery_qty", "delivery_pct", "delivery_as_of", "delivery_kind", "delivery_source", "delivery_source_status",
     "adv_value_inr", "adv_sessions", "liquidity_gate_path",
     "surveillance_is_restricted", "surveillance_restriction_type", "surveillance_source_status",
     "holdings_promoter_pct", "holdings_fii_pct", "holdings_dii_pct", "holdings_conviction_pct",
@@ -672,10 +670,6 @@ export default function App() {
                   <td title={`20-day average traded value from yfinance (sessions: ${s.adv_sessions ?? 0}). Used by the liquidity hard gate.`}>
                     {fmtCr(s.adv_value_inr)}
                   </td>
-                  <td title={s.delivery_kind === "traded_value_proxy" ? "Single-day traded-value proxy: not used by the liquidity hard gate. 20d ADV is the gate metric." : "NSE delivery value"}>
-                    {s.delivery_kind === "actual" ? fmtCr(s.delivery_value_inr) : <span className="na">—</span>}
-                    {s.delivery_kind === "traded_value_proxy" && <span className="proxy-badge"> proxy</span>}
-                  </td>
                   <td>{fmt(s.holdings_conviction_pct, 1, "%")}</td>
                   <td>{s.f_score ?? <span className="na">—</span>}/9</td>
                   <td>
@@ -694,17 +688,8 @@ export default function App() {
                             <ul className="kv">
                               <li><span>F-Score</span><b>{s.f_score ?? "—"}/9</b></li>
                               <li>
-                                <span>ADV (₹cr){s.liquidity_gate_path === "adv" && <span className="gate-path"> gate</span>}</span>
+                                <span>Liquidity / ADV (₹cr){s.liquidity_gate_path && <span className="gate-path"> {s.liquidity_gate_path}</span>}</span>
                                 <b>{fmtCr(s.adv_value_inr)}</b>
-                              </li>
-                              <li>
-                                <span>
-                                  {s.delivery_kind === "actual"
-                                    ? `Delivery (₹cr)${s.liquidity_gate_path === "delivery_actual" ? " gate" : ""}`
-                                    : "Delivery (₹cr)"}
-                                  {s.delivery_kind === "traded_value_proxy" && <span className="proxy-badge">proxy</span>}
-                                </span>
-                                <b>{s.delivery_kind === "actual" ? fmtCr(s.delivery_value_inr) : "—"}</b>
                               </li>
                               <li><span>Holdings conviction</span><b>{fmt(s.holdings_conviction_pct, 1, "%")}</b></li>
                               <li><span>T-group / suspension</span><b>{s.surveillance_is_restricted ? `YES (${s.surveillance_restriction_type})` : "no"}</b></li>
