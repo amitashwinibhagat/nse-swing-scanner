@@ -8,7 +8,7 @@ const TERMS = [
   {
     term: "GATE",
     body:
-      "PASS / FAIL on the seven hard gates (F-Score ≥ 6, drawdown in [-40%, -15%], 25 ≤ RSI ≤ 40, delivery value ≥ ₹5 cr, no T-group / suspension / GSM flag, holdings conviction > 50%, no pending corporate action in the next 30 days). Hard gates fail closed — if a source is unreachable, that gate fails rather than silently passing. The detail drawer reveals which gate blocked a FAIL.",
+      "PASS / FAIL on the seven hard gates (F-Score ≥ 6, drawdown in [-40%, -15%], 25 ≤ RSI ≤ 40, liquidity adequacy ≥ ₹10 cr ADV OR actual delivery ≥ ₹5 cr, no T-group / suspension / GSM flag, holdings conviction > 50%, no pending corporate action in the next 30 days). Hard gates fail closed — if a source is unreachable, that gate fails rather than silently passing. The detail drawer reveals which gate blocked a FAIL.",
   },
   {
     term: "SCORE",
@@ -41,9 +41,14 @@ const TERMS = [
       "Initial stop at 1× ATR(14) below the entry zone. Use a hard GTT order; do not manually trail. The scan's R-multiples assume mechanical execution.",
   },
   {
+    term: "ADV (₹cr)",
+    body:
+      "20-session average traded value (volume × close) from yfinance, in ₹ crores. This is the primary metric for the liquidity hard gate: a row PASSes the gate if ADV ≥ ₹10 cr. It is a more reliable proxy for exitability than a single-day traded-value number and is not affected by NSE's Akamai blocks.",
+  },
+  {
     term: "DEL. VAL (₹cr)",
     body:
-      "Today's delivery value in ₹ crores from a multi-provider chain. The scanner tries (1) NSE bhavcopy, (2) yfinance traded-value proxy (volume × close), (3) BSE bhavcopy. When NSE is reachable you get real delivery data; when it's blocked by Akamai, the yfinance proxy reports traded value (typically 2-3× delivery value) and the UI labels it with a 'proxy' badge so you can tell the difference. Traded-value proxy rows automatically pass the ₹5 cr threshold check via --lenient-external-gates.",
+      "Latest available day's delivery value in ₹ crores from NSE / BSE bhavcopy when reachable. When real delivery is available and ≥ ₹5 cr, that path satisfies the liquidity hard gate. The single-day yfinance traded-value proxy is shown here for transparency but is NOT used by the gate on its own — it is too noisy and previously inflated the PASS list.",
   },
   {
     term: "HOLD %",

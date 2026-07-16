@@ -237,7 +237,12 @@ a fallback; the GitHub-Integration auto-deploy handles most updates.
 | `MIN_MARKET_CAP_CR` | 500 | ₹500 cr market cap floor |
 | `MAX_DE_RATIO` | 1.0 | Debt/Equity ceiling |
 | `MIN_F_SCORE` | 6 | Piotroski F-Score ≥ 6 (relaxed from spec's ≥ 7) |
-| `MIN_DELIVERY_VALUE_INR` | 5_00_00_000 | ₹5 cr/day delivery value floor |
+| `MIN_DELIVERY_VALUE_INR` | 5_00_00_000 | ₹5 cr/day delivery floor (only used when `delivery_kind == "actual"`) |
+| `MIN_ADV_VALUE_INR` | 10_00_00_000 | 20d average traded value floor (liquidity adequacy fallback path) |
+| `MIN_ADV_SECONDARY_FLOOR_INR` | 3_00_00_000 | ADV floor when real delivery path passes (anti-thin-stock guard) |
+| `ADV_HARD_CEILING_INR` | 5_000_00_00_000 | Per-symbol ADV clamp (yfinance outlier protection) |
+| `ADV_LOOKBACK_SESSIONS` | 20 | Sessions in the ADV window |
+| `ADV_MIN_SESSIONS` | 15 | Min valid sessions to compute ADV |
 | `MIN_HOLDINGS_CONVICTION_PCT` | 50 | Promoter+FII+DII ≥ 50% |
 | `DRAWDOWN_LOWER_PCT` | -40.0 | Drawdown gate lower bound |
 | `DRAWDOWN_UPPER_PCT` | -15.0 | Drawdown gate upper bound |

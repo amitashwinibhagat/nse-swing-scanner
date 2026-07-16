@@ -21,6 +21,8 @@ import pandas as pd
 import yfinance as yf
 
 from settings import (
+    ADV_LOOKBACK_SESSIONS,
+    ADV_MIN_SESSIONS,
     ATR_PERIOD,
     ENTRY_ZONE_ATR_FRACTION,
     STOP_LOSS_ATR_MULT,
@@ -112,6 +114,17 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
     # Approximate traded-value proxy (NOT delivery value; delivery comes from bhavcopy)
     adtv_value_inr = avg_vol_30 * current_price
 
+    # True 20-session ADV: mean of (volume_i * close_i) over the last N valid sessions.
+    # Used by the liquidity hard gate so we gate on real exitability, not a single-day
+    # volume×close proxy for delivery. Take the trailing window FIRST, then drop
+    # NaN rows inside it, so adv_sessions reflects how many bars actually contributed.
+    adv_window = hist[["Volume", "Close"]].tail(ADV_LOOKBACK_SESSIONS).dropna()
+    adv_sessions = int(len(adv_window))
+    if adv_sessions >= ADV_MIN_SESSIONS:
+        adv_value_inr = float((adv_window["Volume"] * adv_window["Close"]).mean())
+    else:
+        adv_value_inr = None
+
     # ATR-based entry zone / stop / targets
     entry_low = current_price - ENTRY_ZONE_ATR_FRACTION * (current_atr or 0)
     entry_high = current_price
@@ -142,6 +155,8 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
         "peak_down_day_volume_10d": round(peak_down_volume, 0),
         "volume_surge_factor": round(volume_surge_factor, 2) if not np.isnan(volume_surge_factor) else None,
         "adtv_value_inr_approx": round(adtv_value_inr, 0),
+        "adv_value_inr": round(adv_value_inr, 0) if adv_value_inr is not None else None,
+        "adv_sessions": adv_sessions,
         "error": None,
     }
 

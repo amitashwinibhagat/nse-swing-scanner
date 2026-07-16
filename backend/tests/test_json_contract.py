@@ -33,6 +33,8 @@ def _make_df():
         "tech_risk_reward_target_2": 2.5,
         "tech_volume_surge_factor": 1.2,
         "tech_adtv_value_inr_approx": 1_000_000_000.0,
+        "tech_adv_value_inr": 15_00_00_000,
+        "tech_adv_sessions": 20,
         "fscore_f_score": 7,
         "fscore_f_score_components_available": 9,
         "pe5y_avg_pe_5y": 25.0,
@@ -43,6 +45,8 @@ def _make_df():
         "delivery_as_of": "2026-07-01",
         "delivery_source_status": "ok",
         "delivery_source": "nse:bhavcopy",
+        "delivery_kind": "actual",
+        "liquidity_gate_path": "delivery_actual",
         "surveillance_is_restricted": False,
         "surveillance_restriction_type": None,
         "surveillance_source_status": "ok",
@@ -70,7 +74,8 @@ def test_to_json_records_required_fields_present():
               "delivery_value_inr", "holdings_conviction_pct", "f_score",
               "trailing_pe", "gate_pass", "swing_score", "delivery_source_status",
               "surveillance_source_status", "holdings_source_status",
-              "pending_corporate_action", "market_index_pct_from_ema200"):
+              "pending_corporate_action", "market_index_pct_from_ema200",
+              "adv_value_inr", "liquidity_gate_path"):
         assert k in r, f"missing key: {k}"
 
 

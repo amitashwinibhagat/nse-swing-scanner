@@ -55,7 +55,7 @@ the row is marked as failed for that gate, not silently passed):
 | F-Score | Piotroski F-Score ≥ 6 (configurable; spec is >7) | yfinance financials |
 | Drawdown | -40% ≤ pct off 52W high ≤ -15% | yfinance |
 | RSI | 25 ≤ RSI(14) ≤ 40 | yfinance |
-| Delivery value | latest-day delivery value ≥ ₹5cr | NSE bhavcopy |
+| Liquidity adequacy | actual NSE delivery ≥ ₹5cr **OR** 20d ADV ≥ ₹10cr | NSE bhavcopy (preferred) / yfinance ADV |
 | T-group / suspension | not in T-group / GSM / suspension | NSE → BSE → flag-only |
 | Holdings conviction | promoter + FII + DII > 50% | Screener.in |
 | Pending corporate actions | no excluded action in next 30 days | NSE corporate actions |
@@ -172,13 +172,15 @@ npm run dev   # http://localhost:5173
   NSE's `nsearchives.nseindia.com` archive no longer hosts daily
   equity bhavcopy CSVs, and `www.nseindia.com/api/historical-data/*`
   requires a JS-computed `_abck` cookie that plain HTTP clients can't
-  produce. The scanner reports `delivery_source_status: source_failed`
-  for nearly every stock. The GitHub Actions workflow uses
-  `--lenient-external-gates` so the delivery gate passes on
-  `source_failed` rather than blocking all output; the source status
-  is still visible in the row badge. To re-enable strict delivery
-  gating, drop the flag — but expect ~0 gate-passes unless you wire up
-  Playwright or a paid data feed. Documented in `docs/methodology.md`.
+  produce. The scanner therefore gates on **liquidity adequacy**
+  instead of a single-day delivery number: a row PASSes if real
+  NSE delivery ≥ ₹5cr is available, **or** the 20-session average
+  traded value (ADV) from yfinance is ≥ ₹10cr. ADV is unaffected by
+  the bhavcopy outage, so the PASS list remains honest when NSE is
+  blocked. The single-day traded-value proxy (volume × close) is
+  still surfaced in the UI as a `proxy` badge for transparency, but
+  it is **not** eligible to satisfy the gate on its own — that was
+  the source of inflated PASSes before this fix.
 - **Free data sources are fragile.** NSE, BSE, and Screener.in do not
   publish stable public APIs. If any source changes its URL structure,
   the scanner reports `source_failed` or `flag_only` rather than crashing

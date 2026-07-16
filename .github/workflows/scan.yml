@@ -50,10 +50,11 @@ jobs:
         # speedup that keeps the scan within ~5 min cold-cache:
         #   - Cold cache (first run of the day, weekend-cleared): ~5-7 min.
         #   - Warm cache (subsequent runs): ~30-90 s (cache hits).
-        # --lenient-external-gates: lets delivery/holdings pass when their
-        # source is source_failed (NSE bhavcopy is behind Akamai bot
-        # protection, Screener sometimes rate-limits the runner IP). The
-        # source status is still surfaced in the JSON and UI badge.
+        # --lenient-external-gates: lets the holdings gate pass when its source
+        # is source_failed (Screener.in sometimes rate-limits the runner IP).
+        # The liquidity gate no longer needs this: it falls back to the 20d ADV
+        # path computed from yfinance, which is unaffected by NSE bhavcopy
+        # availability. The source status is still surfaced in the JSON and UI.
 # If NSE/yfinance/Screener rate-limits mid-run, this step fails and
     # the workflow stops WITHOUT committing a partial/corrupt file —
     # the frontend keeps serving the last good scan until the next run.

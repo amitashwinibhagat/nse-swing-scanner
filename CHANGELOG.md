@@ -1,5 +1,53 @@
 # Changelog
 
+## 1.1.8 — Liquidity Adequacy gate (proxy delivery demoted)
+
+### Why
+
+The "delivery ≥ ₹5cr" hard gate was being satisfied by the yfinance
+single-day traded-value proxy (volume × close) whenever NSE bhavcopy was
+unreachable. Traded value is typically 2-3× real delivery, so the
+PASS list was inflated and the dashboard's strongest signal was no
+longer trustworthy.
+
+### Changed
+
+- `backend/scanner.py`: replaced `gate_delivery_value` with
+  `gate_liquidity_adequacy`. A row now PASSes if EITHER real NSE/BSE
+  delivery ≥ ₹5cr is available, OR its 20-session average traded value
+  (ADV) from yfinance is ≥ ₹10cr. Single-day traded-value proxy is no
+  longer a valid gate path on its own.
+- `backend/technicals.py`: computes a true 20d ADV (mean of
+  `volume * close` over the last 20 valid sessions, min_periods=15) and
+  exposes `adv_value_inr` + `adv_sessions`.
+- `backend/settings.py`: adds `MIN_ADV_VALUE_INR`, `ADV_LOOKBACK_SESSIONS`,
+  `ADV_MIN_SESSIONS`. Existing `MIN_DELIVERY_VALUE_INR` is retained for
+  the real-delivery path.
+- JSON contract: new fields `adv_value_inr`, `adv_sessions`,
+  `liquidity_gate_path` — values are `"delivery_actual"` when real NSE
+  delivery satisfied the gate, `"adv"` when the 20d ADV fallback did,
+  or `null` when the gate failed. Surfaces which path satisfied the
+  gate so the UI can label it.
+- `backend/settings.py`: also adds `MIN_ADV_SECONDARY_FLOOR_INR` (₹3cr)
+  as a secondary ADV floor when the real-delivery path passes (prevents
+  thinly-traded names from sneaking through on a single high-delivery
+  day) and `ADV_HARD_CEILING_INR` (₹5000cr) to clamp yfinance volume
+  outliers from suspension/resumption sessions.
+
+### UI
+
+- Table gains an **ADV (₹cr)** column ahead of the delivery column.
+- The delivery column shows `—` for proxy rows; proxy is now annotated
+  as "not used by the gate" in the drawer.
+- Detail drawer shows both ADV and (when available) real delivery, with
+  a small `gate` chip on whichever one satisfied the liquidity gate.
+
+### Validation
+
+- 93 pytest passes; frontend build green.
+- No PASS row with `delivery_kind == "traded_value_proxy"` unless
+  `adv_value_inr >= MIN_ADV_VALUE_INR`.
+
 ## 1.1.7 — Watchdog window extended + cancellation alert
 
 ### Changed

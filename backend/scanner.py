@@ -47,6 +47,9 @@ from corporate_actions import fetch_corporate_actions
 from settings import (
     MIN_F_SCORE,
     MIN_DELIVERY_VALUE_INR,
+    MIN_ADV_VALUE_INR,
+    MIN_ADV_SECONDARY_FLOOR_INR,
+    ADV_HARD_CEILING_INR,
     MIN_HOLDINGS_CONVICTION_PCT,
     DRAWDOWN_LOWER_PCT,
     DRAWDOWN_UPPER_PCT,
@@ -160,36 +163,52 @@ def gate_rsi(rsi) -> tuple[bool, Optional[str]]:
     return True, None
 
 
-def gate_delivery_value(
+def gate_liquidity_adequacy(
+    adv_value_inr: Optional[float],
     delivery_value_inr: Optional[float],
+    delivery_kind: Optional[str],
     delivery_status: str,
-    lenient: bool = False,
 ) -> tuple[bool, Optional[str]]:
     """
-    Hard gate for delivery value (₹5cr/day).
+    Hard gate for exitability / institutional-grade liquidity.
 
-    Strict (default): fail-closed on source_failed, matching the documented
-    methodology. If NSE bhavcopy cannot be reached, no stock passes the
-    delivery gate — even though the source failed. This is the safe default
-    for "this is a real signal" use.
+    Passes when EITHER:
+      - Real delivery data is available (`delivery_kind == "actual"`) AND
+        `delivery_value_inr >= MIN_DELIVERY_VALUE_INR`. This is the original
+        "delivery ≥ ₹5cr" gate and is preferred when source is reachable.
+        A secondary ADV floor (MIN_ADV_SECONDARY_FLOOR_INR) is also required
+        so a thinly-traded name cannot pass via a single high-delivery day
+        (block deal, closing-auction spike, post-resumption print).
+      - 20d average traded value (`adv_value_inr`) is at least
+        `MIN_ADV_VALUE_INR`. This replaces the single-day traded-value proxy
+        path that previously polluted the PASS list.
 
-    Lenient (--lenient-external-gates): when the source is source_failed
-    we let the stock through with a flag rather than auto-failing. Use this
-    when the bhavcopy endpoint is behind Akamai bot protection (the current
-    state of NSE's anonymous-access endpoints) and you still want the
-    dashboard to show candidates.
+    Fails closed when neither path can be evaluated. `delivery_kind ==
+    "traded_value_proxy"` is intentionally NOT a passing path on its own —
+    one-day volume×close is too noisy to gate on, which is exactly why we
+    switched to ADV.
     """
-    if delivery_status not in ("ok", "fallback_used"):
-        if lenient:
+    if (
+        delivery_kind == "actual"
+        and delivery_value_inr is not None
+        and delivery_status in ("ok", "fallback_used")
+        and delivery_value_inr >= MIN_DELIVERY_VALUE_INR
+    ):
+        # Secondary ADV floor protects against single-day delivery spikes on
+        # thinly-traded names (block deal, closing-auction spike).
+        if adv_value_inr is not None and adv_value_inr >= MIN_ADV_SECONDARY_FLOOR_INR:
             return True, None
-        return False, f"delivery_value_missing (source_status={delivery_status})"
-    if delivery_value_inr is None:
-        if lenient:
-            return True, None
-        return False, "delivery_value_missing"
-    if delivery_value_inr < MIN_DELIVERY_VALUE_INR:
-        return False, f"delivery_value {int(delivery_value_inr)} < {int(MIN_DELIVERY_VALUE_INR)}"
-    return True, None
+        if adv_value_inr is None:
+            return False, "liquidity_missing (delivery path needs ADV secondary floor; ADV unavailable)"
+        return False, f"adv {int(adv_value_inr)} below secondary floor {int(MIN_ADV_SECONDARY_FLOOR_INR)} for delivery path"
+
+    if adv_value_inr is None:
+        return False, "liquidity_missing (adv and real delivery unavailable)"
+
+    if adv_value_inr >= MIN_ADV_VALUE_INR:
+        return True, None
+
+    return False, f"adv {int(adv_value_inr)} < {int(MIN_ADV_VALUE_INR)}"
 
 
 def gate_surveillance(is_restricted: bool, source_status: str) -> tuple[bool, Optional[str]]:
@@ -285,9 +304,11 @@ def evaluate_stock(
     row: dict with at least 'yf_ticker', 'company_name', 'industry', 'symbol'
     Returns a merged dict of all raw fields + gate results + composite score.
 
-    lenient_external_gates: when True, delivery and holdings gates pass on
-    source_failed instead of failing the row. Use when external data sources
-    are persistently unreachable (e.g. NSE bhavcopy behind Akamai).
+    lenient_external_gates: when True, the holdings gate passes on source_failed
+    instead of failing the row. Use when external data sources are persistently
+    unreachable (e.g. Screener.in behind a captcha). The liquidity gate is no
+    longer affected by this flag — it falls back to the 20d ADV path, which is
+    computed from yfinance regardless of bhavcopy availability.
     """
     yf_ticker = row["yf_ticker"]
     symbol = row["symbol"]
@@ -363,7 +384,29 @@ def evaluate_stock(
     if not ok:
         fail_reasons.append(why)
 
-    ok, why = gate_delivery_value(deliv["delivery_value_inr"], deliv["source_status"], lenient=lenient_external_gates)
+    raw_adv = tech.get("adv_value_inr")
+    clamped_adv = (
+        min(raw_adv, ADV_HARD_CEILING_INR)
+        if isinstance(raw_adv, (int, float))
+        else raw_adv
+    )
+    ok, why = gate_liquidity_adequacy(
+        clamped_adv,
+        deliv["delivery_value_inr"],
+        deliv.get("delivery_kind"),
+        deliv["source_status"],
+    )
+    if ok:
+        if (
+            deliv.get("delivery_kind") == "actual"
+            and deliv["delivery_value_inr"] is not None
+            and deliv["delivery_value_inr"] >= MIN_DELIVERY_VALUE_INR
+        ):
+            result["liquidity_gate_path"] = "delivery_actual"
+        else:
+            result["liquidity_gate_path"] = "adv"
+    else:
+        result["liquidity_gate_path"] = None
     if not ok:
         fail_reasons.append(why)
 
@@ -643,6 +686,11 @@ def to_json_records(df: pd.DataFrame) -> list:
     Flattens the scanner DataFrame into the JSON contract the frontend expects.
     Field names here are the frontend's public API - change them in both places
     at once, or the dashboard silently shows blanks.
+
+    ADV outlier clamp: yfinance occasionally surfaces multi-100x volume spikes
+    on the first session after suspension/resumption. Each row's ADV is
+    clamped to ADV_HARD_CEILING_INR (set well above the legitimate Nifty 500
+    ceiling) so a single outlier cannot satisfy the gate or distort the UI.
     """
     records = []
     for _, row in df.iterrows():
@@ -682,6 +730,13 @@ def to_json_records(df: pd.DataFrame) -> list:
             "delivery_as_of": r.get("delivery_as_of"),
             "delivery_source_status": r.get("delivery_source_status"),
             "delivery_source": r.get("delivery_source"),
+            "adv_value_inr": _json_safe(
+                min(r.get("tech_adv_value_inr"), ADV_HARD_CEILING_INR)
+                if isinstance(r.get("tech_adv_value_inr"), (int, float))
+                else r.get("tech_adv_value_inr")
+            ),
+            "adv_sessions": _json_safe(r.get("tech_adv_sessions")),
+            "liquidity_gate_path": r.get("liquidity_gate_path"),
             "surveillance_is_restricted": bool(r.get("surveillance_is_restricted", False)),
             "surveillance_restriction_type": r.get("surveillance_restriction_type"),
             "surveillance_source_status": r.get("surveillance_source_status"),
@@ -715,6 +770,7 @@ def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
         "config": {
             "min_f_score": MIN_F_SCORE,
             "min_delivery_value_inr": MIN_DELIVERY_VALUE_INR,
+            "min_adv_value_inr": MIN_ADV_VALUE_INR,
             "min_holdings_conviction_pct": MIN_HOLDINGS_CONVICTION_PCT,
             "rsi_window": [RSI_LOWER, RSI_UPPER],
             "drawdown_window": [DRAWDOWN_LOWER_PCT, DRAWDOWN_UPPER_PCT],

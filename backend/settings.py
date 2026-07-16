@@ -13,8 +13,28 @@ UNIVERSE_DEFAULT_SLEEP_BETWEEN_CALLS = 0.3  # seconds, per-yfinance-call courtes
 MIN_MARKET_CAP_CR = 500            # Rs crore
 MAX_DE_RATIO = 1.0
 MIN_F_SCORE = 6                    # relaxed from spec ">7" — see README
-MIN_DELIVERY_VALUE_INR = 5_00_00_000   # Rs 5 crore, latest available trading day
+MIN_DELIVERY_VALUE_INR = 5_00_00_000   # Rs 5 crore, latest available trading day (only used when delivery_kind == "actual")
 MIN_HOLDINGS_CONVICTION_PCT = 50   # promoter + FII + DII > 50%
+
+# Liquidity Adequacy hard gate: 20d average traded value (volume × close) floor.
+# This is the replacement for the single-day traded-value proxy. Two times the old
+# delivery floor because traded value is typically 2-3x real delivery; calibrated
+# against Nifty 500 mid-cap names.
+MIN_ADV_VALUE_INR = 10_00_00_000   # Rs 10 crore
+ADV_LOOKBACK_SESSIONS = 20
+ADV_MIN_SESSIONS = 15              # allow short histories (IPO, new listing)
+
+# Secondary floor when the real-delivery path satisfies the gate: require
+# ADV at least 30% of MIN_ADV_VALUE_INR. Prevents a thinly traded name from
+# passing via a single high-delivery day (block deal / closing-auction spike).
+MIN_ADV_SECONDARY_FLOOR_INR = 3_00_00_000   # Rs 3 crore
+
+# Per-universe ADV outlier hard ceiling. yfinance occasionally surfaces
+# multi-100x volume spikes on the first session after suspension/resumption;
+# clamping protects the gate and the UI from a single outlier distorting
+# the PASS list. The ceiling is well above any legitimate 20d ADV for the
+# Nifty 500 universe (largest names average ~₹1000cr ADV).
+ADV_HARD_CEILING_INR = 5_000_00_00_000  # Rs 5000 crore
 
 # Hard gate windows (technical)
 DRAWDOWN_LOWER_PCT = -40.0

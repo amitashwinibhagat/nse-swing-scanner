@@ -8,13 +8,23 @@ from scanner import (
     gate_f_score,
     gate_drawdown,
     gate_rsi,
-    gate_delivery_value,
+    gate_liquidity_adequacy,
     gate_surveillance,
     gate_holdings,
     gate_corporate_actions,
     relative_strength_factor,
 )
-from settings import MIN_F_SCORE, MIN_DELIVERY_VALUE_INR, MIN_HOLDINGS_CONVICTION_PCT, DRAWDOWN_LOWER_PCT, DRAWDOWN_UPPER_PCT, RSI_LOWER, RSI_UPPER
+from settings import (
+    MIN_F_SCORE,
+    MIN_DELIVERY_VALUE_INR,
+    MIN_ADV_VALUE_INR,
+    MIN_ADV_SECONDARY_FLOOR_INR,
+    MIN_HOLDINGS_CONVICTION_PCT,
+    DRAWDOWN_LOWER_PCT,
+    DRAWDOWN_UPPER_PCT,
+    RSI_LOWER,
+    RSI_UPPER,
+)
 
 
 def test_gate_f_score_pass():
@@ -61,43 +71,116 @@ def test_gate_rsi_outside_window():
     assert not ok
 
 
-def test_gate_delivery_pass():
-    ok, why = gate_delivery_value(MIN_DELIVERY_VALUE_INR, "ok")
+def test_gate_liquidity_pass_via_actual_delivery():
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=MIN_ADV_SECONDARY_FLOOR_INR,
+        delivery_value_inr=MIN_DELIVERY_VALUE_INR,
+        delivery_kind="actual",
+        delivery_status="ok",
+    )
     assert ok and why is None
 
 
-def test_gate_delivery_too_low():
-    ok, why = gate_delivery_value(MIN_DELIVERY_VALUE_INR - 1, "ok")
-    assert not ok
-    assert "delivery_value" in why
-
-
-def test_gate_delivery_source_failed_fails_closed():
-    ok, why = gate_delivery_value(1_000_000_000, "source_failed")
-    assert not ok
-    assert "source_failed" in why
-
-
-def test_gate_delivery_source_failed_lenient_passes():
-    """Lenient mode lets the delivery gate pass on source_failed."""
-    ok, why = gate_delivery_value(1_000_000_000, "source_failed", lenient=True)
-    assert ok
-    assert why is None
-
-
-def test_gate_delivery_missing_lenient_passes():
-    """Lenient mode passes when delivery_value_inr is None and status is also missing/failed."""
-    ok, why = gate_delivery_value(None, "source_failed", lenient=True)
-    assert ok and why is None
-    ok, why = gate_delivery_value(None, "missing", lenient=True)
+def test_gate_liquidity_pass_via_adv_when_delivery_thin():
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=MIN_ADV_VALUE_INR,
+        delivery_value_inr=MIN_DELIVERY_VALUE_INR - 1,
+        delivery_kind="actual",
+        delivery_status="ok",
+    )
     assert ok and why is None
 
 
-def test_gate_delivery_strict_still_rejects_low_value_in_lenient_mode():
-    """Lenient mode does NOT relax the actual ≥₹5cr threshold; only the missing-source case."""
-    ok, why = gate_delivery_value(MIN_DELIVERY_VALUE_INR - 1, "ok", lenient=True)
+def test_gate_liquidity_pass_via_adv_when_proxy_only():
+    """Single-day proxy alone must NOT satisfy the gate; ADV does."""
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=MIN_ADV_VALUE_INR,
+        delivery_value_inr=1_000_000_000,  # would have passed old proxy gate
+        delivery_kind="traded_value_proxy",
+        delivery_status="ok",
+    )
+    assert ok and why is None
+
+
+def test_gate_liquidity_proxy_only_fails():
+    """Proxy without sufficient ADV must fail (was the source of the false PASSes)."""
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=MIN_ADV_VALUE_INR - 1,
+        delivery_value_inr=1_000_000_000,
+        delivery_kind="traded_value_proxy",
+        delivery_status="ok",
+    )
     assert not ok
-    assert "delivery_value" in why
+    assert "adv" in why
+
+
+def test_gate_liquidity_actual_too_low_and_adv_missing_fails():
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=None,
+        delivery_value_inr=MIN_DELIVERY_VALUE_INR - 1,
+        delivery_kind="actual",
+        delivery_status="ok",
+    )
+    assert not ok
+    assert "liquidity_missing" in why
+
+
+def test_gate_liquidity_adv_below_floor_with_real_delivery_above_passes():
+    """If real delivery ≥ ₹5cr, the actual path passes even when ADV is low."""
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=MIN_ADV_VALUE_INR - 1,
+        delivery_value_inr=MIN_DELIVERY_VALUE_INR,
+        delivery_kind="actual",
+        delivery_status="ok",
+    )
+    assert ok and why is None
+
+
+def test_gate_liquidity_adv_below_floor_fails():
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=MIN_ADV_VALUE_INR - 1,
+        delivery_value_inr=None,
+        delivery_kind=None,
+        delivery_status="source_failed",
+    )
+    assert not ok
+    assert "adv" in why
+
+
+def test_gate_liquidity_delivery_path_requires_secondary_adv_floor():
+    """A thinly-traded name with a single high-delivery day must NOT pass."""
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=MIN_ADV_SECONDARY_FLOOR_INR - 1,
+        delivery_value_inr=MIN_DELIVERY_VALUE_INR,  # real delivery satisfies primary
+        delivery_kind="actual",
+        delivery_status="ok",
+    )
+    assert not ok
+    assert "secondary" in why
+
+
+def test_gate_liquidity_delivery_path_missing_adv_fails():
+    """Delivery path needs ADV for the secondary floor; ADV must not be None."""
+    ok, why = gate_liquidity_adequacy(
+        adv_value_inr=None,
+        delivery_value_inr=MIN_DELIVERY_VALUE_INR,
+        delivery_kind="actual",
+        delivery_status="ok",
+    )
+    assert not ok
+    assert "liquidity_missing" in why
+
+
+def test_gate_liquidity_lenient_not_a_parameter():
+    """--lenient-external-gates must NOT loosen the liquidity gate by design.
+
+    The new gate signature intentionally drops the `lenient` kwarg: the 20d
+    ADV path makes the gate reliable even when bhavcopy is unreachable,
+    so there is no source-failure case to relax. Pin the contract here.
+    """
+    import inspect
+    sig = inspect.signature(gate_liquidity_adequacy)
+    assert "lenient" not in sig.parameters
 
 
 def test_gate_surveillance_clean():

@@ -573,6 +573,22 @@ body {
   cursor: help;
 }
 
+/* Marker for which metric satisfied the liquidity hard gate
+   (delivery_actual vs adv). Visually quieter than the PASS pill so it
+   stays a hint, not a status. */
+.gate-path {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 0.05em 0.4em;
+  border-radius: 0.3em;
+  background: rgba(167, 139, 250, 0.18);
+  color: #a78bfa;
+  font-size: 0.7em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
 /* =========================================================================
    Expanded row detail
    ========================================================================= */
