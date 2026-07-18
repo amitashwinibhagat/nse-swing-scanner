@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-18T13:36:17.950881+00:00",
+  "generated_at": "2026-07-18T13:46:01.957649+00:00",
   "universe_size": 500,
   "gate_pass_count": 24,
   "config": {
@@ -115,9 +115,9 @@
         "quality_composite": 0.7777777777777778,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-08-12",
+      "earnings_within_days": 25,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "HINDPETRO",
@@ -319,9 +319,9 @@
         "quality_composite": 0.7777777777777778,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-24",
+      "earnings_within_days": 6,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "HBLENGINE",
@@ -1033,9 +1033,9 @@
         "quality_composite": 0.8888888888888888,
         "conviction_holding": 1.0
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-30",
+      "earnings_within_days": 12,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "SAIL",
@@ -1135,9 +1135,9 @@
         "quality_composite": 0.8888888888888888,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-24",
+      "earnings_within_days": 6,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "MCX",
@@ -3787,9 +3787,9 @@
         "quality_composite": 0.8888888888888888,
         "conviction_holding": 0.9484999999999999
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-24",
+      "earnings_within_days": 6,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "CHALET",
@@ -5623,9 +5623,9 @@
         "quality_composite": 0.7777777777777778,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-30",
+      "earnings_within_days": 12,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "GRSE",
@@ -5827,9 +5827,9 @@
         "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-31",
+      "earnings_within_days": 13,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "NTPC",
@@ -5929,9 +5929,9 @@
         "quality_composite": 0.7777777777777778,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-29",
+      "earnings_within_days": 11,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "CONCOR",
@@ -15211,9 +15211,9 @@
         "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-07-24",
+      "earnings_within_days": 6,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "NTPCGREEN",
@@ -23269,9 +23269,9 @@
         "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
+      "earnings_date": "2026-08-04",
+      "earnings_within_days": 17,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "360ONE",
