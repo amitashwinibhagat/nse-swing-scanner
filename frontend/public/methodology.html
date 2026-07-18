@@ -437,10 +437,12 @@
         <li><a href="#hard-gates">Hard gates</a></li>
         <li><a href="#soft-score">Soft score</a></li>
         <li><a href="#atr-plan">ATR-based targets</a></li>
+        <li><a href="#decision-layer">Decision-support layer</a></li>
         <li><a href="#source-status">Source-status policy</a></li>
         <li><a href="#data-sources">Data sources &amp; fallbacks</a></li>
         <li><a href="#cache">Cache policy</a></li>
         <li><a href="#monitoring">Monitoring &amp; reliability</a></li>
+        <li><a href="#history-outcomes">Scan history &amp; outcome tracking</a></li>
         <li><a href="#limitations">Limitations</a></li>
         <li><a href="#what-this-is-not">What this is not</a></li>
       </ul>
@@ -516,10 +518,10 @@
               <td>25 / 40</td>
             </tr>
             <tr>
-              <td><code>gate_delivery_value</code></td>
-              <td>Latest-day delivery value ≥ ₹5 cr</td>
-              <td>NSE bhavcopy</td>
-              <td>₹5,00,00,000</td>
+              <td><code>gate_liquidity_adequacy</code></td>
+              <td>20-session ADV ≥ ₹10cr OR real delivery ≥ ₹5cr</td>
+              <td>yfinance ADV / NSE bhavcopy</td>
+              <td>₹10cr / ₹5cr</td>
             </tr>
             <tr>
               <td><code>gate_surveillance</code></td>
@@ -561,9 +563,9 @@
           <div class="meta">backend/technicals.py</div>
         </div>
         <div class="card">
-          <h4>Delivery value</h4>
-          <p>Latest-session delivery value must be at least ₹5 crore. When NSE bhavcopy is blocked, the system falls back to a yfinance traded-value proxy (volume × close) and labels it clearly.</p>
-          <div class="meta">backend/bhavcopy.py</div>
+          <h4>Liquidity adequacy</h4>
+          <p>A row PASSes if EITHER its 20-session average traded value (ADV) from yfinance is ≥ ₹10cr, OR real NSE/BSE delivery ≥ ₹5cr is available. Single-day traded-value proxy is no longer a valid gate path on its own — it was typically 2-3× real delivery and inflated the PASS list. A secondary ₹3cr ADV floor applies when the real-delivery path passes, to keep thinly-traded names out. The drawer shows which path satisfied the gate (<code>delivery_actual</code> vs <code>adv</code>).</p>
+          <div class="meta">backend/bhavcopy.py + backend/technicals.py</div>
         </div>
         <div class="card">
           <h4>Surveillance</h4>
@@ -612,8 +614,10 @@
 
       <h3>Relative-strength factor</h3>
       <p>
-        A multiplier in [0.70, 1.05] is applied to <code>base_score</code> based
-        on how the stock is behaving relative to the Nifty 50 index:
+        A multiplier from the discrete set
+        <code>{0.70, 0.85, 1.0, 1.05}</code> is applied to
+        <code>base_score</code> based on how the stock is behaving
+        relative to the Nifty 50 index:
       </p>
       <ul>
         <li>Stock is ≥ 5 percentage points worse than the index from its 200EMA → penalty (0.85× or 0.70×).</li>
@@ -654,6 +658,119 @@
         Risk-reward ratios are computed against the stop loss. The entry zone is
         a range, not a single price, to account for slippage and intraday
         volatility.
+      </p>
+      <div class="callout warning">
+        <span class="callout-title">R:R is a constant, not a discriminating variable</span>
+        <p>
+          Because the plan is constructed from fixed ATR multiples, R:R to T1
+          is <strong>always exactly 1.5</strong> and R:R to T2 is
+          <strong>always exactly 2.5</strong> for every stock, every day. The
+          dashboard labels these as <code>(fixed)</code> so they aren't
+          mistaken for a signal that discriminates between candidates. A
+          future revision may compute targets from nearby swing structure
+          instead, which would make R:R vary — but only after the forward-return
+          attribution justifies the change.
+        </p>
+      </div>
+    </section>
+
+    <section id="decision-layer">
+      <h2>Decision-support layer</h2>
+      <p>
+        The raw scan output is a ranked list. To turn it into something
+        you can act on without a spreadsheet, the dashboard computes
+        several derived fields client-side from the JSON contract. None
+        of these change the gates or the score — they layer context on
+        top.
+      </p>
+
+      <h3>Entry-state chips</h3>
+      <p>
+        Every card and row shows where the current price sits relative to
+        the scan's stored trade plan:
+        <span class="badge ok">in zone</span>,
+        <span class="badge fallback_used">extended +x%</span>,
+        <span class="badge fallback_used">below zone</span>,
+        <span class="badge source_failed">stopped</span>, or
+        <span class="badge ok">at T1 / T2</span>. Chips are labelled
+        <code>as of scan close</code> because the scan runs twice daily —
+        they describe the last completed session, not real-time.
+      </p>
+
+      <h3>Market-regime KPI</h3>
+      <p>
+        The header shows the Nifty 50's distance to its 200-day EMA:
+        <span class="badge ok">Risk-on</span> (&gt; +2%),
+        <span class="badge fallback_used">Neutral</span> (within ±2%), or
+        <span class="badge source_failed">Risk-off</span> (&lt; −2%,
+        labelled "be selective"). The same threshold drives the regime
+        tag persisted per snapshot (see
+        <a href="#history-outcomes">Scan history &amp; outcome tracking</a>).
+      </p>
+
+      <h3>Position-size calculator</h3>
+      <p>
+        The drawer includes a calculator that sizes positions off the
+        <em>top</em> of the entry zone (worst-case fill). With a 1.0×ATR
+        stop measured from the entry midpoint, the actual stop distance
+        from a zone-high fill is 1.25×ATR — sizing off the midpoint would
+        understate risk by ~25% of the stop distance. Capital and risk-%
+        inputs persist in localStorage.
+      </p>
+
+      <h3>Score-honesty labels</h3>
+      <p>Three labels surface what the score <em>doesn't</em> tell you:</p>
+      <ul>
+        <li><strong>"Scored on N/7 components"</strong> — when a sub-score is missing (e.g. P/E blank for ADR-listed names), the composite renormalises over the remaining weights. Two rows scored on different component counts are not directly comparable.</li>
+        <li><strong>"Market adjustment ×0.85"</strong> — the relative-strength multiplier applied after the weighted sum. The sub-score bars show the pre-multiplier breakdown; this line reconciles them with the final score.</li>
+        <li><strong>R:R "(fixed)"</strong> — risk-reward to T1 is a constant 1.5×ATR multiple from the entry midpoint (T2 is 2.5×), identical for every stock. It is <em>not</em> a discriminating variable; displayed for completeness.</li>
+      </ul>
+
+      <h3>Earnings proximity warning</h3>
+      <p>
+        For gate-passed names, the scanner fetches the next earnings date
+        from yfinance and surfaces an
+        <span class="badge fallback_used">Earnings in Nd</span> chip when
+        the date is within 14 days (red within 3). This is a warning only
+        — never a gate. yfinance NSE earnings dates are frequently missing;
+        absence of the chip means "no data", not "no earnings".
+      </p>
+
+      <h3>Confirmation overlay (A/B label)</h3>
+      <p>
+        Each row carries a <span class="badge ok">Confirmed</span> or
+        <span class="badge fallback_used">Anticipatory</span> label based
+        on early stabilization evidence (RSI rising over 3 sessions AND
+        last close up). This is <strong>not a gate and not a score input</strong>
+        — it's a persisted label so cohort analysis can later measure
+        whether confirmed entries outperform anticipatory ones. Raw
+        features (<code>rsi_delta_3d</code>, <code>vol_ratio_3v20</code>)
+        are also persisted for future re-cutting.
+      </p>
+
+      <h3>Exit-side warnings</h3>
+      <p>
+        The drawer surfaces two expectancy warnings computed from fields
+        already in the JSON — no prediction required:
+      </p>
+      <ul>
+        <li><strong>T1 capped by swing high</strong> — when a recent 3-month swing high sits between the entry zone and T1, the measured-move target is structurally optimistic.</li>
+        <li><strong>Volatility expanding</strong> — when ATR(14) is &gt; 1.3× its value 20 sessions ago, the 1.0×ATR stop is likely to be clipped.</li>
+      </ul>
+      <p class="muted">
+        These are A/B labels awaiting cohort evidence. They flag structural
+        R:R asymmetry; whether they predict underperformance will be
+        visible in the performance view once N is sufficient.
+      </p>
+
+      <h3>Watchlist &amp; "Since last scan"</h3>
+      <p>
+        Stars on cards/rows/drawer persist a watchlist to localStorage.
+        A "Watchlist" filter segment and pin-to-top within the Passed
+        view keep your candidates visible across scans. The delta strip
+        surfaces new PASSes, dropped names, and watchlist entry-state
+        changes since the prior <em>evening</em> scan (morning scans
+        repeat prior close and would produce empty deltas).
       </p>
     </section>
 
@@ -711,6 +828,7 @@
             <tr><td>Shareholding</td><td>Screener.in</td><td>none</td><td>fail-closed</td></tr>
             <tr><td>Surveillance</td><td>NSE + BSE consolidated</td><td>none</td><td>flag-only</td></tr>
             <tr><td>Corporate actions</td><td>NSE corporate-actions API</td><td>none</td><td>fail-closed</td></tr>
+            <tr><td>Earnings dates</td><td>yfinance Ticker.calendar / get_earnings_dates</td><td>none</td><td>fail-open (warning only)</td></tr>
             <tr><td>Delivery value</td><td>NSE archives bhavcopy</td><td>yfinance traded-value proxy</td><td>BSE archives</td></tr>
             <tr><td>Technicals, F-Score, P/E</td><td>yfinance</td><td>none</td><td>fail-closed</td></tr>
             <tr><td>Nifty 50 context</td><td>yfinance ^NSEI</td><td>none</td><td>fail-closed</td></tr>
@@ -760,7 +878,8 @@
             <tr><td>Bhavcopy rollup</td><td>12 hours</td><td>Daily, rarely changes intraday</td></tr>
             <tr><td>Surveillance list</td><td>7 days</td><td>Weekly cadence</td></tr>
             <tr><td>Corporate actions</td><td>12 hours</td><td>Daily refresh</td></tr>
-            <tr><td>yfinance price-derived fields</td><td>12 hours</td><td>Prices, RSI, ATR, etc.</td></tr>
+            <tr><td>Earnings dates</td><td>12 hours</td><td>Changes rarely; cached under <code>earnings:v2:SYM</code></td></tr>
+            <tr><td>yfinance price-derived fields</td><td>12 hours</td><td>Prices, RSI, ATR, confirmation features, exit-warning features</td></tr>
             <tr><td>yfinance fundamentals</td><td>24 hours</td><td>F-Score inputs</td></tr>
           </tbody>
         </table>
@@ -774,6 +893,17 @@
           12 hours. The scanner handles this gracefully by design, but numbers
           may look wrong until the cache expires. This is a known trade-off of
           free data and aggressive caching.
+        </p>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-title">Cache-key versioning</span>
+        <p>
+          When a cached payload's shape changes (new fields added), the cache
+          key is versioned — e.g. <code>tech:TICKER:1y:v3</code> — so old
+          12-hour entries don't mask the new field set for half a day. The
+          version suffix is bumped on every technicals schema change and on
+          the earnings extractor logic change (1.2.1).
         </p>
       </div>
     </section>
@@ -815,6 +945,85 @@
           redundant alarms.
         </p>
       </div>
+
+      <h3>3. Telegram digest</h3>
+      <p>
+        After every successful scan, the workflow sends a Telegram message
+        with the regime chip, PASS count, top-5 candidates by score, and
+        any source warnings. The digest is secrets-gated and soft-fails —
+        an alert outage never blocks a scan. It sends even on zero-PASS
+        days, because silence is indistinguishable from a broken workflow.
+      </p>
+    </section>
+
+    <section id="history-outcomes">
+      <h2>Scan history &amp; outcome tracking</h2>
+      <p>
+        The single biggest honesty gap in most screeners is that they never
+        tell you whether their signals work. This scanner persists every
+        scan and measures forward returns so the question is answerable
+        with data, not opinion.
+      </p>
+
+      <h3>Dated snapshots</h3>
+      <p>
+        Every scan is saved as a minified JSON file at
+        <code>/data/snapshots/YYYY-MM-DD-{am,pm}.json</code> alongside a
+        <code>history_index.json</code>. A rolling 90-day prune runs in
+        the same commit. The repo is effectively a free append-only
+        database of labelled swing setups — every snapshot is a usable
+        row once its T+20 forward window closes.
+      </p>
+
+      <h3>Forward-return attribution</h3>
+      <p>
+        A weekly workflow (Saturday 09:30 IST) reads every snapshot,
+        fetches T+5 / T+10 / T+20 closing prices for the gate-passed
+        cohort, computes <strong>per-name excess return vs Nifty 50</strong>
+        over the same window, and writes
+        <code>/data/performance.json</code>. The dashboard's Performance
+        section renders per-window × score-bucket and per-window × regime
+        hit-rate tables.
+      </p>
+      <div class="callout warning">
+        <span class="callout-title">Statistical discipline (non-negotiable)</span>
+        <ul>
+          <li><strong>Per-scan cohorts, never pooled.</strong> Overlapping T+20 windows across consecutive scans are autocorrelated; pooling per-name rows would inflate apparent N.</li>
+          <li><strong>Median + IQR + N</strong>, never mean-only. Small cohorts and skewed distributions make means misleading.</li>
+          <li><strong>Untrackable names counted separately</strong> (delisted / suspended / yfinance fetch failed), never silently dropped — dropping flatters the hit rate.</li>
+          <li><strong>Regime-tagged.</strong> A 90-day window is roughly one regime; cohort conclusions are tagged with the regime they were measured in.</li>
+          <li><strong>N &lt; 5 cells render "insufficient data"</strong> in the regime-split table rather than a misleading median.</li>
+        </ul>
+      </div>
+
+      <h3>Calibration raw material</h3>
+      <p>
+        <code>performance.json</code> carries a <code>per_name</code>
+        array — snapshot, symbol, score, bucket, regime, confirmation
+        state, per-window excess return. This is the raw material for a
+        future score→probability calibration layer: once ~3-6 months of
+        cohorts exist, the UI can show "names like this, in this regime,
+        beat Nifty X% of the time (N=Y)" instead of an ordinal score.
+        The calibration itself is deferred until the data exists; the
+        plumbing ships now so every snapshot from 2026-07-18 forward is
+        a usable labelled row.
+      </p>
+
+      <div class="callout info">
+        <span class="callout-title">What is deliberately NOT done</span>
+        <ul>
+          <li><strong>No auto-tuning of score weights</strong> on the cohorts — guaranteed overfit at this sample size.</li>
+          <li><strong>No ML / XGBoost / "AI layer"</strong> — same overfit risk, and it would destroy the transparent-score differentiator.</li>
+          <li><strong>No in-sample backtest</strong> as validation — forward tracking is more honest and reuses the snapshot infra.</li>
+          <li><strong>No new hard gates</strong> until the existing ones are validated by cohort evidence.</li>
+        </ul>
+      </div>
+
+      <p class="muted">
+        The moat is not a better formula — it's being the only free Indian
+        screener that <em>publishes its own track record</em>. Every week
+        of snapshots is a proprietary labelled dataset no competitor has.
+      </p>
     </section>
 
     <section id="limitations">
@@ -846,18 +1055,33 @@
           current reference.
         </li>
         <li>
-          <strong>Earnings surprise is not a hard gate.</strong> There is no
-          clean free source for Indian-stock consensus estimates, so the
-          scanner does not screen on data it does not have.
+          <strong>Earnings proximity is a warning, not a gate.</strong>
+          yfinance NSE earnings dates are frequently missing; the scanner
+          surfaces an "Earnings in Nd" chip when a date is available and
+          within 14 days, but does not block entries. Earnings
+          <em>surprise</em> (negative EPS vs consensus) is not screened
+          at all — there is no clean free source for Indian-stock
+          consensus estimates.
         </li>
         <li>
-          <strong>Soft-score weights and F-Score threshold are hand-tuned.</strong>
-          They are not backtested. Treat the score as a ranking, not an edge.
+          <strong>Soft-score weights are hand-tuned but now measured.</strong>
+          They are not backtested and not auto-tuned. Since 1.2.0, the
+          weekly outcome tracker computes forward-return attribution so
+          the weights are <em>visible</em> against evidence; manual
+          tuning stays deferred until cohort N is sufficient. Treat the
+          score as a ranking, not an edge.
+        </li>
+        <li>
+          <strong>Accuracy features are A/B labels, not validated levers.</strong>
+          The confirmation overlay, exit-side warnings, and regime split
+          are persisted from 2026-07-18 forward so cohort analysis can
+          measure them. They do not change the score or the gates; their
+          predictive value will be published once N supports it.
         </li>
         <li>
           <strong>This is not a real-time or intraday system.</strong> The
-          scan runs twice daily. The data is stale within hours of a market
-          session.
+          scan runs twice daily. The data is stale within hours of a
+          market session.
         </li>
       </ul>
 
@@ -907,7 +1131,7 @@
         <a href="https://github.com/amitashwinibhagat/nse-swing-scanner" target="_blank" rel="noreferrer">GitHub</a>
       </p>
       <p>
-        © 2026 DataDab LLP. Methodology last updated 2026-07-03.
+        © 2026 DataDab LLP. Methodology last updated 2026-07-18 (v1.3.0).
       </p>
     </footer>
   </div>
