@@ -83,6 +83,7 @@ const COLUMNS = [
 ];
 
 const STALE_HOURS = 18;
+const STALE_GRACE_MS = 30 * 60 * 1000;
 const ADMIN_COOLDOWN_MS = 10 * 60 * 1000;
 const ADMIN_SECRET_LS_KEY = "nseSwingAdminSecret";
 const ADMIN_LAST_TRIGGER_LS_KEY = "nseSwingLastTriggerAt";
@@ -143,6 +144,14 @@ function freshnessAccent(iso) {
   if (h < 14) return "success";
   if (h < 20) return "warning";
   return "danger";
+}
+
+function computeStale(generatedAt, scanStatus) {
+  const next = scanStatus && scanStatus.next_expected_utc;
+  if (next) {
+    return Date.now() > new Date(next).getTime() + STALE_GRACE_MS;
+  }
+  return hoursSince(generatedAt) > STALE_HOURS;
 }
 
 function exportCsv(rows, filename = "nse_swing_scan.csv") {
@@ -347,7 +356,9 @@ export default function App() {
       if (res.status === 401) {
         localStorage.removeItem(ADMIN_SECRET_LS_KEY);
         setAdminSecret(null);
-        setTriggerError("Invalid admin secret. Stored secret cleared.");
+        setTriggerError(
+          "Invalid admin secret. Recover it from Netlify env var SCAN_TRIGGER_SECRET, or trigger directly with: gh workflow run scan.yml --repo amitashwinibhagat/nse-swing-scanner"
+        );
         return;
       }
       if (res.status === 202) {
@@ -357,7 +368,12 @@ export default function App() {
         setTriggerStatus("queued");
         return;
       }
-      setTriggerError("Scan trigger failed. Check Netlify function logs.");
+      let detail = "Check Netlify function logs.";
+      try {
+        const body = await res.json();
+        if (body && body.error) detail = `Server error: ${body.error}.`;
+      } catch {}
+      setTriggerError(`Scan trigger failed (HTTP ${res.status}). ${detail}`);
     } catch (e) {
       setTriggerError(`Scan trigger failed: ${e.message}`);
     } finally {
@@ -430,7 +446,7 @@ export default function App() {
   }
 
   const generatedAt = new Date(data.generated_at);
-  const stale = hoursSince(data.generated_at) > STALE_HOURS;
+  const stale = computeStale(data.generated_at, scanStatus);
 
   const relativeAge = fmtRelativeAge(data.generated_at);
   const driftNote = fmtDrift(scanStatus);
@@ -543,12 +559,27 @@ export default function App() {
 
       {stale && (
         <div className="stale-banner" role="status">
-          Scan data is older than {STALE_HOURS} hours. The scheduled GitHub Action
-          may have failed — check the{" "}
-          <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
-            Actions tab
-          </a>
-          .
+          {scanStatus && scanStatus.next_expected_utc ? (
+            <>
+              No fresh scan since {fmtRelativeAge(data.generated_at)}. The
+              next scheduled scan was due{" "}
+              {fmtRelativeAge(scanStatus.next_expected_utc)} and did not
+              arrive — check the{" "}
+              <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
+                Actions tab
+              </a>
+              .
+            </>
+          ) : (
+            <>
+              Scan data is older than {STALE_HOURS} hours. The scheduled
+              GitHub Action may have failed — check the{" "}
+              <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
+                Actions tab
+              </a>
+              .
+            </>
+          )}
         </div>
       )}
 

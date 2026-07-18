@@ -219,6 +219,28 @@ jobs:
                       )
                       drift_minutes = int((now - chosen).total_seconds() // 60)
 
+              # Next future scheduled window (Mon-Fri only — matches the cron's
+              # `* * 1-5` weekday constraint). The frontend uses this instead of
+              # a clock-time threshold so the staleness banner doesn't fire on
+              # weekends when no scan is expected.
+              # TODO: also skip NSE holidays (~14/yr) when a holiday list exists.
+              next_expected_utc = None
+              base_date = now.date()
+              for offset in range(7):
+                  cand_date = base_date + datetime.timedelta(days=offset)
+                  if cand_date.weekday() >= 5:   # 5 = Saturday, 6 = Sunday
+                      continue
+                  for h, m in WINDOWS:
+                      cand_dt = datetime.datetime.combine(
+                          cand_date, datetime.time(h, m),
+                          tzinfo=datetime.timezone.utc,
+                      )
+                      if cand_dt > now:
+                          next_expected_utc = cand_dt
+                          break
+                  if next_expected_utc is not None:
+                      break
+
               scheduled_cron = ", ".join(f"{m} {h} * * 1-5" for h, m in WINDOWS)
               status = {
                   "generated_at": scan["generated_at"],
@@ -228,6 +250,9 @@ jobs:
                   "trigger": event,
                   "scheduled_window_utc": scheduled_window_utc,
                   "scheduled_cron": scheduled_cron,
+                  "next_expected_utc": (
+                      next_expected_utc.isoformat() if next_expected_utc else None
+                  ),
                   "drift_minutes": drift_minutes,
               }
               with open("../frontend/public/data/scan_status.json", "w") as f:

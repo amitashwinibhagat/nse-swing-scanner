@@ -6,5 +6,6 @@
   "trigger": "workflow_dispatch",
   "scheduled_window_utc": null,
   "scheduled_cron": "30 3 * * 1-5, 30 10 * * 1-5",
-  "drift_minutes": null
+  "drift_minutes": null,
+  "next_expected_utc": "2026-07-20T03:30:00+00:00"
 }
