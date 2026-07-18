@@ -1,5 +1,103 @@
 # Changelog
 
+## 1.2.0 — Decision-support layer, scan history, outcome tracking, Telegram digest
+
+### Why
+
+The scanner answered "what passed today?" but not the questions a trader
+actually acts on: is this name in its entry zone *now*, what did the
+watchlist do since the last scan, how many shares do I buy, and — the one
+that justifies the whole system — do past PASS lists make money? This
+release closes those gaps without changing any gate or score logic: the
+git-committed JSON contract becomes a free append-only database, and the
+frontend gets a decision layer on top of it.
+
+### Added
+
+**Scan history (B1)**
+- `backend/scripts/snapshot_writer.py`: persists every scan as a dated,
+  minified snapshot `data/snapshots/YYYY-MM-DD-{am|pm}.json` (~770 KB for
+  Nifty 500 vs ~1 MB pretty-printed) plus `history_index.json`. Rolling
+  90-day prune runs in the same step. New `scan.yml` step wires it in;
+  the commit step now also adds `frontend/public/data/snapshots/`.
+
+**Outcome tracking (C1) + hit-rate view (C2)**
+- `backend/performance.py` + `backend/scripts/compute_performance.py`:
+  weekly forward-return attribution (T+5/T+10/T+20) of the gate-passed
+  cohort vs ^NSEI, per-snapshot cohorts (never pooled — overlapping
+  windows are autocorrelated), median + IQR + N per bucket, untrackable
+  symbols counted separately, never silently dropped.
+- `.github/workflows/outcome-tracker.yml`: Saturday 04:00 UTC cron that
+  writes `frontend/public/data/performance.json` and commits it.
+- `frontend/src/components/PerformanceSection.jsx`: per-window ×
+  score-bucket hit-rate table, hidden gracefully until data exists.
+
+**"Since last scan" delta strip (B2)**
+- `frontend/src/utils/delta.js` + `DeltaStrip.jsx`: fetches
+  `history_index.json`, diffs against the previous **evening** snapshot
+  (morning scans repeat prior close and would produce empty deltas),
+  and surfaces new PASSes, dropped names, and watchlist entry-state
+  triggers as a dismissible banner.
+
+**Earnings proximity warning (B3)**
+- `backend/earnings.py`: yfinance earnings-date lookup for gate-passed
+  names only (bounded calls), 12 h cache, fail-open envelope. New JSON
+  fields `earnings_date`, `earnings_within_days`,
+  `earnings_source_status`. Frontend renders an "Earnings in Nd" chip
+  (amber → red within 3 days) on cards, table rows, and the drawer.
+  Warning only — never a gate; yfinance NSE earnings dates are
+  frequently missing.
+
+**Structured gate results (B4)**
+- `gate_results: [{gate, passed, reason}]` in the JSON contract alongside
+  the legacy `gate_fail_reason` string (kept for CSV compat). The drawer
+  now renders a per-gate ✓/✗ checklist with inline values (F-Score,
+  ADV, holdings %, drawdown, RSI, surveillance, corp actions).
+
+**Telegram digest (C3)**
+- `backend/scripts/send_digest.py` + new `scan.yml` step: regime, PASS
+  count, top-5 by score, source warnings. Secrets-gated, soft-fails
+  (`continue-on-error` + exit 0) — an alert outage never blocks a scan.
+  Sends even on zero-PASS days (silence is ambiguous with failure).
+
+**Frontend decision layer**
+- Entry-state chip everywhere (in zone / extended +x% / below zone /
+  stopped / at T1 / at T2), always labelled "as of scan close".
+- Watchlist (localStorage) with stars on cards/rows/drawer, a Watchlist
+  filter segment, and pin-to-top within the Passed view.
+- Market-regime KPI (Nifty vs 200EMA) in the header.
+- Position-size calculator in the drawer: sizes off entry-zone-high
+  (worst-case 1.25·ATR stop distance), persisted capital/risk inputs.
+- Score-honesty labels: "scored on N/7 components" (renormalisation
+  disclosure), "Market adjustment ×0.85" line in SubscoreBars, and
+  explicit "(fixed)" tags on R:R (R:R to T1 is a constant 1.5×ATR
+  multiple, not a discriminating variable).
+- Filter choice persisted across reloads.
+
+### Changed
+
+- `backend/scanner.py`: gate evaluation now also collects `gate_results`;
+  earnings fetch wired in for gate-passed names. Docstring fix:
+  `relative_strength_factor` returns {0.70, 0.85, 1.0, 1.05}, not
+  [0.6, 1.1].
+
+### Operator setup required (optional)
+
+1. Create a Telegram bot via @BotFather; set repo secrets
+   `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`. Without them the digest
+   step is a logged no-op.
+
+### Validation
+
+- 123 pytest passes (was 96), incl. new suites: snapshot_writer,
+  performance (cohort stats, buckets, untrackable), send_digest,
+  earnings, and extended JSON-contract tests for `gate_results` +
+  earnings fields.
+- Frontend build green (45 modules).
+- End-to-end against the committed 2026-07-17 scan: snapshot writer +
+  90-day prune, digest message build, performance payload build, and a
+  NaN/`allow_nan=False` regression check on the new fields all pass.
+
 ## 1.1.9 — Drop Del. val column from UI
 
 ### Why

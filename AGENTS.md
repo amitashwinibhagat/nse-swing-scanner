@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-07-03.
+> Last updated: 2026-07-18.
 
 ## Project Overview
 
@@ -90,13 +90,16 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 .
 ├── .github/workflows/
 │   ├── ci.yml             # push/PR: cron guard + pytest + frontend build
-│   ├── scan.yml           # 2x daily: full scan + commit + Netlify deploy
-│   └── watchdog.yml       # 15min: freshness check + auto-trigger + ping
+│   ├── scan.yml           # 2x daily: full scan + snapshot + digest + commit + Netlify deploy
+│   ├── watchdog.yml       # 15min: freshness check + auto-trigger + ping
+│   └── outcome-tracker.yml # weekly (Sat 04:00 UTC): forward-return attribution
 ├── backend/
 │   ├── scanner.py         # Entry point: run_scan() orchestrates everything
 │   ├── universe.py        # Nifty 100/200/500 fetchers (CSV via NSE archives)
 │   ├── holdings.py        # Screener.in shareholding scraper + cache
 │   ├── corporate_actions.py # NSE corporate-actions endpoint + cache
+│   ├── earnings.py        # yfinance earnings-date lookup (gate-passed names only)
+│   ├── performance.py     # Forward-return attribution math (cohorts, IQR, buckets)
 │   ├── surveillance.py    # NSE/BSE T-group/suspension/GSM fetcher
 │   ├── bhavcopy.py        # Multi-provider delivery data (NSE/yfinance/BSE)
 │   ├── technicals.py      # RSI, ATR, EMAs, 200EMA proximity
@@ -107,26 +110,37 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── nse_client.py      # Akamai-bypass session helpers
 │   ├── requirements.txt   # yfinance, pandas, numpy, requests, bs4, lxml
 │   ├── scripts/
-│   │   └── check_cron_consistency.py  # CI guard (runs in ci.yml)
+│   │   ├── check_cron_consistency.py  # CI guard (runs in ci.yml)
+│   │   ├── snapshot_writer.py         # B1: dated snapshots + history_index + 90d prune
+│   │   ├── compute_performance.py     # C1: outcome tracker CLI (weekly workflow)
+│   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
 │   ├── cache/             # On-disk JSON cache (gitignored, restored via actions/cache@v6)
-│   └── tests/             # 87 tests, all run in <1s
+│   └── tests/             # 123 tests, all run in <1s
 ├── frontend/
 │   ├── public/data/
 │   │   ├── latest_scan.json    # Committed by scan.yml after each run
 │   │   ├── scan_status.json    # Committed by scan.yml (drift calc)
+│   │   ├── performance.json    # Committed by outcome-tracker.yml (weekly)
+│   │   ├── snapshots/          # Dated minified scans + history_index.json (90d window)
 │   │   └── .gitkeep
 │   ├── src/
 │   │   ├── App.jsx              # Top-level dashboard
 │   │   ├── main.jsx             # React root
-│   │   ├── styles.css           # Single CSS file, ~1370 lines
+│   │   ├── styles.css           # Single CSS file, ~1900 lines
+│   │   ├── utils/
+│   │   │   ├── scanPlan.js      # Entry-state, regime, RS factor, earnings chip (pure)
+│   │   │   ├── delta.js         # Snapshot diffing (new PASS / dropped / watchlist)
+│   │   │   └── useWatchlist.js  # localStorage watchlist hook
 │   │   └── components/
 │   │       ├── Kpi.jsx          # KPI tile with delta + accent
-│   │       ├── StockCard.jsx    # Card view
+│   │       ├── StockCard.jsx    # Card view (entry-state + earnings chips, watch star)
 │   │       ├── ScoreRing.jsx    # Soft score donut
-│   │       ├── SubscoreBars.jsx # Sub-score breakdown
+│   │       ├── SubscoreBars.jsx # Sub-score breakdown (+ RS adjustment line)
 │   │       ├── DonutHoldings.jsx
 │   │       ├── Rationale.jsx    # Methodology explainer
-│   │       ├── DetailDrawer.jsx # Per-stock detail panel
+│   │       ├── DetailDrawer.jsx # Per-stock detail panel (gate checklist, position sizer)
+│   │       ├── DeltaStrip.jsx   # "Since last scan" banner (B2)
+│   │       ├── PerformanceSection.jsx # Score-bucket hit-rate view (C2)
 │   │       ├── SegmentedControl.jsx, Skeleton.jsx
 │   ├── netlify/functions/
 │   │   └── trigger-scan.js      # Owner-only POST trigger (?admin=1)
@@ -135,7 +149,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ├── plans/                        # Older planning docs (kept for context)
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.1.6)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.2.0)
 └── AGENTS.md                     # ← you are here
 ```
 
@@ -147,7 +161,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pytest -q                                            # 87 tests, ~0.3s
+pytest -q                                            # 123 tests, ~1s
 python scanner.py --top-n 500 --workers 8 --sleep 0.3 \
     --lenient-external-gates \
     --output ../frontend/public/data/latest_scan.json
@@ -168,7 +182,7 @@ npm run build             # production build to dist/
 ```bash
 cd backend
 .venv/bin/python scripts/check_cron_consistency.py   # CI guard
-.venv/bin/python -m pytest -q                        # 87 tests
+.venv/bin/python -m pytest -q                        # 123 tests
 cd ../frontend && npm run build                      # typecheck + bundle
 ```
 
@@ -217,6 +231,8 @@ gh run watch $RUN_ID --repo amitashwinibhagat/nse-swing-scanner --exit-status
 | `HEALTHCHECK_WATCHDOG_URL` | watchdog.yml | Watchdog heartbeat (period 1h, grace 1h) |
 | `NETLIFY_AUTH_TOKEN` | scan.yml | Netlify deploy trigger (optional; auto-deploy via GH integration is preferred) |
 | `NETLIFY_SITE_ID` | scan.yml | Netlify site ID for the above |
+| `TELEGRAM_BOT_TOKEN` | scan.yml | Bot token for the post-scan digest (optional; absent → no-op) |
+| `TELEGRAM_CHAT_ID` | scan.yml | Target chat for the digest (optional; absent → no-op) |
 
 ### Netlify env vars (Site settings → Environment variables)
 
@@ -339,9 +355,13 @@ a new cached call with a long key, hash it.
   4. `Run full scan` (scanner.py with --top-n 500 --workers 12 --sleep 0.2)
   5. **3× healthchecks.io pings** (start, fail, success — gated by secrets)
   6. Validate JSON contract (asserts `generated_at` + `stocks` non-empty)
-  7. Write `scan_status.json` (drift calc, best-effort, try/except-wrapped)
-  8. Commit + push (gated by `if: success()`)
-  9. Netlify deploy (gated by `if: success()`, env-gated by NETLIFY_AUTH_TOKEN)
+  7. **Write dated snapshot** (`snapshot_writer.py`: minified
+     `data/snapshots/YYYY-MM-DD-{am|pm}.json` + `history_index.json` +
+     rolling 90-day prune)
+  8. Write `scan_status.json` (drift calc, best-effort, try/except-wrapped)
+  9. Commit + push latest_scan.json + scan_status.json + snapshots/
+  10. **Telegram digest** (`send_digest.py`, secrets-gated, soft-fails)
+  11. Netlify deploy (gated by `if: success()`, env-gated by NETLIFY_AUTH_TOKEN)
 
 ### `watchdog.yml` (cron drift detector)
 
@@ -362,6 +382,19 @@ a new cached call with a long key, hash it.
 - Backend job: cron guard + pytest + 5-stock smoke scan
 - Frontend job: npm ci + build
 - Both jobs green = merge-eligible
+
+### `outcome-tracker.yml` (weekly attribution)
+
+- Triggers: `schedule` (cron `0 4 * * 6` — Saturday 09:30 IST) + `workflow_dispatch`
+- Reads `data/snapshots/*`, fetches T+5/T+10/T+20 forward returns for each
+  snapshot's gate-passed cohort (per-name excess vs ^NSEI), writes
+  `data/performance.json`, commits + pushes
+- Statistical discipline is enforced in `backend/performance.py`: per-scan
+  cohorts (never pooled), median + IQR + N, untrackable symbols counted
+  separately. Frontend `PerformanceSection.jsx` renders the per-bucket
+  table and hides gracefully until the first payload lands.
+- First useful score-bucket cohorts appear after ~3-4 weeks of accumulated
+  snapshots (T+20 needs 20 trading days to close).
 
 ## healthchecks.io + Watchdog Setup
 
@@ -495,7 +528,7 @@ Single source of truth lives in two places, kept in sync by
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 87 tests in ~0.3s
+.venv/bin/python -m pytest -q          # 123 tests in ~1s
 ```
 
 Coverage (manual map):
