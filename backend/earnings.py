@@ -16,7 +16,7 @@ Missing / source-failed status is returned honestly; the UI must fail-open
 (no chip rendered) rather than auto-blocking a PASS.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 from typing import Optional
 
 from source_status import make_status
@@ -30,10 +30,39 @@ EARNINGS_WARN_DAYS = 14
 EARNINGS_CACHE_TTL_SECONDS = 12 * 60 * 60   # 12 hours
 
 
+def _as_list(v):
+    if v is None:
+        return []
+    if isinstance(v, (list, tuple)):
+        return list(v)
+    return [v]
+
+
+def _to_date(d) -> Optional[date]:
+    """Normalise yfinance date-ish values (datetime.date, datetime.datetime,
+    pandas Timestamp, ISO string) to a plain date, or None."""
+    if d is None:
+        return None
+    if isinstance(d, datetime):
+        return d.date()
+    if isinstance(d, date):
+        return d
+    try:
+        return datetime.fromisoformat(str(d)[:10]).date()
+    except Exception:
+        return None
+
+
 def _extract_next_earnings_date(yf_ticker: str) -> Optional[str]:
     """
     Try yfinance and return the next future earnings date as an ISO string
     (YYYY-MM-DD), or None when not available.
+
+    Handles both yfinance calendar shapes:
+      - modern (>= ~0.2.40): `Ticker.calendar` is a dict,
+        {'Earnings Date': [datetime.date(...)], ...}
+      - legacy: `Ticker.calendar` is a DataFrame with an 'Earnings Date'
+        row label.
     """
     try:
         import yfinance as yf
@@ -41,31 +70,22 @@ def _extract_next_earnings_date(yf_ticker: str) -> Optional[str]:
     except Exception:
         return None
 
-    # Preferred: Ticker.calendar (a DataFrame with 'Earnings Date' index).
+    today = datetime.utcnow().date()
+
+    # Primary: Ticker.calendar
     try:
         cal = t.calendar
-        if cal is not None and not cal.empty:
-            # The "Earnings Date" row carries the date(s).
+        candidates = []
+        if isinstance(cal, dict):
+            candidates = _as_list(cal.get("Earnings Date"))
+        elif cal is not None and getattr(cal, "empty", True) is False:
             try:
-                ed = cal.loc["Earnings Date"]
-                # May be a single Timestamp or a list of Timestamps.
-                if hasattr(ed, "__iter__") and not isinstance(ed, str):
-                    candidates = [d for d in ed if d is not None]
-                else:
-                    candidates = [ed]
-                today = datetime.utcnow().date()
-                future = []
-                for d in candidates:
-                    try:
-                        dd = d.date() if hasattr(d, "date") else datetime.fromisoformat(str(d)[:10]).date()
-                    except Exception:
-                        continue
-                    if dd >= today:
-                        future.append(dd)
-                if future:
-                    return min(future).isoformat()
+                candidates = [d for d in _as_list(cal.loc["Earnings Date"]) if d is not None]
             except Exception:
-                pass
+                candidates = []
+        future = [d for d in (_to_date(c) for c in candidates) if d and d >= today]
+        if future:
+            return min(future).isoformat()
     except Exception:
         pass
 
@@ -73,15 +93,7 @@ def _extract_next_earnings_date(yf_ticker: str) -> Optional[str]:
     try:
         dates = t.get_earnings_dates(limit=8)
         if dates is not None and len(dates) > 0:
-            today = datetime.utcnow().date()
-            future = []
-            for d in dates:
-                try:
-                    dd = d.date() if hasattr(d, "date") else datetime.fromisoformat(str(d)[:10]).date()
-                except Exception:
-                    continue
-                if dd >= today:
-                    future.append(dd)
+            future = [d for d in (_to_date(x) for x in dates) if d and d >= today]
             if future:
                 return min(future).isoformat()
     except Exception:

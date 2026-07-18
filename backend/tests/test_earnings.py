@@ -13,6 +13,43 @@ if BACKEND_DIR not in sys.path:
 import earnings  # noqa: E402
 
 
+class TestExtractNextEarningsDate(unittest.TestCase):
+    """Regression: yfinance >= 0.2.40 returns Ticker.calendar as a *dict*,
+    not a DataFrame. The original implementation called cal.empty and
+    silently produced 'missing' for every symbol in production."""
+
+    def _fake_ticker(self, calendar_payload, earnings_dates_index=None):
+        class _FakeTicker:
+            calendar = calendar_payload
+            def get_earnings_dates(self, limit=8):
+                return earnings_dates_index or []
+        return _FakeTicker()
+
+    def _run_with_stub(self, fake):
+        # earnings._extract_next_earnings_date imports yfinance lazily
+        # inside the function, so stubbing sys.modules is enough.
+        with mock.patch.dict(sys.modules, {"yfinance": mock.MagicMock(Ticker=lambda tk: fake)}):
+            return earnings._extract_next_earnings_date("X.NS")
+
+    def test_dict_calendar_shape(self):
+        """Dict-shaped calendar (modern yfinance) must parse."""
+        future = datetime.date.today() + datetime.timedelta(days=30)
+        result = self._run_with_stub(self._fake_ticker({"Earnings Date": [future]}))
+        self.assertEqual(result, future.isoformat())
+
+    def test_dict_calendar_past_only_returns_none(self):
+        """Dict calendar with only past dates → None (no future date)."""
+        past = datetime.date.today() - datetime.timedelta(days=10)
+        result = self._run_with_stub(self._fake_ticker({"Earnings Date": [past]}, earnings_dates_index=[]))
+        self.assertIsNone(result)
+
+    def test_none_calendar_falls_back(self):
+        """calendar=None must fall through to get_earnings_dates."""
+        future = datetime.date.today() + datetime.timedelta(days=5)
+        result = self._run_with_stub(self._fake_ticker(None, earnings_dates_index=[future]))
+        self.assertEqual(result, future.isoformat())
+
+
 class TestFetchEarningsUncached(unittest.TestCase):
     def test_returns_missing_when_no_dates(self):
         """No upcoming earnings date from yfinance → status='missing'."""
