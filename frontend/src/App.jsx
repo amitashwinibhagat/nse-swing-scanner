@@ -6,6 +6,10 @@ import StockCard from "./components/StockCard.jsx";
 import DetailDrawer from "./components/DetailDrawer.jsx";
 import { SkeletonGrid } from "./components/Skeleton.jsx";
 import Rationale from "./components/Rationale.jsx";
+import DeltaStrip from "./components/DeltaStrip.jsx";
+import PerformanceSection from "./components/PerformanceSection.jsx";
+import useWatchlist from "./utils/useWatchlist.js";
+import { computeEntryState, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
 
 function IconSearch() {
   return (
@@ -65,7 +69,9 @@ function IconMoon() {
 
 const THEME_LS_KEY = "nseSwingTheme";
 const VIEW_LS_KEY = "nseSwingViewMode";
+const FILTER_LS_KEY = "nseSwingFilter";
 const SCAN_STATUS_URL = "/data/scan_status.json";
+const VALID_FILTERS = ["all", "passed", "watchlist"];
 
 const COLUMNS = [
   { key: "symbol", label: "Stock" },
@@ -165,6 +171,8 @@ function exportCsv(rows, filename = "nse_swing_scan.csv") {
     "surveillance_is_restricted", "surveillance_restriction_type", "surveillance_source_status",
     "holdings_promoter_pct", "holdings_fii_pct", "holdings_dii_pct", "holdings_conviction_pct",
     "pending_corporate_action", "f_score", "trailing_pe", "avg_pe_5y", "gate_fail_reason",
+    // B3/B4 additions
+    "gate_results", "earnings_date", "earnings_within_days", "earnings_source_status",
   ];
   const esc = (v) => {
     if (v === null || v === undefined) return "";
@@ -194,7 +202,15 @@ export default function App() {
   const [error, setError] = useState(null);
   const [scanStatus, setScanStatus] = useState(null);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all"); // all | passed
+  const [filter, setFilter] = useState(() => {
+    if (typeof window === "undefined") return "all";
+    try {
+      const v = localStorage.getItem(FILTER_LS_KEY);
+      return VALID_FILTERS.includes(v) ? v : "all";
+    } catch {
+      return "all";
+    }
+  }); // all | passed | watchlist
   const [sortKey, setSortKey] = useState("swing_score");
   const [sortDir, setSortDir] = useState("desc");
   const [expanded, setExpanded] = useState(null);
@@ -277,10 +293,27 @@ export default function App() {
     try { localStorage.setItem(VIEW_LS_KEY, viewMode); } catch {}
   }, [viewMode]);
 
+  useEffect(() => {
+    try { localStorage.setItem(FILTER_LS_KEY, filter); } catch {}
+  }, [filter]);
+
+  const watchlist = useWatchlist();
+
+  const regime = useMemo(() => {
+    if (!data) return null;
+    for (const s of data.stocks) {
+      if (typeof s.market_index_pct_from_ema200 === "number") {
+        return regimeFromMarketIndex(s.market_index_pct_from_ema200);
+      }
+    }
+    return null;
+  }, [data]);
+
   const rows = useMemo(() => {
     if (!data) return [];
     let r = data.stocks;
     if (filter === "passed") r = r.filter((s) => s.gate_pass);
+    if (filter === "watchlist") r = r.filter((s) => watchlist.has(s.symbol));
     if (search.trim()) {
       const q = search.trim().toUpperCase();
       r = r.filter(
@@ -291,6 +324,11 @@ export default function App() {
       );
     }
     const sorted = [...r].sort((a, b) => {
+      // Pin watchlist symbols to the top when the user is browsing the
+      // passed list — helps a returning user see what they care about first.
+      const aw = watchlist.has(a.symbol) ? 1 : 0;
+      const bw = watchlist.has(b.symbol) ? 1 : 0;
+      if (aw !== bw) return bw - aw;
       const av = a[sortKey];
       const bv = b[sortKey];
       if (av === null || av === undefined) return 1;
@@ -299,7 +337,7 @@ export default function App() {
       return sortDir === "asc" ? av - bv : bv - av;
     });
     return sorted;
-  }, [data, search, filter, sortKey, sortDir]);
+  }, [data, search, filter, sortKey, sortDir, watchlist.symbols]);
 
   function toggleSort(key) {
     if (sortKey === key) {
@@ -476,6 +514,15 @@ export default function App() {
               delta={`${((data.gate_pass_count / data.universe_size) * 100).toFixed(1)}% of universe`}
               accent="success"
             />
+            {regime && (
+              <Kpi
+                label="Regime"
+                value={regime.label}
+                delta={regime.value}
+                accent={regime.tone}
+                title="Nifty 50 distance to its 200-day EMA, computed at scan time."
+              />
+            )}
             <Kpi
               label="Last scan"
               value={`${generatedAt.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })} · ${generatedAt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })} IST`}
@@ -513,6 +560,7 @@ export default function App() {
             options={[
               { value: "all", label: `All · ${data.stocks.length}` },
               { value: "passed", label: `Passed · ${data.gate_pass_count}` },
+              { value: "watchlist", label: `Watchlist · ${watchlist.symbols.length}` },
             ]}
           />
           <div className="icon-group">
@@ -628,7 +676,14 @@ export default function App() {
           <h2>No stocks match</h2>
           <p>Try clearing the filter or search term.</p>
         </div>
-      ) : viewMode === "cards" ? (
+      ) : (
+        <>
+          <DeltaStrip
+            currentGeneratedAt={data.generated_at}
+            stocks={rows}
+            watchlist={watchlist}
+          />
+          {viewMode === "cards" ? (
         <>
           <div className="stock-grid">
             {rows.map((s) => (
@@ -637,6 +692,7 @@ export default function App() {
                 stock={s}
                 expanded={expanded === s.symbol}
                 onToggle={() => setExpanded(expanded === s.symbol ? null : s.symbol)}
+                watchlist={watchlist}
               />
             ))}
           </div>
@@ -646,6 +702,8 @@ export default function App() {
               <DetailDrawer
                 stock={s}
                 onClose={() => setExpanded(null)}
+                watchlist={watchlist}
+                scanDate={data.generated_at}
               />
             ) : null;
           })()}
@@ -684,8 +742,58 @@ export default function App() {
                   aria-label={`${s.symbol} ${s.company_name} — ${s.gate_pass ? "pass" : "fail"}`}
                 >
                   <td className="symbol-cell">
-                    {s.symbol}
+                    <span className="symbol-line">
+                      {s.symbol}
+                      <button
+                        type="button"
+                        className={`watch-star sm ${watchlist.has(s.symbol) ? "on" : ""}`}
+                        onClick={(e) => { e.stopPropagation(); watchlist.toggle(s.symbol); }}
+                        aria-pressed={watchlist.has(s.symbol)}
+                        aria-label={
+                          watchlist.has(s.symbol)
+                            ? `Remove ${s.symbol} from watchlist`
+                            : `Add ${s.symbol} to watchlist`
+                        }
+                        title={watchlist.has(s.symbol) ? "Remove from watchlist" : "Add to watchlist"}
+                      >
+                        <svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true">
+                          <path
+                            d="M10 2.5l2.47 5 5.53.8-4 3.9.94 5.5L10 14.98 5.06 17.7l.94-5.5-4-3.9 5.53-.8L10 2.5z"
+                            fill={watchlist.has(s.symbol) ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    </span>
                     <span className="company">{s.company_name}</span>
+                    {(() => {
+                      const es = computeEntryState(s);
+                      if (!es) return null;
+                      return (
+                        <span
+                          className={`entry-state sm entry-${es.tone}`}
+                          title={es.tooltip}
+                        >
+                          <span className="entry-state-dot" aria-hidden="true" />
+                          {es.label}
+                        </span>
+                      );
+                    })()}
+                    {(() => {
+                      const ea = earningsChip(s);
+                      if (!ea) return null;
+                      return (
+                        <span
+                          className={`entry-state sm entry-${ea.tone}`}
+                          title={ea.tooltip}
+                        >
+                          <span className="entry-state-dot" aria-hidden="true" />
+                          {ea.label}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td>
                     <span className={`gate-badge ${s.gate_pass ? "pass" : "fail"}`}>
@@ -751,7 +859,13 @@ export default function App() {
                         {!s.gate_pass && s.gate_fail_reason && (
                           <div className="fail-reason">Gate fail: {s.gate_fail_reason}</div>
                         )}
-                        <SubscoreBars subScores={s.sub_scores} />
+                        <SubscoreBars
+                          subScores={s.sub_scores}
+                          marketCorrectionFactor={relativeStrengthFactor(
+                            s.pct_from_ema200,
+                            s.market_index_pct_from_ema200,
+                          )}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -760,9 +874,13 @@ export default function App() {
             ))}
           </tbody>
         </table>
+          )}
+        </>
       )}
 
       <Rationale />
+
+      <PerformanceSection />
 
       <div className="footer-note">
         Screening layer only — not investment advice, not a buy/sell signal.

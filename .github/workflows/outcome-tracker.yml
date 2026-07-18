@@ -1,0 +1,70 @@
+name: Outcome Tracker (forward-return attribution)
+
+# Implements the C1 plan item. Runs weekly (Saturday morning IST) to:
+#   1. Read all dated snapshots under frontend/public/data/snapshots/
+#   2. Fetch T+5/T+10/T+20 forward returns (per-name vs ^NSEI) for the
+#      gate-passed cohort of each snapshot.
+#   3. Write frontend/public/data/performance.json with per-window and
+#      per-score-bucket cohort stats (median + IQR, N per cohort).
+#   4. Commit + push.
+#
+# Schedule rationale: forward-return data is only meaningful after the
+# trailing window completes. A Saturday morning run gives the previous
+# week's snapshots T+20 coverage by Tuesday/Wednesday, and the week
+# before that complete T+20 coverage; the trailing 90-day window always
+# has at least some fully-closed cohorts.
+#
+# Statistical rules (per strategic review §6):
+#   - per-scan-date cohorts (no pooling — overlapping T+20 windows are
+#     autocorrelated)
+#   - report N, median, IQR (not just mean)
+#   - untrackable symbols (delisted / fetch failed) are a separate bucket
+#     and never silently dropped
+
+on:
+  schedule:
+    # 04:00 UTC Saturday = 09:30 IST Saturday — outside market hours, well
+    # after the Friday evening scan, and ahead of Monday's open so the
+    # refreshed view is live for the trading week.
+    - cron: "0 4 * * 6"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # commit performance.json back to main
+
+concurrency:
+  group: nse-swing-outcome
+  cancel-in-progress: false
+
+jobs:
+  attribute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Compute performance
+        working-directory: backend
+        run: |
+          python scripts/compute_performance.py \
+            --snapshots ../frontend/public/data/snapshots \
+            --output ../frontend/public/data/performance.json \
+            --cache-dir cache
+
+      - name: Commit and push performance.json
+        run: |
+          git config user.name "nse-swing-scanner-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add frontend/public/data/performance.json || true
+          git diff --staged --quiet && echo "No changes to performance.json" && exit 0
+          git commit -m "Performance update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push

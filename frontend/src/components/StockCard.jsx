@@ -1,4 +1,5 @@
 import ScoreRing from "./ScoreRing.jsx";
+import { computeEntryState, earningsChip } from "../utils/scanPlan.js";
 
 const fmtINR = (v) =>
   v == null ? "—" : `₹${v.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
@@ -7,7 +8,34 @@ const fmtNum = (v, d = 1, suffix = "") =>
 const tone = (v) =>
   v == null ? "" : v < 0 ? "negative" : v > 0 ? "positive" : "";
 
-export default function StockCard({ stock, expanded, onToggle }) {
+function StarButton({ on, onToggle, symbol, stop }) {
+  return (
+    <button
+      type="button"
+      className={`watch-star ${on ? "on" : ""}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle(symbol);
+      }}
+      onKeyDown={(e) => e.stopPropagation()}
+      aria-pressed={on}
+      aria-label={on ? `Remove ${symbol} from watchlist` : `Add ${symbol} to watchlist`}
+      title={on ? "Remove from watchlist" : "Add to watchlist"}
+    >
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+        <path
+          d="M10 2.5l2.47 5 5.53.8-4 3.9.94 5.5L10 14.98 5.06 17.7l.94-5.5-4-3.9 5.53-.8L10 2.5z"
+          fill={on ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
+export default function StockCard({ stock, expanded, onToggle, watchlist }) {
   const {
     symbol,
     company_name,
@@ -24,6 +52,10 @@ export default function StockCard({ stock, expanded, onToggle }) {
     gate_fail_reason,
   } = stock;
 
+  const entryState = computeEntryState(stock);
+  const ea = earningsChip(stock);
+  const watched = watchlist?.has?.(symbol) ?? false;
+
   return (
     <article
       className="stock-card"
@@ -38,11 +70,22 @@ export default function StockCard({ stock, expanded, onToggle }) {
       tabIndex={0}
       role="button"
       aria-expanded={expanded}
-      aria-label={`${symbol} ${company_name} — ${gate_pass ? "pass" : "fail"}`}
+      aria-label={`${symbol} ${company_name} — ${gate_pass ? "pass" : "fail"}${
+        entryState ? ` — ${entryState.label}` : ""
+      }`}
     >
       <header className="stock-card-header">
         <div className="stock-card-id">
-          <h3 className="stock-card-symbol">{symbol}</h3>
+          <div className="stock-card-title-row">
+            <h3 className="stock-card-symbol">{symbol}</h3>
+            {watchlist && (
+              <StarButton
+                on={watched}
+                onToggle={watchlist.toggle}
+                symbol={symbol}
+              />
+            )}
+          </div>
           <p className="stock-card-company">{company_name}</p>
           {industry && (
             <span className="stock-card-industry">{industry}</span>
@@ -65,6 +108,27 @@ export default function StockCard({ stock, expanded, onToggle }) {
         />
       </div>
 
+      {entryState && (
+        <div
+          className={`entry-state entry-${entryState.tone}`}
+          title={entryState.tooltip}
+        >
+          <span className="entry-state-dot" aria-hidden="true" />
+          {entryState.label}
+          <span className="entry-state-asof">as of scan close</span>
+        </div>
+      )}
+
+      {ea && (
+        <div
+          className={`entry-state entry-${ea.tone}`}
+          title={ea.tooltip}
+        >
+          <span className="entry-state-dot" aria-hidden="true" />
+          {ea.label}
+        </div>
+      )}
+
       <div className="stock-card-plan">
         {target_1 != null && (
           <span>
@@ -80,8 +144,18 @@ export default function StockCard({ stock, expanded, onToggle }) {
         {risk_reward_target_1 != null && (
           <span>
             <span className="plan-sep">·</span>
-            <span className="plan-key">RR</span>{" "}
-            {risk_reward_target_1.toFixed(1)}
+            <span
+              className="plan-key"
+              title="R:R to T1 is a fixed 1.5×ATR multiple from entry mid (see methodology). Displayed for completeness; it does not discriminate between candidates."
+            >
+              RR
+            </span>{" "}
+            <span title="Fixed 1.5×ATR multiple from entry mid; see methodology.">
+              {risk_reward_target_1.toFixed(1)}
+              <span className="plan-fixed-tag" title="Constant across all candidates">
+                {" "}(fixed)
+              </span>
+            </span>
           </span>
         )}
       </div>

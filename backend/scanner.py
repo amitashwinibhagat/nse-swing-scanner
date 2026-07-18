@@ -43,6 +43,7 @@ from surveillance import fetch_surveillance_list, check_symbol
 from bhavcopy import fetch_bhavcopy, lookup_delivery
 from holdings import fetch_holdings
 from corporate_actions import fetch_corporate_actions
+from earnings import fetch_earnings
 
 from settings import (
     MIN_F_SCORE,
@@ -268,7 +269,7 @@ def gate_corporate_actions(ca_data: Optional[dict]) -> tuple[bool, Optional[str]
 # ---------------------------------------------------------------------------
 def relative_strength_factor(stock_pct_from_ema200: Optional[float], index_pct_from_ema200: Optional[float]) -> float:
     """
-    Returns a multiplier in [0.6, 1.1] applied to the swing_score.
+    Returns a multiplier in {0.70, 0.85, 1.0, 1.05} applied to the swing_score.
     - If the index is also correcting heavily, the stock's drawdown is normal market
       behavior; small bonus.
     - If the stock is breaking down materially worse than the index, penalize.
@@ -368,19 +369,27 @@ def evaluate_stock(
 
     # --- hard gates ---
     fail_reasons = []
+    # gate_results: parallel to fail_reasons, but keeps EVERY gate (pass or
+    # fail) so the UI can render a per-gate checklist instead of a joined
+    # string. Schema: [{"gate": "f_score", "passed": True/False,
+    # "reason": "..." | null}, ...] — see B4 in the strategic review.
+    gate_results = []
     f_score = fsc.get("f_score")
 
     ok, why = gate_f_score(f_score)
+    gate_results.append({"gate": "f_score", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
 
     pct_off_high = tech.get("pct_off_52wk_high")
     ok, why = gate_drawdown(pct_off_high)
+    gate_results.append({"gate": "drawdown", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
 
     rsi = tech.get("rsi14")
     ok, why = gate_rsi(rsi)
+    gate_results.append({"gate": "rsi", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
 
@@ -407,23 +416,50 @@ def evaluate_stock(
             result["liquidity_gate_path"] = "adv"
     else:
         result["liquidity_gate_path"] = None
+    gate_results.append({
+        "gate": "liquidity_adequacy",
+        "passed": bool(ok),
+        "reason": why if not ok else None,
+    })
     if not ok:
         fail_reasons.append(why)
 
     ok, why = gate_surveillance(surv["is_restricted"], surv["source_status"])
+    gate_results.append({"gate": "surveillance", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
 
     ok, why = gate_holdings(holdings_data, holdings_status, lenient=lenient_external_gates)
+    gate_results.append({"gate": "holdings_conviction", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
 
     ok, why = gate_corporate_actions(ca_data)
+    gate_results.append({"gate": "corporate_actions", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
 
     result["gate_pass"] = len(fail_reasons) == 0
     result["gate_fail_reason"] = "; ".join(fail_reasons) if fail_reasons else None
+    result["gate_results"] = gate_results
+
+    # --- earnings proximity (B3) ---
+    # Warning-only, never a gate. Fetched only for gate-passed names so the
+    # bounded yfinance call cost stays in the tens, not hundreds. Failed /
+    # missing fetches are recorded but do not affect gate_pass or score.
+    earnings_status = "not_applicable"
+    earnings_data = None
+    if result["gate_pass"]:
+        try:
+            ea = fetch_earnings(symbol, yf_ticker)
+            earnings_status = ea.get("status", "missing")
+            earnings_data = ea.get("data")
+        except Exception as e:
+            earnings_status = "source_failed"
+            earnings_data = None
+            result["earnings_error"] = str(e)
+    result["earnings_status"] = earnings_status
+    result["earnings_data"] = earnings_data
 
     # --- soft score ---
     pe_now = pe5y.get("trailing_pe_check")
@@ -754,8 +790,25 @@ def to_json_records(df: pd.DataFrame) -> list:
             # Existing
             "gate_pass": bool(r.get("gate_pass")) if r.get("gate_pass") is not None else False,
             "gate_fail_reason": r.get("gate_fail_reason") if isinstance(r.get("gate_fail_reason"), str) else None,
+            "gate_results": (
+                _json_safe(r.get("gate_results"))
+                if isinstance(r.get("gate_results"), list)
+                else None
+            ),
             "swing_score": _json_safe(r.get("swing_score")),
             "sub_scores": _json_safe(r.get("sub_scores")) if isinstance(r.get("sub_scores"), dict) else None,
+            # B3: earnings proximity (gate-passed names only)
+            "earnings_date": (
+                _json_safe(r.get("earnings_data", {}).get("earnings_date"))
+                if isinstance(r.get("earnings_data"), dict)
+                else None
+            ),
+            "earnings_within_days": (
+                _json_safe(r.get("earnings_data", {}).get("within_days"))
+                if isinstance(r.get("earnings_data"), dict)
+                else None
+            ),
+            "earnings_source_status": r.get("earnings_status"),
         })
     return records
 

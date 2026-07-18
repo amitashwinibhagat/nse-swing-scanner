@@ -60,6 +60,19 @@ def _make_df():
         "market_correction_factor": 1.05,
         "gate_pass": True,
         "gate_fail_reason": None,
+        # B4: per-gate structured results (mirroring what evaluate_stock writes)
+        "gate_results": [
+            {"gate": "f_score", "passed": True, "reason": None},
+            {"gate": "drawdown", "passed": True, "reason": None},
+            {"gate": "rsi", "passed": True, "reason": None},
+            {"gate": "liquidity_adequacy", "passed": True, "reason": None},
+            {"gate": "surveillance", "passed": True, "reason": None},
+            {"gate": "holdings_conviction", "passed": True, "reason": None},
+            {"gate": "corporate_actions", "passed": True, "reason": None},
+        ],
+        # B3: earnings proximity (gate-passed only)
+        "earnings_status": "not_applicable",
+        "earnings_data": None,
         "swing_score": 78.5,
         "sub_scores": {"valuation_compression": 0.5, "oversold_positioning": 1.0},
     }])
@@ -75,8 +88,45 @@ def test_to_json_records_required_fields_present():
               "trailing_pe", "gate_pass", "swing_score", "delivery_source_status",
               "surveillance_source_status", "holdings_source_status",
               "pending_corporate_action", "market_index_pct_from_ema200",
-              "adv_value_inr", "liquidity_gate_path"):
+              "adv_value_inr", "liquidity_gate_path",
+              # B4: structured per-gate results
+              "gate_results",
+              # B3: earnings proximity (gate-passed only)
+              "earnings_date", "earnings_within_days", "earnings_source_status"):
         assert k in r, f"missing key: {k}"
+
+
+def test_to_json_records_gate_results_structure():
+    """B4: gate_results must be a list of {gate, passed, reason} dicts."""
+    df = _make_df()
+    records = to_json_records(df)
+    r = records[0]
+    assert isinstance(r["gate_results"], list)
+    assert len(r["gate_results"]) == 7   # the seven hard gates
+    expected_gates = {
+        "f_score", "drawdown", "rsi", "liquidity_adequacy",
+        "surveillance", "holdings_conviction", "corporate_actions",
+    }
+    actual_gates = {g["gate"] for g in r["gate_results"]}
+    assert actual_gates == expected_gates
+    for g in r["gate_results"]:
+        assert "passed" in g and isinstance(g["passed"], bool)
+        assert "reason" in g  # may be None
+    # All seven gates pass for this well-formed row.
+    assert all(g["passed"] for g in r["gate_results"])
+
+
+def test_to_json_records_earnings_default_not_applicable():
+    """B3: non-passed rows should carry earnings_source_status='not_applicable'
+    and null earnings_date / earnings_within_days."""
+    df = _make_df()
+    records = to_json_records(df)
+    r = records[0]
+    # In _make_df, gate_pass=True so earnings fetch is wired in but no
+    # earnings_data was set — earnings_status defaults to 'not_applicable'.
+    assert r["earnings_source_status"] in ("not_applicable", "missing", "ok", "source_failed")
+    assert r["earnings_date"] is None
+    assert r["earnings_within_days"] is None
 
 
 def test_to_json_records_strips_nan():

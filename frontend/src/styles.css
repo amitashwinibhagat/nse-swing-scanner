@@ -936,6 +936,378 @@ body {
 }
 
 /* =========================================================================
+   Entry-state chip — where price sits relative to the scan's stored plan
+   ========================================================================= */
+.entry-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+}
+
+.entry-state-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+
+.entry-state-asof {
+  margin-left: 4px;
+  font-weight: 400;
+  opacity: 0.7;
+  font-size: var(--t-micro);
+}
+
+.entry-state.entry-success {
+  background: var(--success-dim);
+  color: var(--success);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+.entry-state.entry-warning {
+  background: var(--warning-dim);
+  color: var(--warning);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+.entry-state.entry-danger {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.entry-state.entry-accent {
+  background: rgba(167, 139, 250, 0.18);
+  color: var(--accent-bright);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.entry-state.sm {
+  font-size: 10px;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
+
+.entry-state.lg {
+  margin-top: 8px;
+  padding: 5px 10px;
+  font-size: var(--t-meta);
+}
+
+/* =========================================================================
+   Watchlist star
+   ========================================================================= */
+.watch-star {
+  background: transparent;
+  border: 0;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--text-faint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  line-height: 0;
+}
+.watch-star:hover { color: var(--accent-bright); }
+.watch-star.on   { color: #f5b301; }
+.watch-star.lg   { padding: 4px; }
+.watch-star.sm   { padding: 1px 2px; margin-left: 4px; }
+
+.stock-card-title-row,
+.drawer-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.symbol-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* =========================================================================
+   Plan "as of" caption + "fixed" tag (R:R is a constant)
+   ========================================================================= */
+.plan-asof {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: var(--sp-2);
+}
+.plan-fixed-tag {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+/* =========================================================================
+   Subscore meta (scored-on-N + market adjustment)
+   ========================================================================= */
+.subscore-wrap { margin-bottom: var(--sp-3); }
+.subscore-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+.subscore-meta-item {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  cursor: help;
+}
+.subscore-meta-item.rs-adjust.rs-up   { color: var(--success); border-color: rgba(34, 197, 94, 0.3); }
+.subscore-meta-item.rs-adjust.rs-down { color: var(--warning); border-color: rgba(234, 179, 8, 0.3); }
+
+/* =========================================================================
+   Position-size calculator (DetailDrawer)
+   ========================================================================= */
+.sizer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.sizer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sizer-label {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+.sizer-field input {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  color: var(--text);
+}
+.sizer-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.sizer-results {
+  margin-bottom: var(--sp-3);
+}
+.sizer-note {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+  margin: 0;
+}
+
+/* =========================================================================
+   Delta strip (B2)
+   ========================================================================= */
+.delta-strip {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+.delta-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: var(--t-meta);
+  color: var(--text-dim);
+  margin-bottom: var(--sp-2);
+}
+.delta-section {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 6px 0;
+}
+.delta-tag {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  background: var(--surface-0);
+  color: var(--text-dim);
+}
+.delta-tag.tag-new { background: var(--success-dim); color: var(--success); }
+.delta-tag.tag-drop { background: var(--danger-dim); color: var(--danger); }
+.delta-tag.tag-wl { background: rgba(167, 139, 250, 0.18); color: var(--accent-bright); }
+.delta-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.delta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  background: var(--surface-0);
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
+}
+.delta-chip.drop {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.delta-chip.watch {
+  background: rgba(167, 139, 250, 0.18);
+  color: var(--accent-bright);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+.delta-chip-score {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.delta-chip-arrow {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: 2px;
+}
+.delta-more {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+  padding: 2px 4px;
+}
+
+/* =========================================================================
+   Gate checklist (B4)
+   ========================================================================= */
+.gate-checklist li {
+  align-items: flex-start;
+  gap: 6px;
+}
+.gate-checklist li > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.gate-tick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+.gate-tick.yes {
+  background: var(--success-dim);
+  color: var(--success);
+}
+.gate-tick.no {
+  background: var(--danger-dim);
+  color: var(--danger);
+}
+.gate-inline-value {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+  margin-left: 4px;
+}
+.gate-checklist .gate-failed b {
+  color: var(--danger);
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  text-align: right;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 50%;
+}
+
+/* =========================================================================
+   Performance section (C2)
+   ========================================================================= */
+.performance {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+  margin: var(--sp-4) 0;
+}
+.performance h3 {
+  font-family: var(--font-body);
+  font-size: var(--t-h);
+  margin: 0 0 var(--sp-2);
+}
+.perf-note,
+.perf-fineprint {
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+  margin: 0 0 var(--sp-3);
+}
+.perf-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--text-dim);
+  margin-bottom: var(--sp-3);
+}
+.perf-meta b {
+  color: var(--text);
+  font-weight: 600;
+}
+.perf-table-wrap {
+  overflow-x: auto;
+}
+.perf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+.perf-table th,
+.perf-table td {
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.perf-table th {
+  color: var(--text-dim);
+  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* =========================================================================
    View toggle (icon-only segmented control)
    ========================================================================= */
 .icon-group {

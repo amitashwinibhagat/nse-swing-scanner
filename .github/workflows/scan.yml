@@ -156,6 +156,20 @@ jobs:
         working-directory: backend
         run: python -c "import json; p=json.load(open('../frontend/public/data/latest_scan.json')); assert 'generated_at' in p and 'stocks' in p and p['stocks'], 'invalid scan contract'; print('contract ok:', len(p['stocks']), 'stocks')"
 
+      - name: Write dated snapshot + history index (B1)
+        # Persists the current run as YYYY-MM-DD-{am|pm}.json (minified) and
+        # updates frontend/public/data/snapshots/history_index.json. Rolling
+        # 90-day prune runs in the same step. Cheap (~1-2 s), no network.
+        # Slot is derived from generated_at hour: <8 UTC = am (prior close),
+        # >=8 UTC = pm (same-day close).
+        if: success()
+        working-directory: backend
+        run: |
+          python scripts/snapshot_writer.py \
+            --latest ../frontend/public/data/latest_scan.json \
+            --snapshots ../frontend/public/data/snapshots \
+            --retention-days 90
+
       - name: Write scan_status.json
         # Always run after a successful scan (skip on scan failure). Internal
         # errors are caught and surfaced as warnings — the file is best-effort
@@ -275,11 +289,28 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           # Add whatever files exist. scan_status.json is best-effort; if it
           # wasn't written, `git add` skips that path with a non-fatal warning.
+          # Snapshots + history_index are added recursively; the snapshot_writer
+          # is idempotent and prunes to a 90-day rolling window.
           git add frontend/public/data/latest_scan.json
           git add frontend/public/data/scan_status.json || true
+          git add frontend/public/data/snapshots/ || true
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "Scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
+
+      - name: Send Telegram digest (C3)
+        if: success()
+        # Soft-fails: the script exits 0 even on Telegram error. The scan
+        # itself is the load-bearing artifact; a missing alert must never
+        # roll back a successful deploy.
+        working-directory: backend
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python scripts/send_digest.py \
+            --latest ../frontend/public/data/latest_scan.json \
+            --history ../frontend/public/data/snapshots/history_index.json
 
       - name: Trigger Netlify production deploy
         if: success()
