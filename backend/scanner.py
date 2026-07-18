@@ -773,6 +773,14 @@ def to_json_records(df: pd.DataFrame) -> list:
             ),
             "adv_sessions": _json_safe(r.get("tech_adv_sessions")),
             "liquidity_gate_path": r.get("liquidity_gate_path"),
+            # 1.3.0 accuracy plumbing: confirmation overlay (A/B label)
+            "confirmation_state": r.get("tech_confirmation_state") or "anticipatory",
+            "rsi_delta_3d": _json_safe(r.get("tech_rsi_delta_3d")),
+            "close_up_1d": r.get("tech_close_up_1d"),
+            "vol_ratio_3v20": _json_safe(r.get("tech_vol_ratio_3v20")),
+            # 1.3.0 exit-side warnings
+            "swing_high_63d": _json_safe(r.get("tech_swing_high_63d")),
+            "atr_expansion_ratio": _json_safe(r.get("tech_atr_expansion_ratio")),
             "surveillance_is_restricted": bool(r.get("surveillance_is_restricted", False)),
             "surveillance_restriction_type": r.get("surveillance_restriction_type"),
             "surveillance_source_status": r.get("surveillance_source_status"),

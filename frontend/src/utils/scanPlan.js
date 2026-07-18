@@ -198,3 +198,68 @@ export const GATE_LABELS = {
   holdings_conviction: "Holdings conviction ≥ 50%",
   corporate_actions: "No pending corp action",
 };
+
+/**
+ * 1.3.0: Confirmation overlay chip. A/B label, not a gate. "confirmed"
+ * means early stabilization evidence (RSI turning up + last close up);
+ * "anticipatory" means still a falling knife. Persisted in snapshots so
+ * cohort analysis can split hit-rate by it later.
+ */
+export function confirmationChip(stock) {
+  if (!stock) return null;
+  const state = stock.confirmation_state;
+  if (state !== "confirmed" && state !== "anticipatory") return null;
+  const rsiDelta = stock.rsi_delta_3d;
+  const volRatio = stock.vol_ratio_3v20;
+  const rsiTxt = typeof rsiDelta === "number" ? `RSI 3d Δ ${rsiDelta > 0 ? "+" : ""}${rsiDelta.toFixed(1)}` : "";
+  const volTxt = typeof volRatio === "number" ? `vol 3/20 ${volRatio.toFixed(2)}` : "";
+  const detail = [rsiTxt, volTxt].filter(Boolean).join(" · ");
+  if (state === "confirmed") {
+    return {
+      label: "Confirmed",
+      tone: "success",
+      tooltip: `Early stabilization evidence (RSI turning up + last close up). ${detail}. A/B label — cohort analysis will measure whether confirmed entries outperform anticipatory ones.`,
+    };
+  }
+  return {
+    label: "Anticipatory",
+    tone: "warning",
+    tooltip: `No stabilization evidence yet — buying during the decline. ${detail}. A/B label — these are the baseline cohort; do not assume they underperform until the data says so.`,
+  };
+}
+
+/**
+ * 1.3.0: Exit-side expectancy warnings. Computable now from fields already
+ * in the JSON; no prediction needed, just R:R asymmetry flags.
+ *
+ *   warning_1: T1 capped by nearby swing high (entry_high < swing_high_63d < target_1)
+ *   warning_2: ATR expanding (atr_expansion_ratio > 1.3 → stop likely too tight)
+ */
+export function exitWarnings(stock) {
+  if (!stock) return [];
+  const out = [];
+  const eh = stock.entry_zone_high;
+  const t1 = stock.target_1;
+  const sh = stock.swing_high_63d;
+  if (typeof eh === "number" && typeof t1 === "number" && typeof sh === "number") {
+    if (eh < sh && sh < t1) {
+      const pctBelow = ((t1 - sh) / t1) * 100;
+      out.push({
+        key: "t1_capped",
+        label: `T1 capped by swing high ₹${sh.toFixed(0)}`,
+        detail: `Recent 3-month swing high sits ₹${(t1 - sh).toFixed(0)} (${pctBelow.toFixed(1)}%) below T1 — measured-move target is structurally optimistic.`,
+        tone: "warning",
+      });
+    }
+  }
+  const ae = stock.atr_expansion_ratio;
+  if (typeof ae === "number" && ae > 1.3) {
+    out.push({
+      key: "atr_expanding",
+      label: `Volatility expanding (ATR ×${ae.toFixed(2)} vs 20d ago)`,
+      detail: `ATR(14) is ${((ae - 1) * 100).toFixed(0)}% above its value 20 sessions ago. The 1.0×ATR stop is likely to be clipped — consider a wider stop or smaller size.`,
+      tone: "warning",
+    });
+  }
+  return out;
+}

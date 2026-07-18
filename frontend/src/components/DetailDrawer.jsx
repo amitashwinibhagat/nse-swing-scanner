@@ -4,7 +4,9 @@ import DonutHoldings from "./DonutHoldings.jsx";
 import SubscoreBars from "./SubscoreBars.jsx";
 import {
   computeEntryState,
+  confirmationChip,
   earningsChip,
+  exitWarnings,
   GATE_LABELS,
   relativeStrengthFactor,
   formatScanDate,
@@ -164,6 +166,8 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
   if (!stock) return null;
 
   const entryState = computeEntryState(stock);
+  const conf = confirmationChip(stock);
+  const exits = exitWarnings(stock);
   const ea = earningsChip(stock);
   const watched = watchlist?.has?.(stock.symbol) ?? false;
   const rsFactor = relativeStrengthFactor(
@@ -286,6 +290,15 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
                 >
                   <span className="entry-state-dot" aria-hidden="true" />
                   {ea.label}
+                </div>
+              )}
+              {conf && (
+                <div
+                  className={`entry-state lg entry-${conf.tone}`}
+                  title={conf.tooltip}
+                >
+                  <span className="entry-state-dot" aria-hidden="true" />
+                  {conf.label}
                 </div>
               )}
             </div>
@@ -475,6 +488,26 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
           </div>
 
           <PositionSizer stock={stock} />
+
+          {exits.length > 0 && (
+            <section className="drawer-section exit-warnings">
+              <h4>Exit-side warnings</h4>
+              <ul className="kv">
+                {exits.map((w) => (
+                  <li key={w.key} className="exit-warning-row">
+                    <span title={w.detail}>{w.label}</span>
+                    <b className="exit-warning-detail">{w.detail}</b>
+                  </li>
+                ))}
+              </ul>
+              <p className="sizer-note">
+                Expectancy warnings — not predictions. These flag structural
+                R:R asymmetry (T1 capped by nearby resistance, or stop too
+                tight given expanding volatility) so you can adjust size or
+                skip the trade.
+              </p>
+            </section>
+          )}
 
           <section className="drawer-section">
             <h4>

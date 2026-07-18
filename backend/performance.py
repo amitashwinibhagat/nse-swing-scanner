@@ -83,6 +83,28 @@ def score_bucket(score: Optional[float]) -> str:
     return "<60"
 
 
+# Regime tag thresholds — mirror the frontend regime chip (scanPlan.js).
+# risk_on: Nifty > +2% above 200EMA; risk_off: < -2%; neutral: in between.
+def regime_tag(idx_pct_from_ema200: Optional[float]) -> str:
+    if not isinstance(idx_pct_from_ema200, (int, float)):
+        return "unknown"
+    if idx_pct_from_ema200 > 2:
+        return "risk_on"
+    if idx_pct_from_ema200 < -2:
+        return "risk_off"
+    return "neutral"
+
+
+def _scan_regime(scan: dict) -> str:
+    """Pick the regime tag for a whole snapshot from any row's
+    market_index_pct_from_ema200 (universe-constant)."""
+    for s in scan.get("stocks", []):
+        v = s.get("market_index_pct_from_ema200")
+        if isinstance(v, (int, float)):
+            return regime_tag(v)
+    return "unknown"
+
+
 def _window_label(window: int) -> str:
     return f"T+{window}"
 
@@ -108,9 +130,12 @@ def build_performance_payload(
                   "untrackable": bool,
                   "reason": str|None}.
 
-    Returns a JSON-serialisable dict with three sections:
+    Returns a JSON-serialisable dict with five sections:
       - per_window: aggregated stats by (window, score_bucket)
-      - per_scan:   per-snapshot cohort stats (by window)
+      - by_regime:  aggregated stats by (window, regime) — calibration input
+      - per_scan:   per-snapshot cohort stats (by window, with regime tag)
+      - per_name:   raw labelled rows (snapshot, symbol, score, bucket,
+                    regime, confirmation, windows) — calibration raw material
       - meta:       config + count of untrackable symbols
     """
     per_window_buckets: Dict[int, Dict[str, List[float]]] = {
@@ -118,10 +143,17 @@ def build_performance_payload(
         for w in WINDOWS
     }
     per_window_untrackable: Dict[int, int] = {w: 0 for w in WINDOWS}
+    # Regime-split accumulator: window -> regime -> [excess returns]
+    by_regime_buckets: Dict[int, Dict[str, List[float]]] = {
+        w: {"risk_on": [], "neutral": [], "risk_off": [], "unknown": []}
+        for w in WINDOWS
+    }
     per_scan: List[dict] = []
+    per_name: List[dict] = []
 
     for label, scan in snapshots:
         passed = [s for s in scan.get("stocks", []) if s.get("gate_pass")]
+        scan_regime = _scan_regime(scan)
         bucket_excess: Dict[int, Dict[str, List[float]]] = {
             w: {"80+": [], "70-79": [], "60-69": [], "<60": [], "unknown": []}
             for w in WINDOWS
@@ -131,16 +163,46 @@ def build_performance_payload(
             key = (label, sym)
             fetches = forward_returns.get(key, {})
             bucket = score_bucket(s.get("swing_score"))
+            confirmation = s.get("confirmation_state") or "unknown"
+            # Per-name labelled row — calibration raw material. Includes
+            # every window's outcome so downstream isotonic/logistic fits
+            # don't need to re-walk snapshots.
+            name_row = {
+                "snapshot": label,
+                "symbol": sym,
+                "score": s.get("swing_score"),
+                "bucket": bucket,
+                "regime": scan_regime,
+                "confirmation": confirmation,
+                "windows": {},
+            }
             for w in WINDOWS:
                 fr = fetches.get(w)
                 if not fr or fr.get("untrackable") or fr.get("excess_return_pct") is None:
                     per_window_untrackable[w] += 1
+                    name_row["windows"][_window_label(w)] = {
+                        "excess_return_pct": None,
+                        "untrackable": True,
+                        "reason": (fr.get("reason") if fr else "no_data"),
+                    }
                     continue
                 excess = fr["excess_return_pct"]
                 per_window_buckets[w][bucket].append(excess)
                 bucket_excess[w][bucket].append(excess)
+                by_regime_buckets[w][scan_regime].append(excess)
+                name_row["windows"][_window_label(w)] = {
+                    "excess_return_pct": excess,
+                    "untrackable": False,
+                    "reason": None,
+                }
+            per_name.append(name_row)
 
-        cohort_summary = {"date": label, "passed_count": len(passed), "windows": {}}
+        cohort_summary = {
+            "date": label,
+            "passed_count": len(passed),
+            "regime": scan_regime,
+            "windows": {},
+        }
         for w in WINDOWS:
             all_excess: List[float] = []
             for vals in bucket_excess[w].values():
@@ -161,15 +223,25 @@ def build_performance_payload(
             "untrackable_count": per_window_untrackable[w],
         }
 
+    out_by_regime = {}
+    for w in WINDOWS:
+        regime_stats = {}
+        for rg, vals in by_regime_buckets[w].items():
+            regime_stats[rg] = cohort_stats(vals)
+        out_by_regime[_window_label(w)] = regime_stats
+
     return {
         "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "retention_days": retention_days,
         "windows": out_windows,
+        "by_regime": out_by_regime,
         "per_scan": per_scan,
+        "per_name": per_name,
         "meta": {
             "snapshots_used": len(snapshots),
             "total_passed": sum(len([s for s in scan.get("stocks", []) if s.get("gate_pass")]) for _, scan in snapshots),
             "windows": WINDOWS,
+            "regimes": ["risk_on", "neutral", "risk_off", "unknown"],
         },
     }
 

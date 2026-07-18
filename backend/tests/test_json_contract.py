@@ -75,6 +75,13 @@ def _make_df():
         "earnings_data": None,
         "swing_score": 78.5,
         "sub_scores": {"valuation_compression": 0.5, "oversold_positioning": 1.0},
+        # 1.3.0 accuracy plumbing
+        "tech_confirmation_state": "confirmed",
+        "tech_rsi_delta_3d": 2.4,
+        "tech_close_up_1d": True,
+        "tech_vol_ratio_3v20": 0.85,
+        "tech_swing_high_63d": 3050.0,
+        "tech_atr_expansion_ratio": 1.12,
     }])
 
 
@@ -92,8 +99,24 @@ def test_to_json_records_required_fields_present():
               # B4: structured per-gate results
               "gate_results",
               # B3: earnings proximity (gate-passed only)
-              "earnings_date", "earnings_within_days", "earnings_source_status"):
+              "earnings_date", "earnings_within_days", "earnings_source_status",
+              # 1.3.0: confirmation overlay + exit-warning features
+              "confirmation_state", "rsi_delta_3d", "close_up_1d",
+              "vol_ratio_3v20", "swing_high_63d", "atr_expansion_ratio"):
         assert k in r, f"missing key: {k}"
+
+
+def test_to_json_records_confirmation_state_passes_through():
+    """1.3.0: confirmation_state must be one of the documented labels and
+    default to 'anticipatory' when the technicals field is missing."""
+    df = _make_df()
+    records = to_json_records(df)
+    assert records[0]["confirmation_state"] == "confirmed"
+    # Default when missing
+    row = _make_df().iloc[0].to_dict()
+    row["tech_confirmation_state"] = None
+    r2 = to_json_records(pd.DataFrame([row]))[0]
+    assert r2["confirmation_state"] == "anticipatory"
 
 
 def test_to_json_records_gate_results_structure():

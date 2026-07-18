@@ -56,6 +56,16 @@ export default function PerformanceSection() {
 
   const windows = Object.keys(data.windows || {});
   const buckets = ["80+", "70-79", "60-69", "<60"];
+  const regimes = ["risk_on", "neutral", "risk_off", "unknown"];
+  const regimeLabels = {
+    risk_on: "Risk-on (Nifty > +2% vs 200EMA)",
+    neutral: "Neutral (±2%)",
+    risk_off: "Risk-off (< −2%)",
+    unknown: "Unknown",
+  };
+  const hasRegime = !!data.by_regime;
+  // Statistical guardrail: render regime cell numbers only when N >= 5.
+  const REGIME_N_FLOOR = 5;
 
   return (
     <section className="performance" aria-labelledby="perf-heading">
@@ -113,6 +123,65 @@ export default function PerformanceSection() {
         separately, never silently dropped. Overlapping T+20 windows across
         consecutive scans are autocorrelated — do not pool per-name rows.
       </p>
+
+      {hasRegime && (
+        <>
+          <h4 className="perf-subhead">By market regime</h4>
+          <p className="perf-note">
+            Same cohorts split by the Nifty-vs-200EMA regime at scan time. A
+            90-day window is roughly one regime, so treat the split as
+            directional, not significant. Cells with N &lt; {REGIME_N_FLOOR}
+            render as "insufficient data" rather than a misleading median.
+          </p>
+          <div className="perf-table-wrap">
+            <table className="perf-table">
+              <thead>
+                <tr>
+                  <th>Window</th>
+                  <th>Regime</th>
+                  <th>N</th>
+                  <th>Median excess</th>
+                  <th>IQR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {windows.flatMap((w) =>
+                  regimes.flatMap((rg) => {
+                    const cell = data.by_regime[w]?.[rg];
+                    if (!cell || cell.n === 0) return [];
+                    const insufficient = cell.n < REGIME_N_FLOOR;
+                    return [
+                      <tr key={`${w}-${rg}`}>
+                        <td>{w}</td>
+                        <td>{regimeLabels[rg] || rg}</td>
+                        <td>{cell.n}</td>
+                        <td className={_tone(cell.median)}>
+                          {insufficient || cell.median == null
+                            ? "insufficient data"
+                            : `${cell.median > 0 ? "+" : ""}${cell.median}%`}
+                        </td>
+                        <td>
+                          {insufficient || cell.q1 == null || cell.q3 == null
+                            ? "—"
+                            : `${cell.q1}% / ${cell.q3}%`}
+                        </td>
+                      </tr>,
+                    ];
+                  }),
+                )}
+              </tbody>
+            </table>
+          </div>
+          <p className="perf-fineprint">
+            Calibration raw material: <code>performance.json</code> now carries
+            a <code>per_name</code> array (snapshot, symbol, score, bucket,
+            regime, confirmation, per-window excess) so future score→probability
+            calibration can fit without re-walking snapshots. The confirmation
+            overlay is A/B-label only today — its hit-rate delta publishes here
+            once N is sufficient.
+          </p>
+        </>
+      )}
     </section>
   );
 }

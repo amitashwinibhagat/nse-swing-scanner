@@ -135,6 +135,50 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
     rr1 = ((target_1 - entry_mid) / (entry_mid - stop_loss)) if (target_1 and stop_loss and entry_mid > stop_loss) else None
     rr2 = ((target_2 - entry_mid) / (entry_mid - stop_loss)) if (target_2 and stop_loss and entry_mid > stop_loss) else None
 
+    # --- 1.3.0 accuracy plumbing: confirmation + exit-warning features ---
+    # Confirmation overlay (A/B-able label, NOT a gate): is there early
+    # stabilization evidence, or is this still a falling knife? Persist the
+    # raw features alongside the composite state so cohort analysis can
+    # re-cut later without re-fetching.
+    rsi_series_full = compute_rsi(close, 14)
+    confirmation_state = "anticipatory"
+    rsi_delta_3d = None
+    close_up_1d = None
+    vol_ratio_3v20 = None
+    if len(rsi_series_full) >= 4 and not np.isnan(rsi_series_full.iloc[-1]):
+        rsi_now = float(rsi_series_full.iloc[-1])
+        rsi_3d_ago = float(rsi_series_full.iloc[-4]) if len(rsi_series_full) >= 4 else np.nan
+        if not np.isnan(rsi_3d_ago):
+            rsi_delta_3d = round(rsi_now - rsi_3d_ago, 2)
+    if len(close) >= 2:
+        close_up_1d = bool(close.iloc[-1] > close.iloc[-2])
+    if len(volume) >= 20:
+        recent_vol = float(volume.iloc[-3:].mean())
+        base_vol = float(volume.iloc[-20:].mean())
+        if base_vol > 0:
+            vol_ratio_3v20 = round(recent_vol / base_vol, 2)
+    # Confirmed = RSI turning up over 3 sessions AND last close > prior close.
+    # Both conditions must hold; everything else is anticipatory. This is a
+    # deliberately strict definition so the "confirmed" cohort stays clean.
+    if rsi_delta_3d is not None and rsi_delta_3d > 0 and close_up_1d:
+        confirmation_state = "confirmed"
+
+    # Exit-side warning #1: nearby swing high capping T1.
+    # 63 sessions ≈ 3 trading months. If a recent swing high sits between
+    # entry and T1, the measured-move target is structurally optimistic.
+    swing_high_63d = None
+    if len(high) >= 21:
+        swing_high_63d = float(high.rolling(63, min_periods=21).max().iloc[-1])
+
+    # Exit-side warning #2: ATR expanding (stop too tight).
+    # Ratio of current ATR to ATR 20 sessions ago. >1.3 = volatility
+    # expanding, so the 1.0xATR stop is likely to be clipped.
+    atr_expansion_ratio = None
+    if current_atr and len(atr_series) >= 21:
+        atr_20d_ago = atr_series.iloc[-21]
+        if not np.isnan(atr_20d_ago) and atr_20d_ago > 0:
+            atr_expansion_ratio = round(float(current_atr) / float(atr_20d_ago), 2)
+
     return {
         "yf_ticker": yf_ticker,
         "current_price": round(current_price, 2),
@@ -157,6 +201,13 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
         "adtv_value_inr_approx": round(adtv_value_inr, 0),
         "adv_value_inr": round(adv_value_inr, 0) if adv_value_inr is not None else None,
         "adv_sessions": adv_sessions,
+        # 1.3.0 accuracy plumbing
+        "confirmation_state": confirmation_state,
+        "rsi_delta_3d": rsi_delta_3d,
+        "close_up_1d": close_up_1d,
+        "vol_ratio_3v20": vol_ratio_3v20,
+        "swing_high_63d": round(swing_high_63d, 2) if swing_high_63d is not None else None,
+        "atr_expansion_ratio": atr_expansion_ratio,
         "error": None,
     }
 
@@ -171,7 +222,7 @@ def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
     fields in the JSON contract for one full TTL).
     """
     return cached_call(
-        f"tech:{yf_ticker}:{period}:v2",
+        f"tech:{yf_ticker}:{period}:v3",
         YF_CACHE_TTL_SECONDS,
         _compute_technicals_impl,
         yf_ticker,

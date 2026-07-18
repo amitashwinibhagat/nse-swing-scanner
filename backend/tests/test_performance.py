@@ -55,13 +55,22 @@ class TestScoreBucket(unittest.TestCase):
         self.assertEqual(performance.score_bucket(None), "unknown")
 
 
-def _scan(symbols_with_scores):
+def _scan(symbols_with_scores, idx_pct=-1.5, confirmations=None):
+    """Build a synthetic scan. confirmations: optional {symbol: state} map."""
+    stocks = []
+    for i, (sym, sc) in enumerate(symbols_with_scores):
+        s = {
+            "symbol": sym,
+            "gate_pass": True,
+            "swing_score": sc,
+            "market_index_pct_from_ema200": idx_pct,
+        }
+        if confirmations and sym in confirmations:
+            s["confirmation_state"] = confirmations[sym]
+        stocks.append(s)
     return {
         "generated_at": "2026-07-15T10:31:00+00:00",
-        "stocks": [
-            {"symbol": sym, "gate_pass": True, "swing_score": sc}
-            for sym, sc in symbols_with_scores
-        ],
+        "stocks": stocks,
     }
 
 
@@ -129,6 +138,68 @@ def _perf(excess):
         "untrackable": False,
         "reason": None,
     }
+
+
+class TestRegimeAndPerName(unittest.TestCase):
+    def test_regime_tag_thresholds(self):
+        self.assertEqual(performance.regime_tag(3.0), "risk_on")
+        self.assertEqual(performance.regime_tag(2.01), "risk_on")
+        self.assertEqual(performance.regime_tag(2.0), "neutral")  # strict >
+        self.assertEqual(performance.regime_tag(1.9), "neutral")
+        self.assertEqual(performance.regime_tag(-1.9), "neutral")
+        self.assertEqual(performance.regime_tag(-2.0), "neutral")  # strict <
+        self.assertEqual(performance.regime_tag(-2.01), "risk_off")
+        self.assertEqual(performance.regime_tag(-5.0), "risk_off")
+        self.assertEqual(performance.regime_tag(None), "unknown")
+
+    def test_per_name_rows_carry_regime_and_confirmation(self):
+        snapshots = [
+            ("2026-07-15-pm", _scan(
+                [("A", 85), ("B", 75)],
+                idx_pct=-3.5,
+                confirmations={"A": "confirmed", "B": "anticipatory"},
+            )),
+        ]
+        forward = {
+            ("2026-07-15-pm", "A"): {w: _perf(2.0) for w in (5, 10, 20)},
+            ("2026-07-15-pm", "B"): {w: _perf(-1.0) for w in (5, 10, 20)},
+        }
+        payload = performance.build_performance_payload(snapshots, forward)
+        per_name = payload["per_name"]
+        self.assertEqual(len(per_name), 2)
+        by_sym = {r["symbol"]: r for r in per_name}
+        self.assertEqual(by_sym["A"]["regime"], "risk_off")  # idx_pct=-3.5
+        self.assertEqual(by_sym["A"]["confirmation"], "confirmed")
+        self.assertEqual(by_sym["A"]["bucket"], "80+")
+        self.assertEqual(by_sym["B"]["confirmation"], "anticipatory")
+        self.assertEqual(by_sym["B"]["windows"]["T+20"]["excess_return_pct"], -1.0)
+        # Cohort-level regime tag too
+        self.assertEqual(payload["per_scan"][0]["regime"], "risk_off")
+
+    def test_by_regime_splits_cohorts(self):
+        snapshots = [
+            ("2026-07-14-pm", _scan([("X", 80)], idx_pct=3.0)),    # risk_on
+            ("2026-07-15-pm", _scan([("Y", 80)], idx_pct=-3.0)),   # risk_off
+        ]
+        forward = {
+            ("2026-07-14-pm", "X"): {w: _perf(4.0) for w in (5, 10, 20)},
+            ("2026-07-15-pm", "Y"): {w: _perf(-2.0) for w in (5, 10, 20)},
+        }
+        payload = performance.build_performance_payload(snapshots, forward)
+        t20 = payload["by_regime"]["T+20"]
+        self.assertEqual(t20["risk_on"]["n"], 1)
+        self.assertEqual(t20["risk_on"]["median"], 4.0)
+        self.assertEqual(t20["risk_off"]["n"], 1)
+        self.assertEqual(t20["risk_off"]["median"], -2.0)
+        self.assertEqual(t20["neutral"]["n"], 0)
+
+    def test_per_name_untrackable_marked(self):
+        snapshots = [("2026-07-15-pm", _scan([("A", 80)]))]
+        # No forward returns at all → untrackable
+        payload = performance.build_performance_payload(snapshots, {})
+        row = payload["per_name"][0]
+        self.assertTrue(row["windows"]["T+20"]["untrackable"])
+        self.assertIsNone(row["windows"]["T+20"]["excess_return_pct"])
 
 
 if __name__ == "__main__":

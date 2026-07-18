@@ -9,7 +9,7 @@ import Rationale from "./components/Rationale.jsx";
 import DeltaStrip from "./components/DeltaStrip.jsx";
 import PerformanceSection from "./components/PerformanceSection.jsx";
 import useWatchlist from "./utils/useWatchlist.js";
-import { computeEntryState, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
+import { computeEntryState, confirmationChip, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
 
 function IconSearch() {
   return (
@@ -173,6 +173,9 @@ function exportCsv(rows, filename = "nse_swing_scan.csv") {
     "pending_corporate_action", "f_score", "trailing_pe", "avg_pe_5y", "gate_fail_reason",
     // B3/B4 additions
     "gate_results", "earnings_date", "earnings_within_days", "earnings_source_status",
+    // 1.3.0 accuracy plumbing
+    "confirmation_state", "rsi_delta_3d", "close_up_1d", "vol_ratio_3v20",
+    "swing_high_63d", "atr_expansion_ratio",
   ];
   const esc = (v) => {
     if (v === null || v === undefined) return "";
@@ -791,6 +794,19 @@ export default function App() {
                         >
                           <span className="entry-state-dot" aria-hidden="true" />
                           {ea.label}
+                        </span>
+                      );
+                    })()}
+                    {(() => {
+                      const cf = confirmationChip(s);
+                      if (!cf) return null;
+                      return (
+                        <span
+                          className={`entry-state sm entry-${cf.tone}`}
+                          title={cf.tooltip}
+                        >
+                          <span className="entry-state-dot" aria-hidden="true" />
+                          {cf.label}
                         </span>
                       );
                     })()}
