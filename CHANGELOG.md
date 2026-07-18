@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.2.1 — Earnings extractor: handle dict-shaped yfinance calendar
+
+### Fixed
+
+- `backend/earnings.py`: yfinance >= 0.2.40 returns `Ticker.calendar` as a
+  **dict** (`{'Earnings Date': [date, ...]}`), not a DataFrame. The 1.2.0
+  extractor called `cal.empty`, silently fell through to
+  `get_earnings_dates`, and produced `earnings_source_status='missing'`
+  for every passed name on the first production run. The extractor now
+  handles both shapes plus a `_to_date` normaliser (datetime.date /
+  datetime / Timestamp / ISO-string). Verified live: ATUL, SAIL,
+  HINDZINC, JINDALSTEL all surfaced "earnings in 6d" on the fix run.
+- Cache key bumped `earnings:SYM` → `earnings:v2:SYM` to evict the 12 h
+  "missing" entries written by the broken extractor (the restored
+  actions/cache would otherwise have suppressed fresh fetches for 12 h).
+
+### Validation
+
+- 126 pytest passes (3 new regression tests: dict shape, past-only
+  calendar, `calendar=None` fallback).
+- Post-fix production scan: 10/24 passed names carry real earnings dates;
+  14 remain `missing` (no yfinance data — fail-open by design).
+
 ## 1.2.0 — Decision-support layer, scan history, outcome tracking, Telegram digest
 
 ### Why
