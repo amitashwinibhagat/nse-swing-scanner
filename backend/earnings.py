@@ -111,7 +111,9 @@ def fetch_earnings(symbol: str, yf_ticker: str) -> dict:
     On status='missing' / 'source_failed', `data` is None — the UI must
     not render a chip in that case.
     """
-    cache_key = f"earnings:{symbol.upper()}"
+    # v2 key: invalidates 12h-TTL "missing" entries written before the
+    # dict-calendar fix (1.2.1) so they don't suppress fresh fetches.
+    cache_key = f"earnings:v2:{symbol.upper()}"
     result = cached_call(
         cache_key,
         EARNINGS_CACHE_TTL_SECONDS,
