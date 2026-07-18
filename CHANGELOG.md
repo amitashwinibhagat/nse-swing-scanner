@@ -1,5 +1,77 @@
 # Changelog
 
+## 1.3.0 — Accuracy plumbing: confirmation overlay, exit warnings, regime tagging
+
+### Why
+
+The tool ranks but doesn't yet *predict* — score weights are hand-tuned
+and unvalidated. Before accuracy can be improved it must be *measured*,
+and measurement needs labelled data. This release ships the plumbing
+that snapshots must start carrying **today** so that in 3-6 months the
+calibration, regime-conditional, and confirmation A/B analyses have
+raw material to fit against. Every day without these fields is a lost
+observation.
+
+### Added
+
+**Confirmation overlay (A/B label, not a gate)**
+- `backend/technicals.py`: computes `confirmation_state` ∈ {confirmed,
+  anticipatory} from RSI 3-session delta + last-close uptick. Raw
+  features (`rsi_delta_3d`, `close_up_1d`, `vol_ratio_3v20`) also
+  persisted so cohort analysis can re-cut later without re-fetching.
+- New JSON fields per row: `confirmation_state`, `rsi_delta_3d`,
+  `close_up_1d`, `vol_ratio_3v20`.
+- Frontend chip on cards / table rows / drawer hero.
+
+**Exit-side expectancy warnings (no prediction needed)**
+- `backend/technicals.py`: `swing_high_63d` (3-month rolling high) and
+  `atr_expansion_ratio` (ATR now vs 20 sessions ago).
+- New JSON fields: `swing_high_63d`, `atr_expansion_ratio`.
+- Drawer warnings section: flags when `entry_high < swing_high_63d <
+  target_1` (T1 capped by nearby resistance) or `atr_expansion_ratio >
+  1.3` (stop too tight).
+
+**Regime tagging + per-name outcome rows (calibration raw material)**
+- `backend/performance.py`: each per-name outcome row now carries
+  `regime` (risk_on / neutral / risk_off from the snapshot's
+  market_index_pct_from_ema200), `confirmation` state, score, and
+  bucket. New `by_regime` aggregate section in `performance.json`.
+- `frontend/src/components/PerformanceSection.jsx`: regime-split
+  hit-rate table with honest "insufficient data" cells when N < 5.
+
+### Changed
+
+- `backend/technicals.py`: cache key bumped `v2 → v3` so the new fields
+  land on the next scan instead of being masked by 12h cache (same
+  lesson as the 1.2.1 earnings fix).
+
+### Validation
+
+- 131 pytest passes (was 126); new tests for regime thresholds,
+  per_name row structure, by_regime splits, confirmation field
+  pass-through, and exit-warning feature shape.
+- Frontend build green (45 modules, 206 KB JS / 30 KB CSS).
+- Fresh-cache production simulation: all three live tickers
+  (RELIANCE, INFY, ATUL) produce internally consistent swing_high_63d
+  ratios (1.11-1.16× current price).
+
+### Deferred (3-6 months out, by design)
+
+- **Calibration layer** (score → P(excess > 0 | bucket, regime)):
+  needs accumulated per_name rows. The plumbing ships now.
+- **Confirmation A/B verdict**: split PASS cohorts by
+  confirmation_state once N is sufficient; keep or kill the overlay
+  based on evidence.
+- **Exit-warning A/B**: do T1-capped / ATR-expanding names
+  underperform? Promote to score penalties if so.
+
+### Hard exclusions (accuracy traps)
+
+- No ML / XGBoost — guaranteed overfit at this N.
+- No auto-tuning of score weights on in-sample cohorts.
+- No new hard gates until existing ones are validated.
+- No intraday data.
+
 ## 1.2.1 — Earnings extractor: handle dict-shaped yfinance calendar
 
 ### Fixed

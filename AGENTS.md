@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-07-18.
+> Last updated: 2026-07-18 (1.3.0).
 
 ## Project Overview
 
@@ -149,7 +149,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ├── plans/                        # Older planning docs (kept for context)
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.2.0)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.3.0)
 └── AGENTS.md                     # ← you are here
 ```
 
@@ -161,7 +161,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pytest -q                                            # 123 tests, ~1s
+pytest -q                                            # 131 tests, ~1s
 python scanner.py --top-n 500 --workers 8 --sleep 0.3 \
     --lenient-external-gates \
     --output ../frontend/public/data/latest_scan.json
@@ -182,7 +182,7 @@ npm run build             # production build to dist/
 ```bash
 cd backend
 .venv/bin/python scripts/check_cron_consistency.py   # CI guard
-.venv/bin/python -m pytest -q                        # 123 tests
+.venv/bin/python -m pytest -q                        # 131 tests
 cd ../frontend && npm run build                      # typecheck + bundle
 ```
 
@@ -528,7 +528,7 @@ Single source of truth lives in two places, kept in sync by
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 123 tests in ~1s
+.venv/bin/python -m pytest -q          # 131 tests in ~1s
 ```
 
 Coverage (manual map):
