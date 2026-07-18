@@ -70,25 +70,39 @@ exports.handler = async (event) => {
   }
 
   if (ghRes.status === 401 || ghRes.status === 403) {
+    let detail = "token lacks repo scope or is revoked";
+    try {
+      const j = await ghRes.json();
+      if (j && j.message) detail = j.message;
+    } catch {}
+    console.error("trigger-scan: GitHub rejected dispatch", ghRes.status, detail);
     return {
       statusCode: 502,
-      body: JSON.stringify({ ok: false, error: "github_dispatch_failed" }),
+      body: JSON.stringify({ ok: false, error: "github_dispatch_failed", detail }),
     };
   }
 
   if (ghRes.status === 404) {
+    let detail = "workflow or token permission missing";
+    try {
+      const j = await ghRes.json();
+      if (j && j.message) detail = j.message;
+    } catch {}
+    console.error("trigger-scan: GitHub 404 on dispatch", detail);
     return {
       statusCode: 502,
-      body: JSON.stringify({
-        ok: false,
-        error: "github_dispatch_failed",
-        detail: "workflow or token permission missing",
-      }),
+      body: JSON.stringify({ ok: false, error: "github_dispatch_failed", detail }),
     };
   }
 
+  let detail = `unexpected status ${ghRes.status}`;
+  try {
+    const j = await ghRes.json();
+    if (j && j.message) detail = j.message;
+  } catch {}
+  console.error("trigger-scan: GitHub dispatch unexpected status", ghRes.status, detail);
   return {
     statusCode: 502,
-    body: JSON.stringify({ ok: false, error: "github_dispatch_failed" }),
+    body: JSON.stringify({ ok: false, error: "github_dispatch_failed", detail }),
   };
 };
