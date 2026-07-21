@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T11:30:43.933616+00:00",
+  "generated_at": "2026-07-21T12:06:28.961786+00:00",
   "universe_size": 500,
   "gate_pass_count": 16,
   "config": {
@@ -34038,114 +34038,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "KFINTECH",
-      "company_name": "Kfin Technologies Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "KFINTECH.NS",
-      "current_price": 887.55,
-      "fifty_two_wk_high": 1256.85,
-      "pct_off_52wk_high": -29.38,
-      "pct_from_ema200": -7.25,
-      "rsi14": 54.34,
-      "atr14": 27.57,
-      "entry_zone_low": 873.76,
-      "entry_zone_high": 887.55,
-      "stop_loss": 853.08,
-      "target_1": 922.02,
-      "target_2": 949.59,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.82,
-      "adtv_value_inr_approx": 983576417.0,
-      "f_score": 5.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 40.36,
-      "trailing_pe": 44.83,
-      "delivery_value_inr": 51177017.50256348,
-      "delivery_qty": 57554.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-21",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 976375485.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -2.24,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.76,
-      "swing_high_63d": 979.44,
-      "atr_expansion_ratio": 1.03,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.06,
-      "market_correction_factor": 0.85,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; rsi 54.34 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 54.34 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 23.8,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 1.0,
-        "volume_capitulation": 0.41000000000000003,
-        "quality_composite": 0.5555555555555556,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "KAJARIACER",
       "company_name": "Kajaria Ceramics Ltd.",
       "industry": "Consumer Durables",
@@ -34247,6 +34139,114 @@
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.44499999999999995,
         "quality_composite": 0.7777777777777778,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "KFINTECH",
+      "company_name": "Kfin Technologies Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "KFINTECH.NS",
+      "current_price": 887.55,
+      "fifty_two_wk_high": 1256.85,
+      "pct_off_52wk_high": -29.38,
+      "pct_from_ema200": -7.25,
+      "rsi14": 54.34,
+      "atr14": 27.57,
+      "entry_zone_low": 873.76,
+      "entry_zone_high": 887.55,
+      "stop_loss": 853.08,
+      "target_1": 922.02,
+      "target_2": 949.59,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.82,
+      "adtv_value_inr_approx": 983576417.0,
+      "f_score": 5.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 40.36,
+      "trailing_pe": 44.83,
+      "delivery_value_inr": 51177017.50256348,
+      "delivery_qty": 57554.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-21",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 976375485.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -2.24,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.76,
+      "swing_high_63d": 979.44,
+      "atr_expansion_ratio": 1.03,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.06,
+      "market_correction_factor": 0.85,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 5 < 6; rsi 54.34 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 5 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 54.34 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 23.8,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 1.0,
+        "volume_capitulation": 0.41000000000000003,
+        "quality_composite": 0.5555555555555556,
         "conviction_holding": null
       },
       "earnings_date": null,
@@ -48726,114 +48726,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "CARBORUNIV",
-      "company_name": "Carborundum Universal Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "CARBORUNIV.NS",
-      "current_price": 1112.0,
-      "fifty_two_wk_high": 1241.7,
-      "pct_off_52wk_high": -10.45,
-      "pct_from_ema200": 14.9,
-      "rsi14": 52.63,
-      "atr14": 39.56,
-      "entry_zone_low": 1092.22,
-      "entry_zone_high": 1112.0,
-      "stop_loss": 1062.55,
-      "target_1": 1161.45,
-      "target_2": 1201.02,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.79,
-      "adtv_value_inr_approx": 374775544.0,
-      "f_score": 5.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 59.27,
-      "trailing_pe": 105.4,
-      "delivery_value_inr": 33888128.853027344,
-      "delivery_qty": 30596.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-21",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 165728540.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 6.32,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.8,
-      "swing_high_63d": 1306.9,
-      "atr_expansion_ratio": 0.72,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.06,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; pct_off_high -10.45 outside [-40.0,-15.0]; rsi 52.63 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -10.45 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 52.63 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 12.3,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.5555555555555556,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "CAPLIPOINT",
       "company_name": "Caplin Point Laboratories Ltd.",
       "industry": "Healthcare",
@@ -48905,6 +48797,114 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 61.73 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 12.3,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.5555555555555556,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "CARBORUNIV",
+      "company_name": "Carborundum Universal Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "CARBORUNIV.NS",
+      "current_price": 1112.0,
+      "fifty_two_wk_high": 1241.7,
+      "pct_off_52wk_high": -10.45,
+      "pct_from_ema200": 14.9,
+      "rsi14": 52.63,
+      "atr14": 39.56,
+      "entry_zone_low": 1092.22,
+      "entry_zone_high": 1112.0,
+      "stop_loss": 1062.55,
+      "target_1": 1161.45,
+      "target_2": 1201.02,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.79,
+      "adtv_value_inr_approx": 374775544.0,
+      "f_score": 5.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 59.27,
+      "trailing_pe": 105.4,
+      "delivery_value_inr": 33888128.853027344,
+      "delivery_qty": 30596.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-21",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 165728540.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 6.32,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.8,
+      "swing_high_63d": 1306.9,
+      "atr_expansion_ratio": 0.72,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.06,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 5 < 6; pct_off_high -10.45 outside [-40.0,-15.0]; rsi 52.63 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 5 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -10.45 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 52.63 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
