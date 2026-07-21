@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T09:41:35.399236+00:00",
+  "generated_at": "2026-07-21T11:30:43.933616+00:00",
   "universe_size": 500,
   "gate_pass_count": 16,
   "config": {
@@ -34038,114 +34038,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "KAJARIACER",
-      "company_name": "Kajaria Ceramics Ltd.",
-      "industry": "Consumer Durables",
-      "yf_ticker": "KAJARIACER.NS",
-      "current_price": 1238.7,
-      "fifty_two_wk_high": 1296.35,
-      "pct_off_52wk_high": -4.45,
-      "pct_from_ema200": 11.5,
-      "rsi14": 69.45,
-      "atr14": 28.17,
-      "entry_zone_low": 1224.62,
-      "entry_zone_high": 1238.7,
-      "stop_loss": 1203.49,
-      "target_1": 1273.91,
-      "target_2": 1302.08,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.89,
-      "adtv_value_inr_approx": 335910611.0,
-      "f_score": 7.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 41.66,
-      "trailing_pe": 40.45,
-      "delivery_value_inr": 11751257.263183594,
-      "delivery_qty": 9486.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-21",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 380246959.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -0.69,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.83,
-      "swing_high_63d": 1271.5,
-      "atr_expansion_ratio": 1.04,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.06,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -4.45 outside [-40.0,-15.0]; rsi 69.45 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -4.45 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 69.45 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 23.8,
-      "sub_scores": {
-        "valuation_compression": 0.07261161785885704,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.44499999999999995,
-        "quality_composite": 0.7777777777777778,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "KFINTECH",
       "company_name": "Kfin Technologies Ltd.",
       "industry": "Financial Services",
@@ -34247,6 +34139,114 @@
         "drawdown_sweetspot": 1.0,
         "volume_capitulation": 0.41000000000000003,
         "quality_composite": 0.5555555555555556,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "KAJARIACER",
+      "company_name": "Kajaria Ceramics Ltd.",
+      "industry": "Consumer Durables",
+      "yf_ticker": "KAJARIACER.NS",
+      "current_price": 1238.7,
+      "fifty_two_wk_high": 1296.35,
+      "pct_off_52wk_high": -4.45,
+      "pct_from_ema200": 11.5,
+      "rsi14": 69.45,
+      "atr14": 28.17,
+      "entry_zone_low": 1224.62,
+      "entry_zone_high": 1238.7,
+      "stop_loss": 1203.49,
+      "target_1": 1273.91,
+      "target_2": 1302.08,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.89,
+      "adtv_value_inr_approx": 335910611.0,
+      "f_score": 7.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 41.66,
+      "trailing_pe": 40.45,
+      "delivery_value_inr": 11751257.263183594,
+      "delivery_qty": 9486.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-21",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 380246959.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -0.69,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.83,
+      "swing_high_63d": 1271.5,
+      "atr_expansion_ratio": 1.04,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.06,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -4.45 outside [-40.0,-15.0]; rsi 69.45 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -4.45 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 69.45 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 23.8,
+      "sub_scores": {
+        "valuation_compression": 0.07261161785885704,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.44499999999999995,
+        "quality_composite": 0.7777777777777778,
         "conviction_holding": null
       },
       "earnings_date": null,
@@ -48726,114 +48726,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "CAPLIPOINT",
-      "company_name": "Caplin Point Laboratories Ltd.",
-      "industry": "Healthcare",
-      "yf_ticker": "CAPLIPOINT.NS",
-      "current_price": 2625.0,
-      "fifty_two_wk_high": 2671.5,
-      "pct_off_52wk_high": -1.74,
-      "pct_from_ema200": 28.24,
-      "rsi14": 61.73,
-      "atr14": 89.42,
-      "entry_zone_low": 2580.29,
-      "entry_zone_high": 2625.0,
-      "stop_loss": 2513.23,
-      "target_1": 2736.77,
-      "target_2": 2826.19,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.73,
-      "adtv_value_inr_approx": 473162988.0,
-      "f_score": 5.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 19.98,
-      "trailing_pe": 31.18,
-      "delivery_value_inr": 28575688.96142578,
-      "delivery_qty": 10869.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-21",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 321635939.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -4.43,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.59,
-      "swing_high_63d": 2699.0,
-      "atr_expansion_ratio": 1.01,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.06,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; pct_off_high -1.74 outside [-40.0,-15.0]; rsi 61.73 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -1.74 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 61.73 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 12.3,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.5555555555555556,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "CARBORUNIV",
       "company_name": "Carborundum Universal Ltd.",
       "industry": "Capital Goods",
@@ -48905,6 +48797,114 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 52.63 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 12.3,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.5555555555555556,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "CAPLIPOINT",
+      "company_name": "Caplin Point Laboratories Ltd.",
+      "industry": "Healthcare",
+      "yf_ticker": "CAPLIPOINT.NS",
+      "current_price": 2625.0,
+      "fifty_two_wk_high": 2671.5,
+      "pct_off_52wk_high": -1.74,
+      "pct_from_ema200": 28.24,
+      "rsi14": 61.73,
+      "atr14": 89.42,
+      "entry_zone_low": 2580.29,
+      "entry_zone_high": 2625.0,
+      "stop_loss": 2513.23,
+      "target_1": 2736.77,
+      "target_2": 2826.19,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.73,
+      "adtv_value_inr_approx": 473162988.0,
+      "f_score": 5.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 19.98,
+      "trailing_pe": 31.18,
+      "delivery_value_inr": 28575688.96142578,
+      "delivery_qty": 10869.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-21",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 321635939.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -4.43,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.59,
+      "swing_high_63d": 2699.0,
+      "atr_expansion_ratio": 1.01,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.06,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 5 < 6; pct_off_high -1.74 outside [-40.0,-15.0]; rsi 61.73 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 5 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -1.74 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 61.73 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
