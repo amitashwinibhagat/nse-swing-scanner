@@ -202,5 +202,43 @@ class TestRegimeAndPerName(unittest.TestCase):
         self.assertIsNone(row["windows"]["T+20"]["excess_return_pct"])
 
 
+class TestComputePerformanceCLI(unittest.TestCase):
+    """Regression: scripts/compute_performance.py must resolve backend imports
+    when run as `python scripts/compute_performance.py` (workflow cwd=backend).
+    """
+
+    def test_cli_help_and_empty_snapshots(self):
+        import subprocess
+        import tempfile
+
+        script = os.path.join(BACKEND_DIR, "scripts", "compute_performance.py")
+        env = os.environ.copy()
+        # Mimic a clean runner: no PYTHONPATH pointing at backend.
+        env.pop("PYTHONPATH", None)
+
+        help_proc = subprocess.run(
+            [sys.executable, script, "--help"],
+            cwd=BACKEND_DIR,
+            env=env,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(help_proc.returncode, 0, help_proc.stderr)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            snaps = os.path.join(tmp, "snapshots")
+            os.makedirs(snaps)
+            out = os.path.join(tmp, "performance.json")
+            empty_proc = subprocess.run(
+                [sys.executable, script, "--snapshots", snaps, "--output", out],
+                cwd=BACKEND_DIR,
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(empty_proc.returncode, 0, empty_proc.stderr)
+            self.assertTrue(os.path.isfile(out))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -23,13 +23,20 @@ import os
 import sys
 from typing import List, Tuple
 
-from performance import (
+# Script dir is on sys.path when run as `python scripts/compute_performance.py`;
+# backend/ (parent) is not — add it so `import performance` resolves.
+_SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+_BACKEND_DIR = os.path.dirname(_SCRIPTS_DIR)
+if _BACKEND_DIR not in sys.path:
+    sys.path.insert(0, _BACKEND_DIR)
+
+from performance import (  # noqa: E402
     WINDOWS,
     build_performance_payload,
     fetch_forward_returns,
     write_performance_payload,
 )
-from snapshot_writer import SNAPSHOT_FILENAME_RE, parse_iso_utc
+from snapshot_writer import SNAPSHOT_FILENAME_RE, parse_iso_utc  # noqa: E402
 
 
 def load_snapshots(snapshots_dir: str) -> List[Tuple[str, dict]]:
