@@ -23,6 +23,12 @@ jobs:
         # Fails fast if the YAML cron entries drift from the WINDOWS list
         # baked into the "Write scan_status.json" step.
         run: python scripts/check_cron_consistency.py
+      - name: Check workflow scripts import under Actions invocation
+        working-directory: backend
+        # Re-runs every entrypoint as `python scripts/<name>.py --help` with
+        # cwd=backend and no PYTHONPATH — the same path production workflows
+        # use. Catches ModuleNotFoundError that pytest path-hacks hide.
+        run: python scripts/check_workflow_scripts.py
       - name: Run pytest
         working-directory: backend
         run: pytest -q

@@ -203,27 +203,15 @@ class TestRegimeAndPerName(unittest.TestCase):
 
 
 class TestComputePerformanceCLI(unittest.TestCase):
-    """Regression: scripts/compute_performance.py must resolve backend imports
-    when run as `python scripts/compute_performance.py` (workflow cwd=backend).
-    """
+    """Empty-snapshots path (import path covered by check_workflow_scripts)."""
 
-    def test_cli_help_and_empty_snapshots(self):
+    def test_empty_snapshots_writes_payload(self):
         import subprocess
         import tempfile
 
         script = os.path.join(BACKEND_DIR, "scripts", "compute_performance.py")
         env = os.environ.copy()
-        # Mimic a clean runner: no PYTHONPATH pointing at backend.
         env.pop("PYTHONPATH", None)
-
-        help_proc = subprocess.run(
-            [sys.executable, script, "--help"],
-            cwd=BACKEND_DIR,
-            env=env,
-            capture_output=True,
-            text=True,
-        )
-        self.assertEqual(help_proc.returncode, 0, help_proc.stderr)
 
         with tempfile.TemporaryDirectory() as tmp:
             snaps = os.path.join(tmp, "snapshots")

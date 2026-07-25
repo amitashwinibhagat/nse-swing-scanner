@@ -110,7 +110,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── nse_client.py      # Akamai-bypass session helpers
 │   ├── requirements.txt   # yfinance, pandas, numpy, requests, bs4, lxml
 │   ├── scripts/
-│   │   ├── check_cron_consistency.py  # CI guard (runs in ci.yml)
+│   │   ├── check_cron_consistency.py  # CI guard (cron windows)
+│   │   ├── check_workflow_scripts.py  # CI guard (script import path)
 │   │   ├── snapshot_writer.py         # B1: dated snapshots + history_index + 90d prune
 │   │   ├── compute_performance.py     # C1: outcome tracker CLI (weekly workflow)
 │   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
@@ -181,8 +182,9 @@ npm run build             # production build to dist/
 
 ```bash
 cd backend
-.venv/bin/python scripts/check_cron_consistency.py   # CI guard
-.venv/bin/python -m pytest -q                        # 131 tests
+.venv/bin/python scripts/check_cron_consistency.py   # CI guard (cron windows)
+.venv/bin/python scripts/check_workflow_scripts.py   # CI guard (script imports)
+.venv/bin/python -m pytest -q                        # full suite
 cd ../frontend && npm run build                      # typecheck + bundle
 ```
 
@@ -496,6 +498,14 @@ Single source of truth lives in two places, kept in sync by
 - **Numpy**: scanner uses pandas DataFrames. Code paths avoid global
   state; per-stock eval uses thread-local safety because yfinance
   releases the GIL during I/O.
+- **Workflow scripts path bootstrap** — GH Actions runs
+  `python scripts/<name>.py` with `working-directory: backend`. That puts
+  `scripts/` on `sys.path`, **not** `backend/`. Any script that imports a
+  backend module (`performance`, `scanner`, …) must insert the parent
+  dir onto `sys.path` before those imports (see
+  `compute_performance.py`). Unit tests that path-hack before `import`
+  will **not** catch this. CI runs `scripts/check_workflow_scripts.py`
+  to smoke every entrypoint the same way production does.
 - **No emojis** in code or docs unless the user explicitly asks.
 
 ## Known Issues & Limitations
@@ -553,5 +563,6 @@ list.
 - `README.md` — user-facing docs (setup, methodology, operational risks)
 - `CHANGELOG.md` — versioned release notes (current: 1.1.6)
 - `netlify.toml` — build config + cache-control headers
-- `backend/scripts/check_cron_consistency.py` — CI guard
+- `backend/scripts/check_cron_consistency.py` — CI guard (cron windows)
+- `backend/scripts/check_workflow_scripts.py` — CI guard (script import path)
 - `plans/owner-only-scan-trigger-plan.md` — historical design doc
