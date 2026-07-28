@@ -1,5 +1,51 @@
 # Changelog
 
+## 1.3.1 — Integrity: outcome tracker, coverage gate, score buckets
+
+### Why
+
+The published track record is the moat — but `performance.json` had
+**146/146** `per_name` rows `untrackable: missing_stock_price` (empty
+yfinance cache poison + fragile calendar math), and the latest scan left
+**~52% of the universe unpriced** under yfinance 429s. Measurement was
+theater. This release makes outcomes and coverage fail loudly and
+honestly.
+
+### Fixed
+
+**Outcome tracker (`performance.py`)**
+- Never cache empty price series (anti-poison).
+- Batch yfinance download + retry; MultiIndex `Close` flatten.
+- T+N via Nifty session calendar (not calendar-day approximation).
+- `window_not_closed` separated from untrackable (expected for recent
+  snapshots; excluded from quality alarms).
+- `meta.trackable_count` / `untrackable_count` / `window_not_closed_count`
+  + per-window `reasons` breakdown.
+- `compute_performance.py` exits 1 when T+5 is all-untrackable despite
+  closed windows (prevents silent empty commits).
+
+**Scan coverage**
+- Shared `yf_retry.call_with_retry` on technicals / F-Score / 5Y P/E.
+- Rate-limit payloads are **not** written to the 12 h disk cache.
+- Root JSON `coverage: {priced, universe, rate_limited, pct}`.
+- scanner exits 2 when `coverage.pct < 0.85` so half-blind PASS lists
+  never replace last-good `latest_scan.json`.
+- GHA defaults: `--workers 6 --sleep 0.35`, timeout 45 min.
+
+### Changed
+
+- Score buckets → `pass_v2`: `60+` / `55-59` / `50-54` / `<50` (aligned
+  to live PASS mass; aspirational 70/80 bands stayed empty).
+- `cohort_stats` includes `hit_rate` (excess > 0); UI shows hit rate
+  only when N ≥ 20.
+- Dashboard: Priced KPI + low-coverage banner; PerformanceSection empty
+  state explains reasons; Telegram digest coverage line.
+
+### Validation
+
+- 153 pytest passes; workflow script smoke + cron guard green.
+- Frontend build green (45 modules).
+
 ## 1.3.0 — Accuracy plumbing: confirmation overlay, exit warnings, regime tagging
 
 ### Why

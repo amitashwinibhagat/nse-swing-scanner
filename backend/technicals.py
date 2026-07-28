@@ -31,6 +31,7 @@ from settings import (
     YF_CACHE_TTL_SECONDS,
 )
 from cache import cached_call
+from yf_retry import call_with_retry, is_rate_limit_error, should_cache_yf_payload
 
 
 NIFTY50_TICKER = "^NSEI"  # Nifty 50 index on yfinance
@@ -63,7 +64,15 @@ def compute_atr(high: pd.Series, low: pd.Series, close: pd.Series, period: int =
 def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
     """Implementation behind the cached_call wrapper. See compute_technicals."""
     try:
-        hist = yf.Ticker(yf_ticker).history(period=period, auto_adjust=True)
+        def _hist():
+            return yf.Ticker(yf_ticker).history(period=period, auto_adjust=True)
+
+        hist = call_with_retry(
+            _hist,
+            max_attempts=3,
+            base_delay_s=2.0,
+            is_retryable=is_rate_limit_error,
+        )
     except Exception as e:
         return {"yf_ticker": yf_ticker, "error": f"fetch_failed: {e}"}
 
@@ -227,13 +236,22 @@ def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
         _compute_technicals_impl,
         yf_ticker,
         period,
+        should_cache=should_cache_yf_payload,
     )
 
 
 def _compute_nifty50_context_impl(period: str = "1y") -> dict:
     """Implementation behind the cached_call wrapper. See compute_nifty50_context."""
     try:
-        hist = yf.Ticker(NIFTY50_TICKER).history(period=period, auto_adjust=True)
+        def _hist():
+            return yf.Ticker(NIFTY50_TICKER).history(period=period, auto_adjust=True)
+
+        hist = call_with_retry(
+            _hist,
+            max_attempts=3,
+            base_delay_s=2.0,
+            is_retryable=is_rate_limit_error,
+        )
     except Exception as e:
         return {"error": f"fetch_failed: {e}"}
     if hist is None or hist.empty or len(hist) < 210:

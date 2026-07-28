@@ -517,6 +517,25 @@ export default function App() {
               delta={`${((data.gate_pass_count / data.universe_size) * 100).toFixed(1)}% of universe`}
               accent="success"
             />
+            {data.coverage && (
+              <Kpi
+                label="Priced"
+                value={`${data.coverage.priced}/${data.coverage.universe}`}
+                delta={
+                  data.coverage.rate_limited
+                    ? `${(data.coverage.pct * 100).toFixed(0)}% · ${data.coverage.rate_limited} rate-limited`
+                    : `${(data.coverage.pct * 100).toFixed(0)}% of universe`
+                }
+                accent={
+                  data.coverage.pct >= 0.95
+                    ? "success"
+                    : data.coverage.pct >= 0.85
+                      ? "warning"
+                      : "danger"
+                }
+                title="Stocks with a usable yfinance price this scan. Below 85% the scanner refuses to publish."
+              />
+            )}
             {regime && (
               <Kpi
                 label="Regime"
@@ -607,6 +626,21 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {data.coverage && data.coverage.pct < 0.95 && (
+        <div
+          className={`stale-banner${data.coverage.pct < 0.85 ? " stale-banner--danger" : ""}`}
+          role="status"
+        >
+          Incomplete price coverage: {data.coverage.priced}/{data.coverage.universe}{" "}
+          stocks priced
+          {data.coverage.rate_limited
+            ? ` (${data.coverage.rate_limited} rate-limited by yfinance)`
+            : ""}
+          . PASS list may understate the true opportunity set — treat rankings
+          as partial until coverage recovers.
+        </div>
+      )}
 
       {stale && (
         <div className="stale-banner" role="status">

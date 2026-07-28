@@ -15,7 +15,7 @@ Usage:
 
 Exit codes:
   0  success (even if no snapshots — payload reports "snapshots_used": 0)
-  1  invalid arguments / IO error
+  1  invalid arguments / IO error / zero trackable when data should exist
 """
 import argparse
 import json
@@ -34,9 +34,10 @@ from performance import (  # noqa: E402
     WINDOWS,
     build_performance_payload,
     fetch_forward_returns,
+    outcome_quality_ok,
     write_performance_payload,
 )
-from snapshot_writer import SNAPSHOT_FILENAME_RE, parse_iso_utc  # noqa: E402
+from snapshot_writer import SNAPSHOT_FILENAME_RE  # noqa: E402
 
 
 def load_snapshots(snapshots_dir: str) -> List[Tuple[str, dict]]:
@@ -68,6 +69,11 @@ def main(argv=None) -> int:
     p.add_argument("--output", required=True, help="Path to write performance.json")
     p.add_argument("--cache-dir", default=None, help="Cache directory for fetched prices (default: alongside snapshots)")
     p.add_argument("--no-cache", action="store_true", help="Bypass the prices cache (force re-fetch)")
+    p.add_argument(
+        "--allow-empty-trackable",
+        action="store_true",
+        help="Do not fail when T+5 trackable_count is 0 despite untrackable rows",
+    )
     args = p.parse_args(argv)
 
     cache_dir = args.cache_dir or os.path.join(os.path.dirname(args.snapshots), "..", "..", "backend", "cache")
@@ -94,10 +100,23 @@ def main(argv=None) -> int:
     payload = build_performance_payload(snapshots, forward)
     write_performance_payload(payload, args.output)
     n = payload["meta"]["snapshots_used"]
+    t5 = (payload["meta"].get("trackable_count") or {}).get("T+5", 0)
+    u5 = (payload["meta"].get("untrackable_count") or {}).get("T+5", 0)
+    nc5 = (payload["meta"].get("window_not_closed_count") or {}).get("T+5", 0)
     print(
         f"compute_performance: {n} snapshots; windows={WINDOWS}; "
+        f"T+5 trackable={t5} untrackable={u5} not_closed={nc5}; "
         f"output={args.output}"
     )
+
+    ok, reason = outcome_quality_ok(payload)
+    if not ok and not args.allow_empty_trackable:
+        print(f"::error::compute_performance: {reason}", file=sys.stderr)
+        return 1
+    if not ok:
+        print(f"::warning::compute_performance: {reason} (allowed)")
+    else:
+        print(f"compute_performance: quality ok ({reason})")
     return 0
 
 

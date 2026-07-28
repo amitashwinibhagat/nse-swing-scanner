@@ -42,6 +42,7 @@ import yfinance as yf
 
 from cache import cached_call
 from settings import YF_CACHE_TTL_SECONDS, YF_FUNDAMENTAL_CACHE_TTL_SECONDS
+from yf_retry import call_with_retry, is_rate_limit_error, should_cache_yf_payload
 
 
 def _safe_get(df: pd.DataFrame, row_names, col) -> float:
@@ -60,9 +61,15 @@ def _compute_fscore_impl(yf_ticker: str) -> dict:
     """Implementation behind the cached_call wrapper. See compute_fscore."""
     t = yf.Ticker(yf_ticker)
     try:
-        fin = t.financials          # annual income statement
-        bs = t.balance_sheet        # annual balance sheet
-        cf = t.cashflow             # annual cash flow
+        def _stmts():
+            return t.financials, t.balance_sheet, t.cashflow
+
+        fin, bs, cf = call_with_retry(
+            _stmts,
+            max_attempts=3,
+            base_delay_s=2.0,
+            is_retryable=is_rate_limit_error,
+        )
     except Exception as e:
         return {"yf_ticker": yf_ticker, "error": f"fetch_failed: {e}", "f_score": None}
 
@@ -149,6 +156,7 @@ def compute_fscore(yf_ticker: str) -> dict:
         YF_FUNDAMENTAL_CACHE_TTL_SECONDS,
         _compute_fscore_impl,
         yf_ticker,
+        should_cache=should_cache_yf_payload,
     )
 
 
@@ -156,9 +164,15 @@ def _approx_5y_avg_pe_impl(yf_ticker: str) -> dict:
     """Implementation behind the cached_call wrapper. See approx_5y_avg_pe."""
     t = yf.Ticker(yf_ticker)
     try:
-        fin = t.financials
-        hist = t.history(period="6y", auto_adjust=True)
-        trailing_pe = t.info.get("trailingPE")
+        def _fetch():
+            return t.financials, t.history(period="6y", auto_adjust=True), t.info.get("trailingPE")
+
+        fin, hist, trailing_pe = call_with_retry(
+            _fetch,
+            max_attempts=3,
+            base_delay_s=2.0,
+            is_retryable=is_rate_limit_error,
+        )
     except Exception as e:
         return {"yf_ticker": yf_ticker, "error": f"fetch_failed: {e}", "avg_pe_5y": None}
 
@@ -227,6 +241,7 @@ def approx_5y_avg_pe(yf_ticker: str) -> dict:
         YF_CACHE_TTL_SECONDS,
         _approx_5y_avg_pe_impl,
         yf_ticker,
+        should_cache=should_cache_yf_payload,
     )
 
 

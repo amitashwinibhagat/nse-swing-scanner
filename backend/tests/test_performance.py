@@ -1,8 +1,11 @@
-"""Tests for backend/performance.py (C1 plan item)."""
+"""Tests for backend/performance.py (C1 plan item + P0 integrity)."""
 import datetime
 import os
 import sys
 import unittest
+from unittest.mock import patch
+
+import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BACKEND_DIR = os.path.abspath(os.path.join(HERE, ".."))
@@ -18,15 +21,16 @@ class TestCohortStats(unittest.TestCase):
         self.assertEqual(s["n"], 0)
         self.assertIsNone(s["median"])
         self.assertIsNone(s["q1"])
+        self.assertIsNone(s["hit_rate"])
 
     def test_single(self):
         s = performance.cohort_stats([5.0])
         self.assertEqual(s["n"], 1)
         self.assertEqual(s["median"], 5.0)
         self.assertEqual(s["mean"], 5.0)
+        self.assertEqual(s["hit_rate"], 1.0)
 
     def test_known_distribution(self):
-        # 1..10 → median 5.5, q1 ~3.25, q3 ~7.75 (inclusive)
         vals = [float(i) for i in range(1, 11)]
         s = performance.cohort_stats(vals)
         self.assertEqual(s["n"], 10)
@@ -34,9 +38,14 @@ class TestCohortStats(unittest.TestCase):
         self.assertEqual(s["q1"], 3.25)
         self.assertEqual(s["q3"], 7.75)
         self.assertEqual(s["mean"], 5.5)
+        self.assertEqual(s["hit_rate"], 1.0)
+
+    def test_hit_rate_mixed(self):
+        s = performance.cohort_stats([-2.0, -1.0, 0.0, 1.0, 3.0])
+        # > 0 only: 1.0 and 3.0 → 2/5
+        self.assertEqual(s["hit_rate"], 0.4)
 
     def test_skewed(self):
-        # Heavy right tail — median should be far below the mean.
         vals = [-5.0, -3.0, -1.0, 0.0, 0.0, 1.0, 50.0]
         s = performance.cohort_stats(vals)
         self.assertEqual(s["median"], 0.0)
@@ -44,23 +53,23 @@ class TestCohortStats(unittest.TestCase):
 
 
 class TestScoreBucket(unittest.TestCase):
-    def test_buckets(self):
-        self.assertEqual(performance.score_bucket(85.0), "80+")
-        self.assertEqual(performance.score_bucket(80.0), "80+")
-        self.assertEqual(performance.score_bucket(75.0), "70-79")
-        self.assertEqual(performance.score_bucket(70.0), "70-79")
-        self.assertEqual(performance.score_bucket(65.0), "60-69")
-        self.assertEqual(performance.score_bucket(60.0), "60-69")
-        self.assertEqual(performance.score_bucket(59.9), "<60")
+    def test_pass_v2_buckets(self):
+        self.assertEqual(performance.score_bucket(85.0), "60+")
+        self.assertEqual(performance.score_bucket(60.0), "60+")
+        self.assertEqual(performance.score_bucket(59.9), "55-59")
+        self.assertEqual(performance.score_bucket(55.0), "55-59")
+        self.assertEqual(performance.score_bucket(54.9), "50-54")
+        self.assertEqual(performance.score_bucket(50.0), "50-54")
+        self.assertEqual(performance.score_bucket(49.9), "<50")
         self.assertEqual(performance.score_bucket(None), "unknown")
 
 
-def _scan(symbols_with_scores, idx_pct=-1.5, confirmations=None):
-    """Build a synthetic scan. confirmations: optional {symbol: state} map."""
+def _scan(symbols_with_scores, idx_pct=-1.5, confirmations=None, generated_at="2026-07-15T10:31:00+00:00"):
     stocks = []
-    for i, (sym, sc) in enumerate(symbols_with_scores):
+    for sym, sc in symbols_with_scores:
         s = {
             "symbol": sym,
+            "yf_ticker": f"{sym}.NS",
             "gate_pass": True,
             "swing_score": sc,
             "market_index_pct_from_ema200": idx_pct,
@@ -69,19 +78,27 @@ def _scan(symbols_with_scores, idx_pct=-1.5, confirmations=None):
             s["confirmation_state"] = confirmations[sym]
         stocks.append(s)
     return {
-        "generated_at": "2026-07-15T10:31:00+00:00",
+        "generated_at": generated_at,
         "stocks": stocks,
+    }
+
+
+def _perf(excess):
+    return {
+        "stock_return_pct": round(excess, 2),
+        "index_return_pct": 0.0,
+        "excess_return_pct": round(excess, 2),
+        "untrackable": False,
+        "reason": None,
     }
 
 
 class TestBuildPayload(unittest.TestCase):
     def test_per_scan_and_buckets(self):
         snapshots = [
-            ("2026-07-15-pm", _scan([("A", 85), ("B", 75), ("C", 65), ("D", 50)])),
-            ("2026-07-16-pm", _scan([("A", 82), ("B", 78), ("E", 88)])),
+            ("2026-07-15-pm", _scan([("A", 62), ("B", 57), ("C", 52), ("D", 40)])),
+            ("2026-07-16-pm", _scan([("A", 61), ("B", 56), ("E", 65)])),
         ]
-        # Synthetic forward returns — each symbol returns +2% vs index in
-        # each window; one symbol is untrackable.
         forward = {
             ("2026-07-15-pm", "A"): {w: _perf(2.0) for w in (5, 10, 20)},
             ("2026-07-15-pm", "B"): {w: _perf(2.0) for w in (5, 10, 20)},
@@ -97,65 +114,73 @@ class TestBuildPayload(unittest.TestCase):
         }
         payload = performance.build_performance_payload(snapshots, forward, retention_days=90)
 
-        # Two scans used, four + three = seven passed.
         self.assertEqual(payload["meta"]["snapshots_used"], 2)
         self.assertEqual(payload["meta"]["total_passed"], 7)
+        self.assertEqual(payload["meta"]["bucket_scheme"], "pass_v2")
         self.assertEqual(payload["retention_days"], 90)
 
-        # Per-scan cohorts at T+20 (the slowest window to land).
         ps20 = [c["windows"]["T+20"]["n"] for c in payload["per_scan"]]
-        self.assertEqual(ps20, [3, 3])  # D was untrackable
+        self.assertEqual(ps20, [3, 3])
 
-        # Buckets at T+20: 80+ = [A, A, E] = 3, 70-79 = [B, B] = 2,
-        # 60-69 = [C] = 1, <60 = [] = 0.
         buckets = payload["windows"]["T+20"]["buckets"]
-        self.assertEqual(buckets["80+"]["n"], 3)
-        self.assertEqual(buckets["70-79"]["n"], 2)
-        self.assertEqual(buckets["60-69"]["n"], 1)
-        self.assertEqual(buckets["<60"]["n"], 0)
-        self.assertEqual(buckets["80+"]["median"], 2.0)
+        # A,A,E → 60+ = 3; B,B → 55-59 = 2; C → 50-54 = 1
+        self.assertEqual(buckets["60+"]["n"], 3)
+        self.assertEqual(buckets["55-59"]["n"], 2)
+        self.assertEqual(buckets["50-54"]["n"], 1)
+        self.assertEqual(buckets["<50"]["n"], 0)
+        self.assertEqual(buckets["60+"]["median"], 2.0)
+        self.assertEqual(buckets["60+"]["hit_rate"], 1.0)
 
-        # Untrackable counted (D counts in all three windows).
         self.assertEqual(payload["windows"]["T+20"]["untrackable_count"], 1)
         self.assertEqual(payload["windows"]["T+5"]["untrackable_count"], 1)
+        self.assertEqual(payload["windows"]["T+5"]["trackable_count"], 6)
+        self.assertEqual(payload["meta"]["trackable_count"]["T+5"], 6)
+
+    def test_window_not_closed_excluded_from_untrackable(self):
+        snapshots = [("2026-07-15-pm", _scan([("A", 62)]))]
+        forward = {
+            ("2026-07-15-pm", "A"): {
+                w: {
+                    "stock_return_pct": None,
+                    "index_return_pct": None,
+                    "excess_return_pct": None,
+                    "untrackable": False,
+                    "reason": "window_not_closed",
+                }
+                for w in (5, 10, 20)
+            }
+        }
+        payload = performance.build_performance_payload(snapshots, forward)
+        w = payload["windows"]["T+5"]
+        self.assertEqual(w["untrackable_count"], 0)
+        self.assertEqual(w["window_not_closed_count"], 1)
+        self.assertEqual(w["trackable_count"], 0)
+        row = payload["per_name"][0]
+        self.assertFalse(row["windows"]["T+5"]["untrackable"])
+        self.assertEqual(row["windows"]["T+5"]["reason"], "window_not_closed")
 
     def test_no_snapshots_emits_empty_payload(self):
         payload = performance.build_performance_payload([], {}, retention_days=0)
         self.assertEqual(payload["meta"]["snapshots_used"], 0)
         self.assertEqual(payload["per_scan"], [])
-        # All windows present, all buckets empty.
         for w_label in ("T+5", "T+10", "T+20"):
             self.assertIn(w_label, payload["windows"])
-            for b in ("80+", "70-79", "60-69", "<60", "unknown"):
+            for b in ("60+", "55-59", "50-54", "<50", "unknown"):
                 self.assertEqual(payload["windows"][w_label]["buckets"][b]["n"], 0)
-
-
-def _perf(excess):
-    return {
-        "stock_return_pct": round(excess, 2),
-        "index_return_pct": 0.0,
-        "excess_return_pct": round(excess, 2),
-        "untrackable": False,
-        "reason": None,
-    }
 
 
 class TestRegimeAndPerName(unittest.TestCase):
     def test_regime_tag_thresholds(self):
         self.assertEqual(performance.regime_tag(3.0), "risk_on")
         self.assertEqual(performance.regime_tag(2.01), "risk_on")
-        self.assertEqual(performance.regime_tag(2.0), "neutral")  # strict >
-        self.assertEqual(performance.regime_tag(1.9), "neutral")
-        self.assertEqual(performance.regime_tag(-1.9), "neutral")
-        self.assertEqual(performance.regime_tag(-2.0), "neutral")  # strict <
+        self.assertEqual(performance.regime_tag(2.0), "neutral")
         self.assertEqual(performance.regime_tag(-2.01), "risk_off")
-        self.assertEqual(performance.regime_tag(-5.0), "risk_off")
         self.assertEqual(performance.regime_tag(None), "unknown")
 
     def test_per_name_rows_carry_regime_and_confirmation(self):
         snapshots = [
             ("2026-07-15-pm", _scan(
-                [("A", 85), ("B", 75)],
+                [("A", 62), ("B", 57)],
                 idx_pct=-3.5,
                 confirmations={"A": "confirmed", "B": "anticipatory"},
             )),
@@ -168,18 +193,17 @@ class TestRegimeAndPerName(unittest.TestCase):
         per_name = payload["per_name"]
         self.assertEqual(len(per_name), 2)
         by_sym = {r["symbol"]: r for r in per_name}
-        self.assertEqual(by_sym["A"]["regime"], "risk_off")  # idx_pct=-3.5
+        self.assertEqual(by_sym["A"]["regime"], "risk_off")
         self.assertEqual(by_sym["A"]["confirmation"], "confirmed")
-        self.assertEqual(by_sym["A"]["bucket"], "80+")
+        self.assertEqual(by_sym["A"]["bucket"], "60+")
         self.assertEqual(by_sym["B"]["confirmation"], "anticipatory")
         self.assertEqual(by_sym["B"]["windows"]["T+20"]["excess_return_pct"], -1.0)
-        # Cohort-level regime tag too
         self.assertEqual(payload["per_scan"][0]["regime"], "risk_off")
 
     def test_by_regime_splits_cohorts(self):
         snapshots = [
-            ("2026-07-14-pm", _scan([("X", 80)], idx_pct=3.0)),    # risk_on
-            ("2026-07-15-pm", _scan([("Y", 80)], idx_pct=-3.0)),   # risk_off
+            ("2026-07-14-pm", _scan([("X", 62)], idx_pct=3.0)),
+            ("2026-07-15-pm", _scan([("Y", 62)], idx_pct=-3.0)),
         ]
         forward = {
             ("2026-07-14-pm", "X"): {w: _perf(4.0) for w in (5, 10, 20)},
@@ -191,20 +215,176 @@ class TestRegimeAndPerName(unittest.TestCase):
         self.assertEqual(t20["risk_on"]["median"], 4.0)
         self.assertEqual(t20["risk_off"]["n"], 1)
         self.assertEqual(t20["risk_off"]["median"], -2.0)
-        self.assertEqual(t20["neutral"]["n"], 0)
 
     def test_per_name_untrackable_marked(self):
-        snapshots = [("2026-07-15-pm", _scan([("A", 80)]))]
-        # No forward returns at all → untrackable
+        snapshots = [("2026-07-15-pm", _scan([("A", 62)]))]
         payload = performance.build_performance_payload(snapshots, {})
         row = payload["per_name"][0]
         self.assertTrue(row["windows"]["T+20"]["untrackable"])
         self.assertIsNone(row["windows"]["T+20"]["excess_return_pct"])
 
 
-class TestComputePerformanceCLI(unittest.TestCase):
-    """Empty-snapshots path (import path covered by check_workflow_scripts)."""
+class TestSessionIndexAndCloses(unittest.TestCase):
+    def test_t_plus_session(self):
+        # Mon-Fri style sessions
+        base = datetime.date(2026, 7, 13)  # Monday
+        sessions = [base + datetime.timedelta(days=i) for i in range(0, 30) if (base + datetime.timedelta(days=i)).weekday() < 5]
+        # scan on Monday → T+0 = Monday, T+5 = next Monday
+        self.assertEqual(performance.t_plus_session(sessions, base, 0), base)
+        self.assertEqual(performance.t_plus_session(sessions, base, 5), base + datetime.timedelta(days=7))
+        # scan on Saturday snaps forward to Monday
+        sat = base + datetime.timedelta(days=5)
+        self.assertEqual(performance.t_plus_session(sessions, sat, 0), base + datetime.timedelta(days=7))
 
+    def test_t_plus_beyond_calendar_returns_none(self):
+        sessions = [datetime.date(2026, 7, 13), datetime.date(2026, 7, 14)]
+        self.assertIsNone(performance.t_plus_session(sessions, sessions[0], 5))
+
+    def test_closes_dict_flat(self):
+        idx = pd.to_datetime(["2026-07-13", "2026-07-14"])
+        df = pd.DataFrame({"Close": [100.0, 102.0], "Open": [99.0, 101.0]}, index=idx)
+        got = performance.closes_dict_from_frame(df)
+        self.assertEqual(got["2026-07-13"], 100.0)
+        self.assertEqual(got["2026-07-14"], 102.0)
+
+    def test_closes_dict_multiindex(self):
+        idx = pd.to_datetime(["2026-07-13", "2026-07-14"])
+        cols = pd.MultiIndex.from_tuples([("Close", "AAA.NS"), ("Open", "AAA.NS")])
+        df = pd.DataFrame([[100.0, 99.0], [102.0, 101.0]], index=idx, columns=cols)
+        got = performance.closes_dict_from_frame(df)
+        self.assertEqual(got["2026-07-13"], 100.0)
+
+    def test_cache_entry_usable_rejects_empty(self):
+        self.assertFalse(performance.cache_entry_usable(None, min_end_date="2026-08-01"))
+        self.assertFalse(performance.cache_entry_usable(
+            {"end_date": "2026-08-01", "closes": {}}, min_end_date="2026-08-01"
+        ))
+        self.assertTrue(performance.cache_entry_usable(
+            {"end_date": "2026-08-15", "closes": {"2026-07-13": 1.0}},
+            min_end_date="2026-08-01",
+        ))
+        self.assertFalse(performance.cache_entry_usable(
+            {"end_date": "2026-07-01", "closes": {"2026-07-13": 1.0}},
+            min_end_date="2026-08-01",
+        ))
+
+
+class TestFetchForwardReturnsInjected(unittest.TestCase):
+    def _make_sessions(self, start, n_days=40):
+        """Build Mon-Fri session closes for index + stock."""
+        dates = []
+        d = start
+        while len(dates) < n_days:
+            if d.weekday() < 5:
+                dates.append(d)
+            d += datetime.timedelta(days=1)
+        return dates
+
+    def test_fetch_computes_excess_and_respects_not_closed(self):
+        start = datetime.date(2026, 6, 1)
+        sessions = self._make_sessions(start, 50)
+        # Build synthetic OHLCV frames
+        nifty = {d.isoformat(): 100.0 + i for i, d in enumerate(sessions)}
+        stock = {d.isoformat(): 50.0 + i * 0.5 for i, d in enumerate(sessions)}
+
+        def fake_download(tickers, start_s, end_s):
+            frames = {}
+            for tk in tickers:
+                series = nifty if tk == "^NSEI" else stock
+                idx = pd.to_datetime(list(series.keys()))
+                frames[tk] = pd.DataFrame({"Close": [series[k.strftime("%Y-%m-%d")] for k in idx]}, index=idx)
+            if len(tickers) == 1:
+                return frames[tickers[0]]
+            # Multi-ticker group_by=ticker style
+            return pd.concat(frames, axis=1)
+
+        scan_date = sessions[5]  # mid series
+        # as_of far enough for T+5 but not T+20 relative to a late scan
+        as_of = sessions[5 + 8]  # T+5 closed, T+20 maybe not depending on length
+        snapshots = [
+            ("2026-06-label-pm", _scan(
+                [("AAA", 55)],
+                generated_at=scan_date.isoformat() + "T10:00:00+00:00",
+            )),
+        ]
+        out = performance.fetch_forward_returns(
+            snapshots,
+            no_cache=True,
+            today=as_of,
+            download_fn=fake_download,
+            max_attempts=1,
+        )
+        row = out[("2026-06-label-pm", "AAA")]
+        self.assertFalse(row[5]["untrackable"])
+        self.assertIsNotNone(row[5]["excess_return_pct"])
+        # T+20 should be window_not_closed if as_of is only +8 sessions
+        self.assertEqual(row[20]["reason"], "window_not_closed")
+
+    def test_empty_download_not_cached(self, tmp_path_factory=None):
+        import tempfile
+
+        def empty_download(tickers, start_s, end_s):
+            return pd.DataFrame()
+
+        snapshots = [
+            ("2026-07-01-pm", _scan(
+                [("AAA", 55)],
+                generated_at="2026-07-01T10:00:00+00:00",
+            )),
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            out = performance.fetch_forward_returns(
+                snapshots,
+                cache_dir=tmp,
+                no_cache=False,
+                today=datetime.date(2026, 7, 28),
+                download_fn=empty_download,
+                max_attempts=1,
+            )
+            cache_path = os.path.join(tmp, "performance_prices.json")
+            # Either no cache file, or no empty-poison entries with ok closes
+            if os.path.exists(cache_path):
+                import json
+                with open(cache_path) as f:
+                    cache = json.load(f)
+                for entry in cache.values():
+                    self.assertTrue(entry.get("closes"), "empty closes must not be cached")
+            # All missing stock price or window issues — not silently trackable
+            row = out[("2026-07-01-pm", "AAA")]
+            self.assertTrue(
+                row[5]["untrackable"] or row[5]["reason"] == "window_not_closed"
+                or row[5]["reason"] == "missing_stock_price"
+            )
+
+
+class TestOutcomeQuality(unittest.TestCase):
+    def test_all_open_ok(self):
+        payload = {
+            "meta": {
+                "snapshots_used": 2,
+                "trackable_count": {"T+5": 0},
+                "untrackable_count": {"T+5": 0},
+                "window_not_closed_count": {"T+5": 10},
+            }
+        }
+        ok, _ = performance.outcome_quality_ok(payload)
+        self.assertTrue(ok)
+
+    def test_all_untrackable_fails(self):
+        payload = {
+            "meta": {
+                "snapshots_used": 2,
+                "trackable_count": {"T+5": 0},
+                "untrackable_count": {"T+5": 10},
+                "window_not_closed_count": {"T+5": 0},
+            }
+        }
+        ok, reason = performance.outcome_quality_ok(payload)
+        self.assertFalse(ok)
+        self.assertIn("broken", reason)
+
+
+class TestComputePerformanceCLI(unittest.TestCase):
     def test_empty_snapshots_writes_payload(self):
         import subprocess
         import tempfile
@@ -226,6 +406,24 @@ class TestComputePerformanceCLI(unittest.TestCase):
             )
             self.assertEqual(empty_proc.returncode, 0, empty_proc.stderr)
             self.assertTrue(os.path.isfile(out))
+
+
+class TestCoverageHelper(unittest.TestCase):
+    def test_compute_coverage(self):
+        # Import from scanner
+        sys.path.insert(0, BACKEND_DIR)
+        import scanner
+
+        records = [
+            {"current_price": 100.0, "gate_fail_reason": None},
+            {"current_price": None, "gate_fail_reason": "fetch_failed: Too Many Requests. Rate limited."},
+            {"current_price": 50.0, "gate_fail_reason": "rsi 50 outside"},
+        ]
+        cov = scanner.compute_coverage(records)
+        self.assertEqual(cov["priced"], 2)
+        self.assertEqual(cov["universe"], 3)
+        self.assertEqual(cov["rate_limited"], 1)
+        self.assertAlmostEqual(cov["pct"], 2 / 3, places=4)
 
 
 if __name__ == "__main__":

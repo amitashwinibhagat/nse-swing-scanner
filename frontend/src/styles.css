@@ -413,6 +413,9 @@ body {
   font-family: var(--font-body);
   margin-bottom: var(--sp-4);
 }
+.stale-banner--danger {
+  font-weight: 600;
+}
 
 /* =========================================================================
    Admin controls (?admin=1)
@@ -1282,6 +1285,22 @@ body {
 .perf-meta b {
   color: var(--text);
   font-weight: 600;
+}
+.perf-alert {
+  background: var(--warning-dim, rgba(245, 158, 11, 0.12));
+  border: 1px solid var(--warning, #f59e0b);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  font-size: var(--t-meta);
+  font-family: var(--font-body);
+  margin-bottom: var(--sp-3);
+}
+.perf-alert p {
+  margin: 0 0 6px;
+}
+.perf-alert p:last-child {
+  margin-bottom: 0;
 }
 .perf-table-wrap {
   overflow-x: auto;

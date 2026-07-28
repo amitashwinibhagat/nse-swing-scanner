@@ -821,13 +821,46 @@ def to_json_records(df: pd.DataFrame) -> list:
     return records
 
 
+def compute_coverage(records: list) -> dict:
+    """
+    Universe coverage stats for the JSON root. A row is "priced" when
+    current_price is a finite number — rate-limited yfinance fetches leave
+    it null and must not silently shrink the PASS funnel.
+    """
+    universe = len(records)
+    priced = 0
+    rate_limited = 0
+    for r in records:
+        px = r.get("current_price")
+        if isinstance(px, (int, float)):
+            priced += 1
+        reason = r.get("gate_fail_reason") or ""
+        low = reason.lower()
+        if "too many requests" in low or "rate limit" in low or "rate limited" in low:
+            rate_limited += 1
+    pct = round(priced / universe, 4) if universe else 0.0
+    return {
+        "priced": priced,
+        "universe": universe,
+        "rate_limited": rate_limited,
+        "pct": pct,
+    }
+
+
+# Floor below which a scan is considered half-blind and must not replace
+# latest_scan.json (last-good is better than false confidence).
+MIN_COVERAGE_PCT = 0.85
+
+
 def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
     records = to_json_records(df)
     gate_pass_count = sum(1 for r in records if r["gate_pass"])
+    coverage = compute_coverage(records)
     payload = {
         "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "universe_size": len(records),
         "gate_pass_count": gate_pass_count,
+        "coverage": coverage,
         "config": {
             "min_f_score": MIN_F_SCORE,
             "min_delivery_value_inr": MIN_DELIVERY_VALUE_INR,
@@ -888,6 +921,19 @@ if __name__ == "__main__":
     )
     elapsed = time.time() - start
     payload = write_scan_output(df, args.output)
+    cov = payload.get("coverage") or {}
     print(f"Scan complete in {elapsed/60:.1f} min. "
           f"{payload['gate_pass_count']}/{payload['universe_size']} passed all gates. "
+          f"coverage={cov.get('priced')}/{cov.get('universe')} "
+          f"({(cov.get('pct') or 0)*100:.1f}% priced, "
+          f"{cov.get('rate_limited', 0)} rate-limited). "
           f"Wrote {args.output}")
+    if (cov.get("pct") or 0) < MIN_COVERAGE_PCT:
+        print(
+            f"::error::coverage {cov.get('pct')} < {MIN_COVERAGE_PCT} "
+            f"({cov.get('priced')}/{cov.get('universe')} priced, "
+            f"{cov.get('rate_limited')} rate-limited) — refusing to treat "
+            f"this as a good scan. Last-good latest_scan.json should be kept.",
+            file=sys.stderr,
+        )
+        sys.exit(2)

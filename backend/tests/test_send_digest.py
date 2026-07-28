@@ -77,6 +77,18 @@ class TestBuildMessage(unittest.TestCase):
         self.assertIn("Source warnings", msg)
         self.assertIn("Surveillance", msg)
 
+    def test_coverage_line(self):
+        scan = _make_scan(idx_pct=-1.0, passed_count=2)
+        scan["coverage"] = {"priced": 450, "universe": 500, "rate_limited": 40, "pct": 0.9}
+        with tempfile.TemporaryDirectory() as f:
+            path = os.path.join(f, "latest.json")
+            with open(path, "w") as fp:
+                json.dump(scan, fp)
+            msg = send_digest.build_message(path, None)
+        self.assertIn("Coverage", msg)
+        self.assertIn("450/500", msg)
+        self.assertIn("rate-limited", msg)
+
 
 class TestSendTelegram(unittest.TestCase):
     def test_missing_secrets_skips_soft(self):

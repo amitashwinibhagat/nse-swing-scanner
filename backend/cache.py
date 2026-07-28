@@ -85,6 +85,7 @@ def cached_call(
     fn: Callable[..., T],
     *args,
     cache_dir: str = DEFAULT_CACHE_DIR,
+    should_cache: Optional[Callable[[T], bool]] = None,
     **kwargs,
 ) -> T:
     """
@@ -93,6 +94,10 @@ def cached_call(
 
     Bypassed (always calls fn) when the `NSE_SWING_NO_CACHE` env var is set to
     a truthy value — used by tests to exercise the live code paths.
+
+    should_cache: optional predicate; when it returns False the result is
+    returned to the caller but NOT written (e.g. rate-limit failures must
+    not poison the 12 h yfinance cache).
 
     Centralising the env-var check + read-then-write pattern here means new
     cached functions don't need to copy the boilerplate, and the bypass flag
@@ -104,10 +109,11 @@ def cached_call(
             return cached
     result = fn(*args, **kwargs)
     if not os.environ.get(NO_CACHE_ENV_VAR):
-        try:
-            write_cache(key, result, cache_dir=cache_dir)
-        except (OSError, TypeError):
-            # Cache write failure must not break the caller. On-disk cache
-            # is best-effort; the next call will simply recompute.
-            pass
+        if should_cache is None or should_cache(result):
+            try:
+                write_cache(key, result, cache_dir=cache_dir)
+            except (OSError, TypeError):
+                # Cache write failure must not break the caller. On-disk cache
+                # is best-effort; the next call will simply recompute.
+                pass
     return result

@@ -93,6 +93,14 @@ def build_message(latest_path: str, history_path: Optional[str]) -> Optional[str
     lines.append(f"*NSE Swing Scanner* — {scan.get('generated_at', '')[:16].replace('T', ' ')} UTC")
     lines.append(f"{regime_emoji} Regime: *{regime_label}* ({_fmt_pct(idx_pct)})")
     lines.append(f"PASS: *{gate_pass} / {universe}*")
+    cov = scan.get("coverage") or {}
+    if cov:
+        priced = cov.get("priced")
+        univ = cov.get("universe", universe)
+        pct = cov.get("pct")
+        rl = cov.get("rate_limited") or 0
+        pct_s = f"{pct * 100:.0f}%" if isinstance(pct, (int, float)) else "—"
+        lines.append(f"Coverage: *{priced}/{univ}* priced ({pct_s})" + (f", {rl} rate-limited" if rl else ""))
     lines.append("")
 
     if top:

@@ -19,7 +19,9 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # Nifty 500 with 12 workers: cold-cache ~5-7 min, warm-cache ~30-90 s. 30 min leaves comfortable headroom for retry cascades.
+    # Retries on 429 + lower concurrency can stretch cold-cache runs; 45 min
+    # leaves headroom without letting a hung job burn the free-tier budget.
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -42,22 +44,15 @@ jobs:
 
       - name: Run full scan
         working-directory: backend
-        run: python scanner.py --top-n 500 --workers 12 --sleep 0.2 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
-        # Nifty 500 (top 500 by free-float market cap) with 12 parallel workers.
-        # Tuned conservatively to stay under Screener.in / yfinance rate-limit
-        # ceilings on a shared GitHub Actions egress IP. The yfinance result
-        # cache (12 h for price-derived, 24 h for fundamentals) is the main
-        # speedup that keeps the scan within ~5 min cold-cache:
-        #   - Cold cache (first run of the day, weekend-cleared): ~5-7 min.
-        #   - Warm cache (subsequent runs): ~30-90 s (cache hits).
-        # --lenient-external-gates: lets the holdings gate pass when its source
-        # is source_failed (Screener.in sometimes rate-limits the runner IP).
-        # The liquidity gate no longer needs this: it falls back to the 20d ADV
-        # path computed from yfinance, which is unaffected by NSE bhavcopy
-        # availability. The source status is still surfaced in the JSON and UI.
-# If NSE/yfinance/Screener rate-limits mid-run, this step fails and
-    # the workflow stops WITHOUT committing a partial/corrupt file —
-    # the frontend keeps serving the last good scan until the next run.
+        run: python scanner.py --top-n 500 --workers 6 --sleep 0.35 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
+        # Nifty 500 with 6 workers + 0.35s sleep + per-call 429 retry (yf_retry).
+        # Tuned after 52% rate-limit blackouts at workers=12/sleep=0.2 on the
+        # shared GHA egress IP. scanner.py exits 2 when coverage.pct < 0.85 so
+        # a half-blind PASS list never replaces last-good latest_scan.json.
+        #   - Cold cache: ~8-15 min with retries.
+        #   - Warm cache: ~1-3 min (cache hits; rate-limit errors not cached).
+        # --lenient-external-gates: holdings gate passes on source_failed
+        # (Screener captcha). Liquidity uses 20d ADV when bhavcopy is down.
 
       - name: Ping healthchecks.io (scan started)
         if: ${{ github.event_name == 'schedule' }}
@@ -154,7 +149,18 @@ jobs:
 
       - name: Validate JSON contract
         working-directory: backend
-        run: python -c "import json; p=json.load(open('../frontend/public/data/latest_scan.json')); assert 'generated_at' in p and 'stocks' in p and p['stocks'], 'invalid scan contract'; print('contract ok:', len(p['stocks']), 'stocks')"
+        run: |
+          python -c "
+          import json, sys
+          p=json.load(open('../frontend/public/data/latest_scan.json'))
+          assert 'generated_at' in p and 'stocks' in p and p['stocks'], 'invalid scan contract'
+          cov=p.get('coverage') or {}
+          assert 'priced' in cov and 'pct' in cov, 'missing coverage block'
+          if cov.get('pct', 0) < 0.85:
+              print(f\"::error::coverage {cov.get('pct')} < 0.85\", file=sys.stderr)
+              sys.exit(1)
+          print('contract ok:', len(p['stocks']), 'stocks; coverage', cov)
+          "
 
       - name: Write dated snapshot + history index (B1)
         # Persists the current run as YYYY-MM-DD-{am|pm}.json (minified) and
@@ -296,7 +302,15 @@ jobs:
           git add frontend/public/data/snapshots/ || true
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "Scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
+          # Rebase+retry: outcome-tracker (or another scan) may land on main
+          # between checkout and push.
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push && exit 0
+            echo "push attempt $i failed; retrying…"
+            sleep $((i * 3))
+          done
+          echo "::error::failed to push scan commit after retries"
+          exit 1
 
       - name: Send Telegram digest (C3)
         if: success()

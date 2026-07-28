@@ -67,4 +67,11 @@ jobs:
           git add frontend/public/data/performance.json || true
           git diff --staged --quiet && echo "No changes to performance.json" && exit 0
           git commit -m "Performance update: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
+          # Rebase+retry against concurrent scan.yml commits on main.
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push && exit 0
+            echo "push attempt $i failed; retrying…"
+            sleep $((i * 3))
+          done
+          echo "::error::failed to push performance commit after retries"
+          exit 1

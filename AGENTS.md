@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-07-18 (1.3.0).
+> Last updated: 2026-07-28 (1.3.1).
 
 ## Project Overview
 
@@ -99,7 +99,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── holdings.py        # Screener.in shareholding scraper + cache
 │   ├── corporate_actions.py # NSE corporate-actions endpoint + cache
 │   ├── earnings.py        # yfinance earnings-date lookup (gate-passed names only)
-│   ├── performance.py     # Forward-return attribution math (cohorts, IQR, buckets)
+│   ├── performance.py     # Forward returns, pass_v2 buckets, trackable meta
+│   ├── yf_retry.py        # Shared 429 retry + rate-limit cache predicate
 │   ├── surveillance.py    # NSE/BSE T-group/suspension/GSM fetcher
 │   ├── bhavcopy.py        # Multi-provider delivery data (NSE/yfinance/BSE)
 │   ├── technicals.py      # RSI, ATR, EMAs, 200EMA proximity
@@ -533,12 +534,17 @@ Single source of truth lives in two places, kept in sync by
 7. **No backtest / paper-trade validation** — the soft score weights
    are hand-tuned, not backtested. Treat the score as a ranking, not
    an edge.
+8. **yfinance rate-limits on GHA egress** (1.3.1 mitigation: yf_retry,
+   workers=6/sleep=0.35, coverage gate at 85%, rate-limit results not
+   cached). A half-blind scan exits 2 and keeps last-good JSON.
+9. **Outcome tracker empty cache poison** (1.3.1 fix: never cache empty
+   closes; session-index T+N; window_not_closed ≠ untrackable).
 
 ## Tests
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 131 tests in ~1s
+.venv/bin/python -m pytest -q          # 153+ tests in ~2s
 ```
 
 Coverage (manual map):
