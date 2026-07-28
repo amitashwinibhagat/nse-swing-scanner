@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T10:07:41.990206+00:00",
+  "generated_at": "2026-07-28T11:40:56.565127+00:00",
   "universe_size": 500,
   "gate_pass_count": 36,
   "coverage": {
@@ -39121,7 +39121,7 @@
     },
     {
       "symbol": "ASTERDM",
-      "company_name": "Aster DM Healthcare Ltd.",
+      "company_name": "Aster DM Quality Care Ltd.",
       "industry": "Healthcare",
       "yf_ticker": "ASTERDM.NS",
       "current_price": 805.0,
