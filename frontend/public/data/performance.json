@@ -1,126 +1,156 @@
 {
-  "generated_at": "2026-07-28T09:03:23.819526+00:00",
+  "generated_at": "2026-07-28T09:06:23.224206+00:00",
   "retention_days": 90,
   "windows": {
     "T+5": {
       "buckets": {
-        "80+": {
-          "n": 0,
-          "median": null,
-          "q1": null,
-          "q3": null,
-          "mean": null
+        "60+": {
+          "n": 10,
+          "median": -1.77,
+          "q1": -3.5,
+          "q3": -1.45,
+          "mean": -1.07,
+          "hit_rate": 0.2
         },
-        "70-79": {
-          "n": 0,
-          "median": null,
-          "q1": null,
-          "q3": null,
-          "mean": null
+        "55-59": {
+          "n": 1,
+          "median": 1.36,
+          "q1": 1.36,
+          "q3": 1.36,
+          "mean": 1.36,
+          "hit_rate": 1.0
         },
-        "60-69": {
-          "n": 0,
-          "median": null,
-          "q1": null,
-          "q3": null,
-          "mean": null
+        "50-54": {
+          "n": 14,
+          "median": 1.68,
+          "q1": -0.51,
+          "q3": 1.95,
+          "mean": 1.03,
+          "hit_rate": 0.643
         },
-        "<60": {
-          "n": 0,
-          "median": null,
-          "q1": null,
-          "q3": null,
-          "mean": null
+        "<50": {
+          "n": 25,
+          "median": -0.27,
+          "q1": -0.98,
+          "q3": 0.16,
+          "mean": 0.47,
+          "hit_rate": 0.36
         },
         "unknown": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         }
       },
-      "untrackable_count": 171
+      "trackable_count": 50,
+      "untrackable_count": 0,
+      "window_not_closed_count": 121,
+      "reasons": {
+        "window_not_closed": 121
+      }
     },
     "T+10": {
       "buckets": {
-        "80+": {
+        "60+": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
-        "70-79": {
+        "55-59": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
-        "60-69": {
+        "50-54": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
-        "<60": {
+        "<50": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
         "unknown": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         }
       },
-      "untrackable_count": 171
+      "trackable_count": 0,
+      "untrackable_count": 0,
+      "window_not_closed_count": 171,
+      "reasons": {
+        "window_not_closed": 171
+      }
     },
     "T+20": {
       "buckets": {
-        "80+": {
+        "60+": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
-        "70-79": {
+        "55-59": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
-        "60-69": {
+        "50-54": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
-        "<60": {
+        "<50": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         },
         "unknown": {
           "n": 0,
           "median": null,
           "q1": null,
           "q3": null,
-          "mean": null
+          "mean": null,
+          "hit_rate": null
         }
       },
-      "untrackable_count": 171
+      "trackable_count": 0,
+      "untrackable_count": 0,
+      "window_not_closed_count": 171,
+      "reasons": {
+        "window_not_closed": 171
+      }
     }
   },
   "by_regime": {
@@ -130,28 +160,32 @@
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "neutral": {
-        "n": 0,
-        "median": null,
-        "q1": null,
-        "q3": null,
-        "mean": null
+        "n": 50,
+        "median": -0.27,
+        "q1": -1.25,
+        "q3": 1.81,
+        "mean": 0.33,
+        "hit_rate": 0.42
       },
       "risk_off": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "unknown": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       }
     },
     "T+10": {
@@ -160,28 +194,32 @@
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "neutral": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "risk_off": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "unknown": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       }
     },
     "T+20": {
@@ -190,28 +228,32 @@
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "neutral": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "risk_off": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       },
       "unknown": {
         "n": 0,
         "median": null,
         "q1": null,
         "q3": null,
-        "mean": null
+        "mean": null,
+        "hit_rate": null
       }
     }
   },
@@ -222,13 +264,14 @@
       "regime": "neutral",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 24,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null
+            "n": 24,
+            "median": -0.3,
+            "q1": -1.45,
+            "q3": 1.88,
+            "mean": 0.27,
+            "hit_rate": 0.458
           }
         },
         "T+10": {
@@ -238,7 +281,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -248,7 +292,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -259,13 +304,14 @@
       "regime": "neutral",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 13,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null
+            "n": 13,
+            "median": -0.27,
+            "q1": -0.98,
+            "q3": 1.68,
+            "mean": 0.39,
+            "hit_rate": 0.385
           }
         },
         "T+10": {
@@ -275,7 +321,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -285,7 +332,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -296,13 +344,14 @@
       "regime": "neutral",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 13,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null
+            "n": 13,
+            "median": -0.27,
+            "q1": -0.98,
+            "q3": 1.68,
+            "mean": 0.39,
+            "hit_rate": 0.385
           }
         },
         "T+10": {
@@ -312,7 +361,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -322,7 +372,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -339,7 +390,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -349,7 +401,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -359,7 +412,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -376,7 +430,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -386,7 +441,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -396,7 +452,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -413,7 +470,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -423,7 +481,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -433,7 +492,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -450,7 +510,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -460,7 +521,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -470,7 +532,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -487,7 +550,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -497,7 +561,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -507,7 +572,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -524,7 +590,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -534,7 +601,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -544,7 +612,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -561,7 +630,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -571,7 +641,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -581,7 +652,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -598,7 +670,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -608,7 +681,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -618,7 +692,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -635,7 +710,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -645,7 +721,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -655,7 +732,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -672,7 +750,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -682,7 +761,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -692,7 +772,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -709,7 +790,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+10": {
@@ -719,7 +801,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         },
         "T+20": {
@@ -729,7 +812,8 @@
             "median": null,
             "q1": null,
             "q3": null,
-            "mean": null
+            "mean": null,
+            "hit_rate": null
           }
         }
       }
@@ -740,24 +824,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "SUZLON",
       "score": 74.1,
-      "bucket": "70-79",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -6.79,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -765,24 +849,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "ATUL",
       "score": 65.5,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 10.52,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -790,24 +874,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "HBLENGINE",
       "score": 64.8,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -3.5,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -815,24 +899,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "ITI",
       "score": 64.2,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -1.77,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -840,24 +924,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "NATIONALUM",
       "score": 62.3,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -1.34,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -865,24 +949,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "SAIL",
       "score": 62.1,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 2.7,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -890,24 +974,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "JPPOWER",
       "score": 55.7,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.36,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -915,24 +999,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "HINDCOPPER",
       "score": 54.5,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.82,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -940,24 +1024,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "GESHIP",
       "score": 52.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 0.82,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -965,24 +1049,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "HINDZINC",
       "score": 52.3,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.95,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -990,24 +1074,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "NLCINDIA",
       "score": 50.6,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.86,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1015,24 +1099,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "GVT&D",
       "score": 48.7,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -7.07,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1040,24 +1124,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "TIINDIA",
       "score": 48.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.51,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1065,24 +1149,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "GRSE",
       "score": 48.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 3.06,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1090,24 +1174,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "TATAPOWER",
       "score": 48.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -2.96,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1115,24 +1199,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "NTPC",
       "score": 47.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.33,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1140,24 +1224,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "GPIL",
       "score": 45.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.68,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1165,24 +1249,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "WAAREEENER",
       "score": 45.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -3.26,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1190,24 +1274,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "VMM",
       "score": 41.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.53,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1215,24 +1299,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "JINDALSTEL",
       "score": 38.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 3.12,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1240,24 +1324,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "SCI",
       "score": 37.7,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 0.16,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1265,24 +1349,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "SJVN",
       "score": 37.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.98,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1290,24 +1374,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "DATAPATTNS",
       "score": 35.3,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 9.5,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1315,24 +1399,24 @@
       "snapshot": "2026-07-18-pm",
       "symbol": "TIMKEN",
       "score": 31.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.27,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1340,24 +1424,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "ITI",
       "score": 61.4,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -1.77,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1365,24 +1449,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "HBLENGINE",
       "score": 60.4,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -3.5,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1390,24 +1474,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "SAIL",
       "score": 54.5,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 2.7,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1415,24 +1499,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "GPIL",
       "score": 52.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.68,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1440,24 +1524,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "HINDZINC",
       "score": 50.8,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.95,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1465,24 +1549,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "TIINDIA",
       "score": 50.8,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.51,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1490,24 +1574,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "VMM",
       "score": 50.1,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.53,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1515,24 +1599,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "WAAREEENER",
       "score": 49.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -3.26,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1540,24 +1624,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "LEMONTREE",
       "score": 42.4,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.1,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1565,24 +1649,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "TIMKEN",
       "score": 37.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.27,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1590,24 +1674,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "SJVN",
       "score": 36.3,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.98,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1615,24 +1699,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "SCI",
       "score": 35.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 0.16,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1640,24 +1724,24 @@
       "snapshot": "2026-07-20-am",
       "symbol": "DATAPATTNS",
       "score": 35.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 9.5,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1665,24 +1749,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "ITI",
       "score": 61.4,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -1.77,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1690,24 +1774,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "HBLENGINE",
       "score": 60.4,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -3.5,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1715,24 +1799,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "SAIL",
       "score": 54.5,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 2.7,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1740,24 +1824,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "GPIL",
       "score": 52.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.68,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1765,24 +1849,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "HINDZINC",
       "score": 50.8,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 1.95,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1790,24 +1874,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "TIINDIA",
       "score": 50.8,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.51,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1815,24 +1899,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "VMM",
       "score": 50.1,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.53,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1840,24 +1924,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "WAAREEENER",
       "score": 49.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -3.26,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1865,24 +1949,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "LEMONTREE",
       "score": 42.4,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.1,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1890,24 +1974,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "TIMKEN",
       "score": 37.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.27,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1915,24 +1999,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "SJVN",
       "score": 36.3,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": -0.98,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1940,24 +2024,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "SCI",
       "score": 35.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 0.16,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1965,24 +2049,24 @@
       "snapshot": "2026-07-20-pm",
       "symbol": "DATAPATTNS",
       "score": 35.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "excess_return_pct": 9.5,
+          "untrackable": false,
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -1990,24 +2074,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "SAIL",
       "score": 61.6,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2015,24 +2099,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "ITI",
       "score": 61.5,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2040,24 +2124,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "HBLENGINE",
       "score": 59.7,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2065,24 +2149,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "HINDCOPPER",
       "score": 59.0,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2090,24 +2174,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "GPIL",
       "score": 52.3,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2115,24 +2199,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "GRSE",
       "score": 50.6,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2140,24 +2224,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "VMM",
       "score": 50.1,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2165,24 +2249,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "WAAREEENER",
       "score": 49.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2190,24 +2274,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "NLCINDIA",
       "score": 46.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2215,24 +2299,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "LEMONTREE",
       "score": 42.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2240,24 +2324,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "DATAPATTNS",
       "score": 41.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2265,24 +2349,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "SCI",
       "score": 40.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2290,24 +2374,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "ABFRL",
       "score": 39.8,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2315,24 +2399,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "JINDALSTEL",
       "score": 36.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2340,24 +2424,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "SJVN",
       "score": 36.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2365,24 +2449,24 @@
       "snapshot": "2026-07-21-am",
       "symbol": "TIMKEN",
       "score": 29.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2390,24 +2474,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "SAIL",
       "score": 61.6,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2415,24 +2499,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "ITI",
       "score": 61.5,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2440,24 +2524,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "HBLENGINE",
       "score": 59.7,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2465,24 +2549,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "HINDCOPPER",
       "score": 59.0,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2490,24 +2574,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "GPIL",
       "score": 52.3,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2515,24 +2599,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "GRSE",
       "score": 50.6,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2540,24 +2624,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "VMM",
       "score": 50.1,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2565,24 +2649,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "WAAREEENER",
       "score": 49.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2590,24 +2674,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "NLCINDIA",
       "score": 46.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2615,24 +2699,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "LEMONTREE",
       "score": 42.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2640,24 +2724,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "DATAPATTNS",
       "score": 41.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2665,24 +2749,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "SCI",
       "score": 40.0,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2690,24 +2774,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "ABFRL",
       "score": 39.8,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2715,24 +2799,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "JINDALSTEL",
       "score": 36.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2740,24 +2824,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "SJVN",
       "score": 36.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2765,24 +2849,24 @@
       "snapshot": "2026-07-21-pm",
       "symbol": "TIMKEN",
       "score": 29.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2790,24 +2874,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "ITI",
       "score": 64.0,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2815,24 +2899,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "HBLENGINE",
       "score": 59.5,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2840,24 +2924,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "CEATLTD",
       "score": 59.1,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2865,24 +2949,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "INDIAMART",
       "score": 57.7,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2890,24 +2974,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "ABSLAMC",
       "score": 57.3,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2915,24 +2999,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "GPIL",
       "score": 53.6,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2940,24 +3024,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "HDFCBANK",
       "score": 41.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2965,24 +3049,24 @@
       "snapshot": "2026-07-22-am",
       "symbol": "ABFRL",
       "score": 41.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -2990,24 +3074,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "ITI",
       "score": 64.0,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3015,24 +3099,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "HBLENGINE",
       "score": 59.5,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3040,24 +3124,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "CEATLTD",
       "score": 59.1,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3065,24 +3149,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "INDIAMART",
       "score": 57.7,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3090,24 +3174,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "ABSLAMC",
       "score": 57.3,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3115,24 +3199,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "GPIL",
       "score": 53.6,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3140,24 +3224,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "HDFCBANK",
       "score": 41.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3165,24 +3249,24 @@
       "snapshot": "2026-07-22-pm",
       "symbol": "ABFRL",
       "score": 41.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3190,24 +3274,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "CEATLTD",
       "score": 60.6,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3215,24 +3299,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "ITI",
       "score": 59.8,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3240,24 +3324,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "HBLENGINE",
       "score": 56.2,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3265,24 +3349,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "GPIL",
       "score": 53.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3290,24 +3374,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "INDIAMART",
       "score": 52.5,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3315,24 +3399,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "ITCHOTELS",
       "score": 49.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3340,24 +3424,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "HDFCBANK",
       "score": 39.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3365,24 +3449,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "IRCTC",
       "score": 35.8,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3390,24 +3474,24 @@
       "snapshot": "2026-07-23-am",
       "symbol": "ABFRL",
       "score": 33.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3415,24 +3499,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "CEATLTD",
       "score": 60.6,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3440,24 +3524,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "ITI",
       "score": 59.8,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3465,24 +3549,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "HBLENGINE",
       "score": 56.2,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3490,24 +3574,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "GPIL",
       "score": 53.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3515,24 +3599,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "INDIAMART",
       "score": 52.5,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3540,24 +3624,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "ITCHOTELS",
       "score": 49.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3565,24 +3649,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "HDFCBANK",
       "score": 39.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3590,24 +3674,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "IRCTC",
       "score": 35.8,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3615,24 +3699,24 @@
       "snapshot": "2026-07-23-pm",
       "symbol": "ABFRL",
       "score": 33.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3640,24 +3724,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "CEATLTD",
       "score": 60.6,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3665,24 +3749,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "HINDCOPPER",
       "score": 59.1,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3690,24 +3774,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "ITI",
       "score": 55.9,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3715,24 +3799,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "GVT&D",
       "score": 52.8,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3740,24 +3824,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "ABSLAMC",
       "score": 52.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3765,24 +3849,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "ENGINERSIN",
       "score": 52.3,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3790,24 +3874,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "ITCHOTELS",
       "score": 51.6,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3815,24 +3899,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "AMBER",
       "score": 51.3,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3840,24 +3924,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "INDIAMART",
       "score": 49.8,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3865,24 +3949,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "GRSE",
       "score": 48.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3890,24 +3974,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "IFCI",
       "score": 45.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3915,24 +3999,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "GPIL",
       "score": 40.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3940,24 +4024,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "HDFCBANK",
       "score": 39.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3965,24 +4049,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "HBLENGINE",
       "score": 39.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -3990,24 +4074,24 @@
       "snapshot": "2026-07-24-am",
       "symbol": "CIEINDIA",
       "score": 36.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4015,24 +4099,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "CEATLTD",
       "score": 60.6,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4040,24 +4124,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "HINDCOPPER",
       "score": 59.1,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4065,24 +4149,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "ITI",
       "score": 55.9,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4090,24 +4174,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "GVT&D",
       "score": 52.8,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4115,24 +4199,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "ABSLAMC",
       "score": 52.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4140,24 +4224,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "ENGINERSIN",
       "score": 52.3,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4165,24 +4249,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "ITCHOTELS",
       "score": 51.6,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4190,24 +4274,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "AMBER",
       "score": 51.3,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4215,24 +4299,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "INDIAMART",
       "score": 49.8,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4240,24 +4324,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "GRSE",
       "score": 48.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4265,24 +4349,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "IFCI",
       "score": 45.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4290,24 +4374,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "GPIL",
       "score": 40.9,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4315,24 +4399,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "HDFCBANK",
       "score": 39.6,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4340,24 +4424,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "HBLENGINE",
       "score": 39.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4365,24 +4449,24 @@
       "snapshot": "2026-07-24-pm",
       "symbol": "CIEINDIA",
       "score": 36.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4390,24 +4474,24 @@
       "snapshot": "2026-07-27-am",
       "symbol": "CEATLTD",
       "score": 58.0,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4415,24 +4499,24 @@
       "snapshot": "2026-07-27-am",
       "symbol": "GVT&D",
       "score": 54.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4440,24 +4524,24 @@
       "snapshot": "2026-07-27-am",
       "symbol": "CIEINDIA",
       "score": 45.7,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4465,24 +4549,24 @@
       "snapshot": "2026-07-27-am",
       "symbol": "HBLENGINE",
       "score": 45.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4490,24 +4574,24 @@
       "snapshot": "2026-07-27-am",
       "symbol": "GPIL",
       "score": 34.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4515,24 +4599,24 @@
       "snapshot": "2026-07-27-pm",
       "symbol": "CEATLTD",
       "score": 58.0,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "risk_off",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4540,24 +4624,24 @@
       "snapshot": "2026-07-27-pm",
       "symbol": "GVT&D",
       "score": 54.7,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4565,24 +4649,24 @@
       "snapshot": "2026-07-27-pm",
       "symbol": "CIEINDIA",
       "score": 45.7,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4590,24 +4674,24 @@
       "snapshot": "2026-07-27-pm",
       "symbol": "HBLENGINE",
       "score": 45.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4615,24 +4699,24 @@
       "snapshot": "2026-07-27-pm",
       "symbol": "GPIL",
       "score": 34.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "risk_off",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4640,24 +4724,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "HINDCOPPER",
       "score": 61.3,
-      "bucket": "60-69",
+      "bucket": "60+",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4665,24 +4749,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "GVT&D",
       "score": 59.9,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4690,24 +4774,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "ITI",
       "score": 58.3,
-      "bucket": "<60",
+      "bucket": "55-59",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4715,24 +4799,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "POWERINDIA",
       "score": 51.9,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4740,24 +4824,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "AMBER",
       "score": 51.4,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4765,24 +4849,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "ABSLAMC",
       "score": 51.0,
-      "bucket": "<60",
+      "bucket": "50-54",
       "regime": "neutral",
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4790,24 +4874,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "HFCL",
       "score": 46.2,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4815,24 +4899,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "IFCI",
       "score": 45.1,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4840,24 +4924,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "CEMPRO",
       "score": 44.4,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4865,24 +4949,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "HBLENGINE",
       "score": 43.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4890,24 +4974,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "BEL",
       "score": 42.4,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4915,24 +4999,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "INDIAMART",
       "score": 42.3,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4940,24 +5024,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "CIEINDIA",
       "score": 38.8,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4965,24 +5049,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "GPIL",
       "score": 37.5,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     },
@@ -4990,24 +5074,24 @@
       "snapshot": "2026-07-28-am",
       "symbol": "HDFCBANK",
       "score": 32.7,
-      "bucket": "<60",
+      "bucket": "<50",
       "regime": "neutral",
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+10": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         },
         "T+20": {
           "excess_return_pct": null,
-          "untrackable": true,
-          "reason": "missing_stock_price"
+          "untrackable": false,
+          "reason": "window_not_closed"
         }
       }
     }
@@ -5025,6 +5109,28 @@
       "neutral",
       "risk_off",
       "unknown"
-    ]
+    ],
+    "bucket_scheme": "pass_v2",
+    "buckets": [
+      "60+",
+      "55-59",
+      "50-54",
+      "<50"
+    ],
+    "trackable_count": {
+      "T+5": 50,
+      "T+10": 0,
+      "T+20": 0
+    },
+    "untrackable_count": {
+      "T+5": 0,
+      "T+10": 0,
+      "T+20": 0
+    },
+    "window_not_closed_count": {
+      "T+5": 121,
+      "T+10": 171,
+      "T+20": 171
+    }
   }
 }
