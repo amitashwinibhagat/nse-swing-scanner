@@ -79,6 +79,18 @@ def clear_cache(cache_dir: str = DEFAULT_CACHE_DIR) -> int:
     return n
 
 
+def delete_cache(key: str, cache_dir: str = DEFAULT_CACHE_DIR) -> bool:
+    """Remove one cache file. Returns True if a file was deleted."""
+    path = cache_path(cache_dir, key)
+    try:
+        if os.path.exists(path):
+            os.remove(path)
+            return True
+    except OSError:
+        pass
+    return False
+
+
 def cached_call(
     key: str,
     ttl_seconds: int,
@@ -95,9 +107,11 @@ def cached_call(
     Bypassed (always calls fn) when the `NSE_SWING_NO_CACHE` env var is set to
     a truthy value — used by tests to exercise the live code paths.
 
-    should_cache: optional predicate; when it returns False the result is
-    returned to the caller but NOT written (e.g. rate-limit failures must
-    not poison the 12 h yfinance cache).
+    should_cache: optional predicate applied on both read and write. When a
+    cached value fails the predicate (e.g. a pre-1.3.1 rate-limit error still
+    sitting in actions/cache), the entry is deleted and treated as a miss so
+    the live path can retry. When a fresh result fails the predicate it is
+    returned but not written.
 
     Centralising the env-var check + read-then-write pattern here means new
     cached functions don't need to copy the boilerplate, and the bypass flag
@@ -106,7 +120,10 @@ def cached_call(
     if not os.environ.get(NO_CACHE_ENV_VAR):
         cached = read_cache(key, cache_dir=cache_dir, max_age_seconds=ttl_seconds)
         if cached is not None:
-            return cached
+            if should_cache is None or should_cache(cached):
+                return cached
+            # Poisoned entry (e.g. historical rate-limit payload) — drop it.
+            delete_cache(key, cache_dir=cache_dir)
     result = fn(*args, **kwargs)
     if not os.environ.get(NO_CACHE_ENV_VAR):
         if should_cache is None or should_cache(result):

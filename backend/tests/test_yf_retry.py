@@ -108,6 +108,42 @@ class TestCachedCallShouldCache(unittest.TestCase):
                 else:
                     os.environ["NSE_SWING_NO_CACHE"] = "1"
 
+    def test_poisoned_rate_limit_cache_is_ignored_on_read(self):
+        """Pre-1.3.1 entries that cached 429 payloads must not short-circuit."""
+        import tempfile
+        from cache import write_cache
+
+        with tempfile.TemporaryDirectory() as tmp:
+            old = os.environ.pop("NSE_SWING_NO_CACHE", None)
+            try:
+                write_cache(
+                    "tech:poison",
+                    {"error": "fetch_failed: Too Many Requests. Rate limited.", "yf_ticker": "X.NS"},
+                    cache_dir=tmp,
+                )
+                calls = {"n": 0}
+
+                def live():
+                    calls["n"] += 1
+                    return {"error": None, "current_price": 100.0}
+
+                got = cached_call(
+                    "tech:poison",
+                    3600,
+                    live,
+                    cache_dir=tmp,
+                    should_cache=yf_retry.should_cache_yf_payload,
+                )
+                self.assertEqual(got["current_price"], 100.0)
+                self.assertEqual(calls["n"], 1)
+                # Poison file deleted; good result written
+                self.assertEqual(read_cache("tech:poison", cache_dir=tmp)["current_price"], 100.0)
+            finally:
+                if old is not None:
+                    os.environ["NSE_SWING_NO_CACHE"] = old
+                else:
+                    os.environ["NSE_SWING_NO_CACHE"] = "1"
+
 
 if __name__ == "__main__":
     unittest.main()

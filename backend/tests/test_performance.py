@@ -425,6 +425,63 @@ class TestCoverageHelper(unittest.TestCase):
         self.assertEqual(cov["rate_limited"], 1)
         self.assertAlmostEqual(cov["pct"], 2 / 3, places=4)
 
+    def test_is_rate_limited_row_uses_tech_price(self):
+        import scanner
+
+        self.assertFalse(scanner._is_rate_limited_row({
+            "tech_current_price": 100.0,
+            "gate_fail_reason": "rsi 50 outside",
+        }))
+        self.assertTrue(scanner._is_rate_limited_row({
+            "tech_current_price": None,
+            "gate_fail_reason": "fetch_failed: Too Many Requests. Rate limited.",
+        }))
+        self.assertFalse(scanner._is_rate_limited_row({
+            "tech_current_price": None,
+            "gate_fail_reason": "f_score 4 < 6",
+        }))
+
+    def test_recover_rate_limited_rows(self):
+        import scanner
+
+        rows = [
+            {"symbol": "OK", "tech_current_price": 10.0, "gate_fail_reason": None},
+            {
+                "symbol": "RL",
+                "tech_current_price": None,
+                "gate_fail_reason": "fetch_failed: Too Many Requests. Rate limited.",
+            },
+        ]
+        inputs = {
+            "OK": {"symbol": "OK", "yf_ticker": "OK.NS"},
+            "RL": {"symbol": "RL", "yf_ticker": "RL.NS"},
+        }
+
+        def fake_eval(rdict, *a, **k):
+            return {
+                **rdict,
+                "tech_current_price": 42.0,
+                "gate_pass": False,
+                "gate_fail_reason": "rsi 50 outside",
+            }
+
+        with unittest.mock.patch.object(scanner, "_evaluate_one_stock", side_effect=fake_eval):
+            out = scanner._recover_rate_limited_rows(
+                rows,
+                inputs_by_symbol=inputs,
+                sleep_between_calls=0,
+                surveillance_payload={},
+                bhavcopy_payload={},
+                skip_holdings=True,
+                skip_corporate_actions=True,
+                lenient_external_gates=False,
+                pause_every=100,
+                pause_s=0,
+            )
+        by_sym = {r["symbol"]: r for r in out}
+        self.assertEqual(by_sym["RL"]["tech_current_price"], 42.0)
+        self.assertEqual(by_sym["OK"]["tech_current_price"], 10.0)
+
 
 if __name__ == "__main__":
     unittest.main()

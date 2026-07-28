@@ -665,8 +665,124 @@ def run_scan(
             raise
 
     print(f"Per-stock evaluation complete in {time.time()-start:.1f}s")
+
+    # Recovery pass: rate-limited / unpriced rows get a slow serial retry.
+    # Parallel bursts on GHA egress trip yfinance hard; a second pass with
+    # workers=1 and longer sleep recovers most of the remainder without
+    # publishing a half-blind PASS list.
+    rows = _recover_rate_limited_rows(
+        rows,
+        inputs_by_symbol={r["symbol"]: r for r in inputs},
+        sleep_between_calls=max(sleep_between_calls, 0.6),
+        surveillance_payload=surveillance_payload,
+        bhavcopy_payload=bhavcopy_payload,
+        skip_holdings=skip_holdings,
+        skip_corporate_actions=skip_corporate_actions,
+        lenient_external_gates=lenient_external_gates,
+    )
+
     df = pd.DataFrame(rows)
     return df
+
+
+def _row_price(row: dict):
+    """Price on a raw evaluate_stock row (tech_*) or JSON record (current_price)."""
+    for k in ("tech_current_price", "current_price"):
+        v = row.get(k)
+        if isinstance(v, (int, float)):
+            return v
+    return None
+
+
+def _is_rate_limited_row(row: dict) -> bool:
+    """True when the row failed due to yfinance throttle (no usable price)."""
+    if _row_price(row) is not None:
+        return False
+    # evaluate_stock stores tech error under tech_error or gate_fail_reason
+    blobs = [
+        str(row.get("gate_fail_reason") or ""),
+        str(row.get("tech_error") or ""),
+        str(row.get("error") or ""),
+    ]
+    text = " ".join(blobs).lower()
+    return any(
+        m in text
+        for m in (
+            "too many requests",
+            "rate limit",
+            "rate limited",
+            "empty history after retries",
+        )
+    )
+
+
+def _recover_rate_limited_rows(
+    rows: list,
+    *,
+    inputs_by_symbol: dict,
+    sleep_between_calls: float,
+    surveillance_payload: dict,
+    bhavcopy_payload: dict,
+    skip_holdings: bool,
+    skip_corporate_actions: bool,
+    lenient_external_gates: bool,
+    max_recover: int = 400,
+    pause_every: int = 25,
+    pause_s: float = 8.0,
+) -> list:
+    """
+    Re-evaluate rate-limited symbols one-at-a-time. Mutates/replaces entries
+    in `rows` and returns the updated list.
+    """
+    need_idx = [i for i, r in enumerate(rows) if _is_rate_limited_row(r)]
+    if not need_idx:
+        print("Recovery pass: no rate-limited rows")
+        return rows
+
+    targets = need_idx[:max_recover]
+    print(
+        f"Recovery pass: re-fetching {len(targets)}/{len(need_idx)} "
+        f"rate-limited symbols (serial, sleep={sleep_between_calls}s)…"
+    )
+    recovered = 0
+    start = time.time()
+    for n_done, i in enumerate(targets, 1):
+        sym = rows[i].get("symbol")
+        base = inputs_by_symbol.get(sym)
+        if not base:
+            continue
+        # Fresh copy so we don't carry stale tech_* fields from the failed pass
+        rdict = dict(base)
+        try:
+            fresh = _evaluate_one_stock(
+                rdict,
+                sleep_between_calls,
+                surveillance_payload,
+                bhavcopy_payload,
+                skip_holdings,
+                skip_corporate_actions,
+                lenient_external_gates,
+            )
+            rows[i] = fresh
+            if _row_price(fresh) is not None:
+                recovered += 1
+        except Exception as e:
+            rows[i] = {
+                **rdict,
+                "gate_pass": False,
+                "gate_fail_reason": f"recovery_exception: {e}",
+            }
+        if n_done % pause_every == 0:
+            print(
+                f"  recovery {n_done}/{len(targets)} "
+                f"(recovered={recovered}, {time.time()-start:.0f}s) — pausing {pause_s:.0f}s"
+            )
+            time.sleep(pause_s)
+    print(
+        f"Recovery pass done: recovered {recovered}/{len(targets)} "
+        f"in {time.time()-start:.0f}s"
+    )
+    return rows
 
 
 # ---------------------------------------------------------------------------

@@ -19,9 +19,9 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    # Retries on 429 + lower concurrency can stretch cold-cache runs; 45 min
-    # leaves headroom without letting a hung job burn the free-tier budget.
-    timeout-minutes: 45
+    # Recovery pass for rate-limited symbols can add 10–20 min on cold/partial
+    # cache; 60 min leaves headroom without burning free-tier budget on hangs.
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -44,13 +44,12 @@ jobs:
 
       - name: Run full scan
         working-directory: backend
-        run: python scanner.py --top-n 500 --workers 6 --sleep 0.35 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
-        # Nifty 500 with 6 workers + 0.35s sleep + per-call 429 retry (yf_retry).
-        # Tuned after 52% rate-limit blackouts at workers=12/sleep=0.2 on the
-        # shared GHA egress IP. scanner.py exits 2 when coverage.pct < 0.85 so
-        # a half-blind PASS list never replaces last-good latest_scan.json.
-        #   - Cold cache: ~8-15 min with retries.
-        #   - Warm cache: ~1-3 min (cache hits; rate-limit errors not cached).
+        run: python scanner.py --top-n 500 --workers 4 --sleep 0.5 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
+        # Nifty 500: 4 workers + 0.5s sleep + 429 retry + serial recovery pass
+        # for rate-limited symbols. Poisoned rate-limit cache entries are
+        # rejected on read (1.3.2). scanner exits 2 when coverage.pct < 0.85.
+        #   - Warm cache + recovery: ~10-25 min typical on GHA egress.
+        #   - Cold cache worst case can approach timeout; 45 min headroom.
         # --lenient-external-gates: holdings gate passes on source_failed
         # (Screener captcha). Liquidity uses 20d ADV when bhavcopy is down.
 

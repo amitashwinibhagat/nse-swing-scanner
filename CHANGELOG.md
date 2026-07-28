@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.3.2 — Scan coverage: purge poisoned 429 cache + serial recovery
+
+### Why
+
+Post-1.3.1 GHA scan still reported **233/500 priced (46.6%)** and exited 2.
+Wall-clock was ~88s at 5.7 stocks/s — retries never fired because
+`actions/cache` restored **pre-1.3.1 rate-limit error payloads** as warm
+hits. `should_cache` only blocked *writes*; poisoned *reads* still short-
+circuited live fetches.
+
+### Fixed
+
+- `cached_call`: apply `should_cache` on **read**; delete failing entries
+  and treat as miss (evicts historical 429 poison from GHA cache).
+- `technicals`: retry empty history (soft throttle); tag empty-after-retry
+  as rate-limited for coverage accounting.
+- `run_scan`: serial **recovery pass** for rate-limited symbols (longer
+  sleep, pause every 25 names).
+- GHA: workers=4, sleep=0.5, timeout 60m.
+
+### Validation
+
+- pytest green (incl. poison-cache-on-read + recovery unit tests).
+
 ## 1.3.1 — Integrity: outcome tracker, coverage gate, score buckets
 
 ### Why

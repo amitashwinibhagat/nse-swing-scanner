@@ -69,15 +69,25 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
 
         hist = call_with_retry(
             _hist,
-            max_attempts=3,
-            base_delay_s=2.0,
+            max_attempts=4,
+            base_delay_s=3.0,
             is_retryable=is_rate_limit_error,
+            # yfinance sometimes returns empty instead of raising on throttle.
+            retryable_result=lambda h: h is None or getattr(h, "empty", True),
         )
     except Exception as e:
         return {"yf_ticker": yf_ticker, "error": f"fetch_failed: {e}"}
 
     if hist is None or hist.empty or len(hist) < 210:
-        return {"yf_ticker": yf_ticker, "error": f"insufficient_history ({0 if hist is None else len(hist)} bars)"}
+        n_bars = 0 if hist is None or getattr(hist, "empty", True) else len(hist)
+        # Empty after retries is often a soft rate-limit; tag it so coverage
+        # accounting and the recovery pass can re-attempt later.
+        if n_bars == 0:
+            return {
+                "yf_ticker": yf_ticker,
+                "error": "fetch_failed: Too Many Requests. Rate limited. (empty history after retries)",
+            }
+        return {"yf_ticker": yf_ticker, "error": f"insufficient_history ({n_bars} bars)"}
 
     # yfinance sometimes returns the most recent session with all-NaN OHLCV
     # (incomplete feed, e.g. intraday session still settling). Drop trailing
