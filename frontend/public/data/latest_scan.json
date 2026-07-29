@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T04:19:37.665683+00:00",
+  "generated_at": "2026-07-29T06:19:18.936296+00:00",
   "universe_size": 500,
   "gate_pass_count": 27,
   "coverage": {
@@ -1536,114 +1536,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "SAGILITY",
-      "company_name": "Sagility Ltd.",
-      "industry": "Information Technology",
-      "yf_ticker": "SAGILITY.NS",
-      "current_price": 44.02,
-      "fifty_two_wk_high": 54.53,
-      "pct_off_52wk_high": -19.27,
-      "pct_from_ema200": 1.78,
-      "rsi14": 63.57,
-      "atr14": 1.46,
-      "entry_zone_low": 43.29,
-      "entry_zone_high": 44.02,
-      "stop_loss": 42.19,
-      "target_1": 45.85,
-      "target_2": 47.31,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 2.07,
-      "adtv_value_inr_approx": 1089560708.0,
-      "f_score": 8.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 28.41,
-      "trailing_pe": 20.86,
-      "delivery_value_inr": 196539105.9515152,
-      "delivery_qty": 4504678.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-29",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 1259858067.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 17.72,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 1.87,
-      "swing_high_63d": 45.4,
-      "atr_expansion_ratio": 1.43,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.92,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "rsi 63.57 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 63.57 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 60.7,
-      "sub_scores": {
-        "valuation_compression": 0.6643787398803238,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.644,
-        "drawdown_sweetspot": 0.8539999999999999,
-        "volume_capitulation": 0.5349999999999999,
-        "quality_composite": 0.8888888888888888,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "HINDPETRO",
       "company_name": "Hindustan Petroleum Corporation Ltd.",
       "industry": "Oil Gas & Consumable Fuels",
@@ -2068,6 +1960,114 @@
         "support_proximity": 0.46799999999999997,
         "drawdown_sweetspot": 0.9799999999999998,
         "volume_capitulation": 0.0,
+        "quality_composite": 0.7777777777777778,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "SAGILITY",
+      "company_name": "Sagility Ltd.",
+      "industry": "Information Technology",
+      "yf_ticker": "SAGILITY.NS",
+      "current_price": 44.02,
+      "fifty_two_wk_high": 54.53,
+      "pct_off_52wk_high": -19.27,
+      "pct_from_ema200": 1.78,
+      "rsi14": 63.57,
+      "atr14": 1.46,
+      "entry_zone_low": 43.29,
+      "entry_zone_high": 44.02,
+      "stop_loss": 42.19,
+      "target_1": 45.85,
+      "target_2": 47.31,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 2.07,
+      "adtv_value_inr_approx": 1089560708.0,
+      "f_score": 7.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 28.41,
+      "trailing_pe": 20.86,
+      "delivery_value_inr": 196539105.9515152,
+      "delivery_qty": 4504678.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-29",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 1259858067.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 17.72,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 1.87,
+      "swing_high_63d": 45.4,
+      "atr_expansion_ratio": 1.43,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.92,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "rsi 63.57 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 63.57 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 58.2,
+      "sub_scores": {
+        "valuation_compression": 0.6643787398803238,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.644,
+        "drawdown_sweetspot": 0.8539999999999999,
+        "volume_capitulation": 0.5349999999999999,
         "quality_composite": 0.7777777777777778,
         "conviction_holding": null
       },
