@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-30T04:13:08.168268+00:00",
+  "generated_at": "2026-07-30T06:11:32.647052+00:00",
   "universe_size": 500,
   "gate_pass_count": 19,
   "coverage": {
@@ -44844,114 +44844,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "DEVYANI",
-      "company_name": "Devyani International Ltd.",
-      "industry": "Consumer Services",
-      "yf_ticker": "DEVYANI.NS",
-      "current_price": 116.25,
-      "fifty_two_wk_high": 188.9,
-      "pct_off_52wk_high": -38.46,
-      "pct_from_ema200": -7.22,
-      "rsi14": 56.47,
-      "atr14": 4.02,
-      "entry_zone_low": 114.24,
-      "entry_zone_high": 116.25,
-      "stop_loss": 111.22,
-      "target_1": 121.28,
-      "target_2": 125.3,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.64,
-      "adtv_value_inr_approx": 334428542.0,
-      "f_score": 4.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 772.02,
-      "trailing_pe": null,
-      "delivery_value_inr": 516097782.69493103,
-      "delivery_qty": 4457958.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-30",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 380843709.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -2.85,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 3.66,
-      "swing_high_63d": 124.0,
-      "atr_expansion_ratio": 1.12,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.69,
-      "market_correction_factor": 0.85,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; rsi 56.47 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 56.47 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 16.5,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.15399999999999991,
-        "volume_capitulation": 0.31999999999999995,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "DIVISLAB",
       "company_name": "Divi's Laboratories Ltd.",
       "industry": "Healthcare",
@@ -45053,6 +44945,114 @@
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.37,
         "quality_composite": 0.5555555555555556,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "DEVYANI",
+      "company_name": "Devyani International Ltd.",
+      "industry": "Consumer Services",
+      "yf_ticker": "DEVYANI.NS",
+      "current_price": 116.25,
+      "fifty_two_wk_high": 188.9,
+      "pct_off_52wk_high": -38.46,
+      "pct_from_ema200": -7.22,
+      "rsi14": 56.47,
+      "atr14": 4.02,
+      "entry_zone_low": 114.24,
+      "entry_zone_high": 116.25,
+      "stop_loss": 111.22,
+      "target_1": 121.28,
+      "target_2": 125.3,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.64,
+      "adtv_value_inr_approx": 334428542.0,
+      "f_score": 4.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 772.02,
+      "trailing_pe": null,
+      "delivery_value_inr": 516097782.69493103,
+      "delivery_qty": 4457958.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-30",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 380843709.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -2.85,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 3.66,
+      "swing_high_63d": 124.0,
+      "atr_expansion_ratio": 1.12,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.69,
+      "market_correction_factor": 0.85,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; rsi 56.47 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 56.47 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 16.5,
+      "sub_scores": {
+        "valuation_compression": null,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.15399999999999991,
+        "volume_capitulation": 0.31999999999999995,
+        "quality_composite": 0.4444444444444444,
         "conviction_holding": null
       },
       "earnings_date": null,
