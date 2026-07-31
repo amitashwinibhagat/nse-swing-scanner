@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-31T10:10:42.387991+00:00",
+  "generated_at": "2026-07-31T12:21:17.437231+00:00",
   "universe_size": 500,
   "gate_pass_count": 18,
   "coverage": {
@@ -18600,114 +18600,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "DOMS",
-      "company_name": "DOMS Industries Ltd.",
-      "industry": "Fast Moving Consumer Goods",
-      "yf_ticker": "DOMS.NS",
-      "current_price": 2266.3,
-      "fifty_two_wk_high": 2688.93,
-      "pct_off_52wk_high": -15.72,
-      "pct_from_ema200": -2.93,
-      "rsi14": 48.92,
-      "atr14": 58.31,
-      "entry_zone_low": 2237.14,
-      "entry_zone_high": 2266.3,
-      "stop_loss": 2193.41,
-      "target_1": 2339.19,
-      "target_2": 2397.51,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.35,
-      "adtv_value_inr_approx": 150077562.0,
-      "f_score": 8.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 68.6,
-      "trailing_pe": 59.93,
-      "delivery_value_inr": 29503531.53125,
-      "delivery_qty": 12992.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-31",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 92187706.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": null,
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": 0.25,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.75,
-      "swing_high_63d": 2403.0,
-      "atr_expansion_ratio": 0.8,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.27,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "rsi 48.92 outside [25,40]; adv 92187706 < 100000000",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 48.92 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": false,
-          "reason": "adv 92187706 < 100000000"
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 35.3,
-      "sub_scores": {
-        "valuation_compression": 0.31596209912536427,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.4139999999999999,
-        "drawdown_sweetspot": 0.14400000000000013,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.8888888888888888,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "DALBHARAT",
       "company_name": "Dalmia Bharat Ltd.",
       "industry": "Construction Materials",
@@ -18809,6 +18701,114 @@
         "drawdown_sweetspot": 1.0,
         "volume_capitulation": 1.0,
         "quality_composite": 0.6666666666666666,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "DOMS",
+      "company_name": "DOMS Industries Ltd.",
+      "industry": "Fast Moving Consumer Goods",
+      "yf_ticker": "DOMS.NS",
+      "current_price": 2266.3,
+      "fifty_two_wk_high": 2688.93,
+      "pct_off_52wk_high": -15.72,
+      "pct_from_ema200": -2.93,
+      "rsi14": 48.92,
+      "atr14": 58.31,
+      "entry_zone_low": 2237.14,
+      "entry_zone_high": 2266.3,
+      "stop_loss": 2193.41,
+      "target_1": 2339.19,
+      "target_2": 2397.51,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.35,
+      "adtv_value_inr_approx": 150077562.0,
+      "f_score": 8.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 68.6,
+      "trailing_pe": 59.93,
+      "delivery_value_inr": 29503531.53125,
+      "delivery_qty": 12992.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-31",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 92187706.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": null,
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": 0.25,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.75,
+      "swing_high_63d": 2403.0,
+      "atr_expansion_ratio": 0.8,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.27,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "rsi 48.92 outside [25,40]; adv 92187706 < 100000000",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 48.92 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": false,
+          "reason": "adv 92187706 < 100000000"
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 35.3,
+      "sub_scores": {
+        "valuation_compression": 0.31596209912536427,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.4139999999999999,
+        "drawdown_sweetspot": 0.14400000000000013,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.8888888888888888,
         "conviction_holding": null
       },
       "earnings_date": null,
