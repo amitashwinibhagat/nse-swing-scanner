@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-31T04:30:20.437902+00:00",
+  "generated_at": "2026-07-31T06:34:31.439715+00:00",
   "universe_size": 500,
   "gate_pass_count": 18,
   "coverage": {
@@ -51108,114 +51108,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "RECLTD",
-      "company_name": "REC Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "RECLTD.NS",
-      "current_price": 371.9,
-      "fifty_two_wk_high": 379.0,
-      "pct_off_52wk_high": -1.87,
-      "pct_from_ema200": 6.0,
-      "rsi14": 67.53,
-      "atr14": 7.54,
-      "entry_zone_low": 368.13,
-      "entry_zone_high": 371.9,
-      "stop_loss": 362.47,
-      "target_1": 381.33,
-      "target_2": 388.87,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.65,
-      "adtv_value_inr_approx": 1974201812.0,
-      "f_score": 4.0,
-      "f_score_components_available": 7,
-      "avg_pe_5y": 5.36,
-      "trailing_pe": 6.11,
-      "delivery_value_inr": 222476792.9053955,
-      "delivery_qty": 597574.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-07-31",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 1638114564.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 5.95,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.79,
-      "swing_high_63d": 374.41,
-      "atr_expansion_ratio": 1.01,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.27,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; pct_off_high -1.87 outside [-40.0,-15.0]; rsi 67.53 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -1.87 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 67.53 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 9.9,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "RBLBANK",
       "company_name": "RBL Bank Ltd.",
       "industry": "Financial Services",
@@ -51287,6 +51179,114 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 58.42 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 9.9,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.4444444444444444,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "RECLTD",
+      "company_name": "REC Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "RECLTD.NS",
+      "current_price": 371.9,
+      "fifty_two_wk_high": 379.0,
+      "pct_off_52wk_high": -1.87,
+      "pct_from_ema200": 6.0,
+      "rsi14": 67.53,
+      "atr14": 7.54,
+      "entry_zone_low": 368.13,
+      "entry_zone_high": 371.9,
+      "stop_loss": 362.47,
+      "target_1": 381.33,
+      "target_2": 388.87,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.65,
+      "adtv_value_inr_approx": 1974201812.0,
+      "f_score": 4.0,
+      "f_score_components_available": 7,
+      "avg_pe_5y": 5.36,
+      "trailing_pe": 6.11,
+      "delivery_value_inr": 222476792.9053955,
+      "delivery_qty": 597574.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-07-31",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 1638114564.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 5.95,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.79,
+      "swing_high_63d": 374.41,
+      "atr_expansion_ratio": 1.01,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.27,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; pct_off_high -1.87 outside [-40.0,-15.0]; rsi 67.53 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -1.87 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 67.53 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
