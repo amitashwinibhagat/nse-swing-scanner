@@ -1,40 +1,40 @@
 {
-  "generated_at": "2026-07-28T09:06:23.224206+00:00",
+  "generated_at": "2026-08-01T06:29:42.309095+00:00",
   "retention_days": 90,
   "windows": {
     "T+5": {
       "buckets": {
         "60+": {
-          "n": 10,
-          "median": -1.77,
-          "q1": -3.5,
-          "q3": -1.45,
-          "mean": -1.07,
-          "hit_rate": 0.2
+          "n": 18,
+          "median": -1.02,
+          "q1": -1.31,
+          "q3": 1.55,
+          "mean": 0.18,
+          "hit_rate": 0.389
         },
         "55-59": {
-          "n": 1,
-          "median": 1.36,
-          "q1": 1.36,
-          "q3": 1.36,
-          "mean": 1.36,
-          "hit_rate": 1.0
+          "n": 19,
+          "median": -2.68,
+          "q1": -3.37,
+          "q3": -0.22,
+          "mean": -1.84,
+          "hit_rate": 0.263
         },
         "50-54": {
-          "n": 14,
-          "median": 1.68,
-          "q1": -0.51,
-          "q3": 1.95,
-          "mean": 1.03,
-          "hit_rate": 0.643
+          "n": 30,
+          "median": 0.61,
+          "q1": -0.87,
+          "q3": 1.48,
+          "mean": 0.23,
+          "hit_rate": 0.667
         },
         "<50": {
-          "n": 25,
-          "median": -0.27,
-          "q1": -0.98,
-          "q3": 0.16,
-          "mean": 0.47,
-          "hit_rate": 0.36
+          "n": 67,
+          "median": 0.26,
+          "q1": -1.09,
+          "q3": 1.9,
+          "mean": 0.97,
+          "hit_rate": 0.522
         },
         "unknown": {
           "n": 0,
@@ -45,11 +45,12 @@
           "hit_rate": null
         }
       },
-      "trackable_count": 50,
-      "untrackable_count": 0,
-      "window_not_closed_count": 121,
+      "trackable_count": 134,
+      "untrackable_count": 12,
+      "window_not_closed_count": 188,
       "reasons": {
-        "window_not_closed": 121
+        "missing_stock_price": 12,
+        "window_not_closed": 188
       }
     },
     "T+10": {
@@ -97,9 +98,9 @@
       },
       "trackable_count": 0,
       "untrackable_count": 0,
-      "window_not_closed_count": 171,
+      "window_not_closed_count": 334,
       "reasons": {
-        "window_not_closed": 171
+        "window_not_closed": 334
       }
     },
     "T+20": {
@@ -147,9 +148,9 @@
       },
       "trackable_count": 0,
       "untrackable_count": 0,
-      "window_not_closed_count": 171,
+      "window_not_closed_count": 334,
       "reasons": {
-        "window_not_closed": 171
+        "window_not_closed": 334
       }
     }
   },
@@ -164,20 +165,20 @@
         "hit_rate": null
       },
       "neutral": {
-        "n": 50,
-        "median": -0.27,
-        "q1": -1.25,
-        "q3": 1.81,
-        "mean": 0.33,
-        "hit_rate": 0.42
+        "n": 98,
+        "median": 0.26,
+        "q1": -1.31,
+        "q3": 1.71,
+        "mean": 0.63,
+        "hit_rate": 0.561
       },
       "risk_off": {
-        "n": 0,
-        "median": null,
-        "q1": null,
-        "q3": null,
-        "mean": null,
-        "hit_rate": null
+        "n": 36,
+        "median": -1.02,
+        "q1": -2.68,
+        "q3": 1.4,
+        "mean": -0.6,
+        "hit_rate": 0.333
       },
       "unknown": {
         "n": 0,
@@ -267,11 +268,11 @@
           "n": 24,
           "stats": {
             "n": 24,
-            "median": -0.3,
-            "q1": -1.45,
-            "q3": 1.88,
-            "mean": 0.27,
-            "hit_rate": 0.458
+            "median": 1.03,
+            "q1": -0.6,
+            "q3": 2.04,
+            "mean": 1.7,
+            "hit_rate": 0.625
           }
         },
         "T+10": {
@@ -307,11 +308,11 @@
           "n": 13,
           "stats": {
             "n": 13,
-            "median": -0.27,
-            "q1": -0.98,
-            "q3": 1.68,
-            "mean": 0.39,
-            "hit_rate": 0.385
+            "median": 0.19,
+            "q1": -1.02,
+            "q3": 1.17,
+            "mean": 1.3,
+            "hit_rate": 0.538
           }
         },
         "T+10": {
@@ -347,11 +348,11 @@
           "n": 13,
           "stats": {
             "n": 13,
-            "median": -0.27,
-            "q1": -0.98,
-            "q3": 1.68,
-            "mean": 0.39,
-            "hit_rate": 0.385
+            "median": 0.19,
+            "q1": -1.02,
+            "q3": 1.17,
+            "mean": 1.3,
+            "hit_rate": 0.538
           }
         },
         "T+10": {
@@ -384,14 +385,14 @@
       "regime": "neutral",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 16,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 16,
+            "median": 0.26,
+            "q1": -1.13,
+            "q3": 1.61,
+            "mean": -0.08,
+            "hit_rate": 0.562
           }
         },
         "T+10": {
@@ -424,14 +425,14 @@
       "regime": "neutral",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 16,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 16,
+            "median": 0.26,
+            "q1": -1.13,
+            "q3": 1.61,
+            "mean": -0.08,
+            "hit_rate": 0.562
           }
         },
         "T+10": {
@@ -464,14 +465,14 @@
       "regime": "neutral",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 8,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 8,
+            "median": -0.65,
+            "q1": -1.87,
+            "q3": 0.93,
+            "mean": -0.65,
+            "hit_rate": 0.5
           }
         },
         "T+10": {
@@ -504,14 +505,14 @@
       "regime": "neutral",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 8,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 8,
+            "median": -0.65,
+            "q1": -1.87,
+            "q3": 0.93,
+            "mean": -0.65,
+            "hit_rate": 0.5
           }
         },
         "T+10": {
@@ -544,14 +545,14 @@
       "regime": "risk_off",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 9,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 9,
+            "median": -2.06,
+            "q1": -2.73,
+            "q3": 1.48,
+            "mean": -1.09,
+            "hit_rate": 0.333
           }
         },
         "T+10": {
@@ -584,14 +585,14 @@
       "regime": "risk_off",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 9,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 9,
+            "median": -2.06,
+            "q1": -2.73,
+            "q3": 1.48,
+            "mean": -1.09,
+            "hit_rate": 0.333
           }
         },
         "T+10": {
@@ -624,14 +625,14 @@
       "regime": "risk_off",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 9,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 9,
+            "median": -0.84,
+            "q1": -1.21,
+            "q3": 0.28,
+            "mean": -0.1,
+            "hit_rate": 0.333
           }
         },
         "T+10": {
@@ -664,14 +665,14 @@
       "regime": "risk_off",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 9,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null
+            "n": 9,
+            "median": -0.84,
+            "q1": -1.21,
+            "q3": 0.28,
+            "mean": -0.1,
+            "hit_rate": 0.333
           }
         },
         "T+10": {
@@ -817,6 +818,286 @@
           }
         }
       }
+    },
+    {
+      "date": "2026-07-28-pm",
+      "passed_count": 36,
+      "regime": "neutral",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-07-29-am",
+      "passed_count": 27,
+      "regime": "neutral",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-07-29-pm",
+      "passed_count": 27,
+      "regime": "neutral",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-07-30-am",
+      "passed_count": 19,
+      "regime": "neutral",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-07-30-pm",
+      "passed_count": 18,
+      "regime": "neutral",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-07-31-am",
+      "passed_count": 18,
+      "regime": "neutral",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-07-31-pm",
+      "passed_count": 18,
+      "regime": "neutral",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null
+          }
+        }
+      }
     }
   ],
   "per_name": [
@@ -829,7 +1110,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -6.79,
+          "excess_return_pct": 1.11,
           "untrackable": false,
           "reason": null
         },
@@ -854,7 +1135,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": 10.52,
+          "excess_return_pct": 12.46,
           "untrackable": false,
           "reason": null
         },
@@ -879,7 +1160,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": -3.5,
+          "excess_return_pct": -1.31,
           "untrackable": false,
           "reason": null
         },
@@ -904,7 +1185,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -1.77,
+          "excess_return_pct": -1.02,
           "untrackable": false,
           "reason": null
         },
@@ -929,7 +1210,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -1.34,
+          "excess_return_pct": -0.03,
           "untrackable": false,
           "reason": null
         },
@@ -954,7 +1235,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 2.7,
+          "excess_return_pct": 0.99,
           "untrackable": false,
           "reason": null
         },
@@ -979,7 +1260,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.36,
+          "excess_return_pct": 1.71,
           "untrackable": false,
           "reason": null
         },
@@ -1004,7 +1285,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.82,
+          "excess_return_pct": 1.07,
           "untrackable": false,
           "reason": null
         },
@@ -1029,7 +1310,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 0.82,
+          "excess_return_pct": 1.83,
           "untrackable": false,
           "reason": null
         },
@@ -1054,7 +1335,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.95,
+          "excess_return_pct": 2.34,
           "untrackable": false,
           "reason": null
         },
@@ -1079,7 +1360,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.86,
+          "excess_return_pct": 1.69,
           "untrackable": false,
           "reason": null
         },
@@ -1104,7 +1385,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -7.07,
+          "excess_return_pct": -4.46,
           "untrackable": false,
           "reason": null
         },
@@ -1129,7 +1410,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.51,
+          "excess_return_pct": -0.3,
           "untrackable": false,
           "reason": null
         },
@@ -1154,7 +1435,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 3.06,
+          "excess_return_pct": 4.35,
           "untrackable": false,
           "reason": null
         },
@@ -1179,7 +1460,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": -2.96,
+          "excess_return_pct": -0.81,
           "untrackable": false,
           "reason": null
         },
@@ -1204,7 +1485,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.33,
+          "excess_return_pct": 2.02,
           "untrackable": false,
           "reason": null
         },
@@ -1229,7 +1510,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.68,
+          "excess_return_pct": -1.6,
           "untrackable": false,
           "reason": null
         },
@@ -1254,7 +1535,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": -3.26,
+          "excess_return_pct": -2.0,
           "untrackable": false,
           "reason": null
         },
@@ -1279,7 +1560,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.53,
+          "excess_return_pct": 0.19,
           "untrackable": false,
           "reason": null
         },
@@ -1304,7 +1585,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 3.12,
+          "excess_return_pct": 4.14,
           "untrackable": false,
           "reason": null
         },
@@ -1329,7 +1610,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 0.16,
+          "excess_return_pct": 2.12,
           "untrackable": false,
           "reason": null
         },
@@ -1354,7 +1635,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.98,
+          "excess_return_pct": -0.53,
           "untrackable": false,
           "reason": null
         },
@@ -1379,7 +1660,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 9.5,
+          "excess_return_pct": 15.99,
           "untrackable": false,
           "reason": null
         },
@@ -1404,7 +1685,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.27,
+          "excess_return_pct": 0.92,
           "untrackable": false,
           "reason": null
         },
@@ -1429,7 +1710,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -1.77,
+          "excess_return_pct": -1.02,
           "untrackable": false,
           "reason": null
         },
@@ -1454,7 +1735,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -3.5,
+          "excess_return_pct": -1.31,
           "untrackable": false,
           "reason": null
         },
@@ -1479,7 +1760,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": 2.7,
+          "excess_return_pct": 0.99,
           "untrackable": false,
           "reason": null
         },
@@ -1504,7 +1785,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.68,
+          "excess_return_pct": -1.6,
           "untrackable": false,
           "reason": null
         },
@@ -1529,7 +1810,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.95,
+          "excess_return_pct": 2.34,
           "untrackable": false,
           "reason": null
         },
@@ -1554,7 +1835,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.51,
+          "excess_return_pct": -0.3,
           "untrackable": false,
           "reason": null
         },
@@ -1579,7 +1860,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.53,
+          "excess_return_pct": 0.19,
           "untrackable": false,
           "reason": null
         },
@@ -1604,7 +1885,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -3.26,
+          "excess_return_pct": -2.0,
           "untrackable": false,
           "reason": null
         },
@@ -1629,7 +1910,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.1,
+          "excess_return_pct": 1.17,
           "untrackable": false,
           "reason": null
         },
@@ -1654,7 +1935,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.27,
+          "excess_return_pct": 0.92,
           "untrackable": false,
           "reason": null
         },
@@ -1679,7 +1960,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.98,
+          "excess_return_pct": -0.53,
           "untrackable": false,
           "reason": null
         },
@@ -1704,7 +1985,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 0.16,
+          "excess_return_pct": 2.12,
           "untrackable": false,
           "reason": null
         },
@@ -1729,7 +2010,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 9.5,
+          "excess_return_pct": 15.99,
           "untrackable": false,
           "reason": null
         },
@@ -1754,7 +2035,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -1.77,
+          "excess_return_pct": -1.02,
           "untrackable": false,
           "reason": null
         },
@@ -1779,7 +2060,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -3.5,
+          "excess_return_pct": -1.31,
           "untrackable": false,
           "reason": null
         },
@@ -1804,7 +2085,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": 2.7,
+          "excess_return_pct": 0.99,
           "untrackable": false,
           "reason": null
         },
@@ -1829,7 +2110,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.68,
+          "excess_return_pct": -1.6,
           "untrackable": false,
           "reason": null
         },
@@ -1854,7 +2135,7 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": 1.95,
+          "excess_return_pct": 2.34,
           "untrackable": false,
           "reason": null
         },
@@ -1879,7 +2160,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.51,
+          "excess_return_pct": -0.3,
           "untrackable": false,
           "reason": null
         },
@@ -1904,7 +2185,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.53,
+          "excess_return_pct": 0.19,
           "untrackable": false,
           "reason": null
         },
@@ -1929,7 +2210,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -3.26,
+          "excess_return_pct": -2.0,
           "untrackable": false,
           "reason": null
         },
@@ -1954,7 +2235,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.1,
+          "excess_return_pct": 1.17,
           "untrackable": false,
           "reason": null
         },
@@ -1979,7 +2260,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.27,
+          "excess_return_pct": 0.92,
           "untrackable": false,
           "reason": null
         },
@@ -2004,7 +2285,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": -0.98,
+          "excess_return_pct": -0.53,
           "untrackable": false,
           "reason": null
         },
@@ -2029,7 +2310,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 0.16,
+          "excess_return_pct": 2.12,
           "untrackable": false,
           "reason": null
         },
@@ -2054,7 +2335,7 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": 9.5,
+          "excess_return_pct": 15.99,
           "untrackable": false,
           "reason": null
         },
@@ -2079,9 +2360,9 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.92,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2104,9 +2385,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.45,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2129,9 +2410,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.84,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2154,9 +2435,9 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.08,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2179,9 +2460,9 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.61,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2204,9 +2485,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.49,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2229,9 +2510,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.65,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2254,9 +2535,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.55,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2279,9 +2560,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 2.16,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2304,9 +2585,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.26,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2329,9 +2610,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 4.31,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2354,9 +2635,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.56,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2379,9 +2660,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.4,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2404,9 +2685,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.77,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2429,9 +2710,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.62,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2454,9 +2735,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.26,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2479,9 +2760,9 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.92,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2504,9 +2785,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.45,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2529,9 +2810,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.84,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2554,9 +2835,9 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.08,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2579,9 +2860,9 @@
       "confirmation": "confirmed",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.61,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2604,9 +2885,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.49,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2629,9 +2910,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.65,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2654,9 +2935,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.55,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2679,9 +2960,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 2.16,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2704,9 +2985,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.26,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2729,9 +3010,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 4.31,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2754,9 +3035,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.56,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2779,9 +3060,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.4,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2804,9 +3085,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.77,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2829,9 +3110,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.62,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2854,9 +3135,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.26,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2879,9 +3160,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.31,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2904,9 +3185,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.7,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2929,9 +3210,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.58,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2954,9 +3235,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -4.85,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -2979,9 +3260,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.4,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3004,9 +3285,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 2.67,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3029,9 +3310,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.72,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3054,9 +3335,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.71,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3079,9 +3360,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.31,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3104,9 +3385,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.7,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3129,9 +3410,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.58,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3154,9 +3435,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -4.85,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3179,9 +3460,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.4,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3204,9 +3485,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 2.67,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3229,9 +3510,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.72,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3254,9 +3535,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.71,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3279,9 +3560,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.7,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3304,9 +3585,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.37,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3329,9 +3610,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.68,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3354,9 +3635,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.48,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3379,9 +3660,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -4.53,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3404,9 +3685,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.73,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3429,9 +3710,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.98,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3454,9 +3735,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.06,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3479,9 +3760,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 3.32,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3504,9 +3785,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.7,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3529,9 +3810,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.37,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3554,9 +3835,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.68,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3579,9 +3860,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.48,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3604,9 +3885,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -4.53,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3629,9 +3910,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.73,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3654,9 +3935,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.98,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3679,9 +3960,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -2.06,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3704,9 +3985,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 3.32,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3730,8 +4011,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3754,9 +4035,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.84,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3780,8 +4061,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3804,9 +4085,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.4,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3830,8 +4111,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3855,8 +4136,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3879,9 +4160,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.06,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3905,8 +4186,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3929,9 +4210,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.33,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3954,9 +4235,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.21,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -3979,9 +4260,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 6.56,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4005,8 +4286,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4029,9 +4310,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.87,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4054,9 +4335,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.28,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4079,9 +4360,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.84,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4105,8 +4386,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4129,9 +4410,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.84,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4155,8 +4436,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4179,9 +4460,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 1.4,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4205,8 +4486,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4230,8 +4511,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4254,9 +4535,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.06,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4280,8 +4561,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4304,9 +4585,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -0.33,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4329,9 +4610,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.21,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4354,9 +4635,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 6.56,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4380,8 +4661,8 @@
       "windows": {
         "T+5": {
           "excess_return_pct": null,
-          "untrackable": false,
-          "reason": "window_not_closed"
+          "untrackable": true,
+          "reason": "missing_stock_price"
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4404,9 +4685,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -1.87,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4429,9 +4710,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": 0.28,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -4454,9 +4735,9 @@
       "confirmation": "anticipatory",
       "windows": {
         "T+5": {
-          "excess_return_pct": null,
+          "excess_return_pct": -3.84,
           "untrackable": false,
-          "reason": "window_not_closed"
+          "reason": null
         },
         "T+10": {
           "excess_return_pct": null,
@@ -5094,11 +5375,4086 @@
           "reason": "window_not_closed"
         }
       }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "ENRIN",
+      "score": 82.9,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "NSLNISP",
+      "score": 78.7,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "SOBHA",
+      "score": 78.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "IGIL",
+      "score": 72.1,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "NATIONALUM",
+      "score": 65.6,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "HINDCOPPER",
+      "score": 61.3,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "GVT&D",
+      "score": 59.9,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "TATASTEEL",
+      "score": 58.7,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "ITI",
+      "score": 58.3,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "SUZLON",
+      "score": 56.4,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "WAAREEENER",
+      "score": 52.9,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "POWERINDIA",
+      "score": 51.9,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "AMBER",
+      "score": 51.4,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "VMM",
+      "score": 51.3,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "TIINDIA",
+      "score": 51.2,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "ABSLAMC",
+      "score": 51.0,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "ONGC",
+      "score": 49.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "INDIAMART",
+      "score": 48.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "NTPC",
+      "score": 48.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "ZENTEC",
+      "score": 47.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "TITAGARH",
+      "score": 47.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "TATAPOWER",
+      "score": 46.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "HFCL",
+      "score": 46.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "IFCI",
+      "score": 45.1,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "CEMPRO",
+      "score": 44.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "HBLENGINE",
+      "score": 43.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "IRCTC",
+      "score": 43.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "INDUSTOWER",
+      "score": 43.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "BEL",
+      "score": 42.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "NBCC",
+      "score": 42.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "CIEINDIA",
+      "score": 38.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "LTFOODS",
+      "score": 38.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "GPIL",
+      "score": 37.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "TIMKEN",
+      "score": 36.6,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "HDFCBANK",
+      "score": 32.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-28-pm",
+      "symbol": "SJVN",
+      "score": 32.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "ENRIN",
+      "score": 83.0,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "SOBHA",
+      "score": 78.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "IGIL",
+      "score": 72.3,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "NATIONALUM",
+      "score": 65.5,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "HINDCOPPER",
+      "score": 64.0,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "GVT&D",
+      "score": 59.7,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "SUZLON",
+      "score": 51.8,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "WAAREEENER",
+      "score": 51.8,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "ITI",
+      "score": 51.5,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "VMM",
+      "score": 50.4,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "HBLENGINE",
+      "score": 50.1,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "POWERINDIA",
+      "score": 49.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "TIINDIA",
+      "score": 49.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "INDIAMART",
+      "score": 47.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "HFCL",
+      "score": 45.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "BEL",
+      "score": 43.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "ZENTEC",
+      "score": 43.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "VBL",
+      "score": 43.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "ONGC",
+      "score": 42.6,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "INDUSTOWER",
+      "score": 42.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "IFCI",
+      "score": 40.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "TIMKEN",
+      "score": 39.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "CEMPRO",
+      "score": 39.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "CIEINDIA",
+      "score": 38.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "SJVN",
+      "score": 36.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "FORCEMOT",
+      "score": 36.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-am",
+      "symbol": "HDFCBANK",
+      "score": 35.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "ENRIN",
+      "score": 83.0,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "SOBHA",
+      "score": 78.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "IGIL",
+      "score": 72.3,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "NATIONALUM",
+      "score": 65.5,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "HINDCOPPER",
+      "score": 64.0,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "GVT&D",
+      "score": 59.7,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "SUZLON",
+      "score": 51.8,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "WAAREEENER",
+      "score": 51.8,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "ITI",
+      "score": 51.5,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "VMM",
+      "score": 50.4,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "HBLENGINE",
+      "score": 50.1,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "POWERINDIA",
+      "score": 49.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "TIINDIA",
+      "score": 49.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "INDIAMART",
+      "score": 47.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "HFCL",
+      "score": 45.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "BEL",
+      "score": 43.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "ZENTEC",
+      "score": 43.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "VBL",
+      "score": 43.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "ONGC",
+      "score": 42.6,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "INDUSTOWER",
+      "score": 42.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "IFCI",
+      "score": 40.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "TIMKEN",
+      "score": 39.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "CEMPRO",
+      "score": 39.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "CIEINDIA",
+      "score": 38.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "SJVN",
+      "score": 36.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "FORCEMOT",
+      "score": 36.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-29-pm",
+      "symbol": "HDFCBANK",
+      "score": 35.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "ENRIN",
+      "score": 78.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "SOBHA",
+      "score": 78.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "GVT&D",
+      "score": 64.7,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "VBL",
+      "score": 56.4,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "HBLENGINE",
+      "score": 50.5,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "TIINDIA",
+      "score": 49.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "ZENTEC",
+      "score": 47.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "INDIAMART",
+      "score": 46.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "ITI",
+      "score": 46.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "CEMPRO",
+      "score": 46.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "CIEINDIA",
+      "score": 44.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "VMM",
+      "score": 43.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "BEL",
+      "score": 42.6,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "LEMONTREE",
+      "score": 41.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "TIMKEN",
+      "score": 40.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "NBCC",
+      "score": 38.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "WAAREEENER",
+      "score": 37.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "HDFCBANK",
+      "score": 34.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-am",
+      "symbol": "SJVN",
+      "score": 33.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "ENRIN",
+      "score": 78.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "SOBHA",
+      "score": 78.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "GVT&D",
+      "score": 64.7,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "VBL",
+      "score": 56.4,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "HBLENGINE",
+      "score": 50.5,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "TIINDIA",
+      "score": 49.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "ZENTEC",
+      "score": 47.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "INDIAMART",
+      "score": 46.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "ITI",
+      "score": 46.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "CEMPRO",
+      "score": 46.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "CIEINDIA",
+      "score": 44.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "VMM",
+      "score": 43.4,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "BEL",
+      "score": 42.6,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "LEMONTREE",
+      "score": 41.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "TIMKEN",
+      "score": 40.8,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "NBCC",
+      "score": 38.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "WAAREEENER",
+      "score": 37.0,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-30-pm",
+      "symbol": "SJVN",
+      "score": 33.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "ENRIN",
+      "score": 80.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "SOBHA",
+      "score": 76.1,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "MCX",
+      "score": 66.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "VBL",
+      "score": 59.2,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "SUZLON",
+      "score": 58.3,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "SRF",
+      "score": 53.5,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "INDIAMART",
+      "score": 53.1,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "TIINDIA",
+      "score": 49.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "WAAREEENER",
+      "score": 49.1,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "ITI",
+      "score": 46.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "BEL",
+      "score": 46.1,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "VMM",
+      "score": 44.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "CIEINDIA",
+      "score": 43.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "ZENTEC",
+      "score": 40.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "ONGC",
+      "score": 40.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "RAILTEL",
+      "score": 34.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "TEGA",
+      "score": 32.1,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-am",
+      "symbol": "TIMKEN",
+      "score": 30.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "ENRIN",
+      "score": 80.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "SOBHA",
+      "score": 76.1,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "MCX",
+      "score": 66.4,
+      "bucket": "60+",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "VBL",
+      "score": 59.2,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "SUZLON",
+      "score": 58.3,
+      "bucket": "55-59",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "SRF",
+      "score": 53.5,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "INDIAMART",
+      "score": 53.1,
+      "bucket": "50-54",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "TIINDIA",
+      "score": 49.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "WAAREEENER",
+      "score": 49.1,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "ITI",
+      "score": 46.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "BEL",
+      "score": 46.1,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "VMM",
+      "score": 44.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "CIEINDIA",
+      "score": 43.2,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "ZENTEC",
+      "score": 40.9,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "ONGC",
+      "score": 40.3,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "RAILTEL",
+      "score": 34.5,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "TEGA",
+      "score": 32.1,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "anticipatory",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
+    },
+    {
+      "snapshot": "2026-07-31-pm",
+      "symbol": "TIMKEN",
+      "score": 30.7,
+      "bucket": "<50",
+      "regime": "neutral",
+      "confirmation": "confirmed",
+      "windows": {
+        "T+5": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+10": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        },
+        "T+20": {
+          "excess_return_pct": null,
+          "untrackable": false,
+          "reason": "window_not_closed"
+        }
+      }
     }
   ],
   "meta": {
-    "snapshots_used": 14,
-    "total_passed": 171,
+    "snapshots_used": 21,
+    "total_passed": 334,
     "windows": [
       5,
       10,
@@ -5118,19 +9474,19 @@
       "<50"
     ],
     "trackable_count": {
-      "T+5": 50,
+      "T+5": 134,
       "T+10": 0,
       "T+20": 0
     },
     "untrackable_count": {
-      "T+5": 0,
+      "T+5": 12,
       "T+10": 0,
       "T+20": 0
     },
     "window_not_closed_count": {
-      "T+5": 121,
-      "T+10": 171,
-      "T+20": 171
+      "T+5": 188,
+      "T+10": 334,
+      "T+20": 334
     }
   }
 }
