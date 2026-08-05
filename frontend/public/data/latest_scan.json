@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-05T11:41:51.727164+00:00",
+  "generated_at": "2026-08-05T12:24:42.220096+00:00",
   "universe_size": 500,
   "gate_pass_count": 10,
   "coverage": {
@@ -27132,114 +27132,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "NATIONALUM",
-      "company_name": "National Aluminium Co. Ltd.",
-      "industry": "Metals & Mining",
-      "yf_ticker": "NATIONALUM.NS",
-      "current_price": 381.05,
-      "fifty_two_wk_high": 439.31,
-      "pct_off_52wk_high": -13.26,
-      "pct_from_ema200": 12.23,
-      "rsi14": 65.06,
-      "atr14": 10.83,
-      "entry_zone_low": 375.64,
-      "entry_zone_high": 381.05,
-      "stop_loss": 367.51,
-      "target_1": 394.59,
-      "target_2": 405.42,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.81,
-      "adtv_value_inr_approx": 3372159647.0,
-      "f_score": 8.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 8.46,
-      "trailing_pe": 11.15,
-      "delivery_value_inr": 628825343.4949951,
-      "delivery_qty": 1647002.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-05",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 2450650521.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 15.92,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 1.45,
-      "swing_high_63d": 444.5,
-      "atr_expansion_ratio": 0.84,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 51.28,
-      "holdings_fii_pct": 22.27,
-      "holdings_dii_pct": 10.75,
-      "holdings_conviction_pct": 84.3,
-      "holdings_source_status": "fallback_used",
-      "holdings_source": "screener.in(standalone)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": 0.86,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -13.26 outside [-40.0,-15.0]; rsi 65.06 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -13.26 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 65.06 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 27.8,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.8888888888888888,
-        "conviction_holding": 1.0
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "NAVINFLUOR",
       "company_name": "Navin Fluorine International Ltd.",
       "industry": "Chemicals",
@@ -27342,6 +27234,114 @@
         "volume_capitulation": 0.19499999999999995,
         "quality_composite": 0.8888888888888888,
         "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "NATIONALUM",
+      "company_name": "National Aluminium Co. Ltd.",
+      "industry": "Metals & Mining",
+      "yf_ticker": "NATIONALUM.NS",
+      "current_price": 381.05,
+      "fifty_two_wk_high": 439.31,
+      "pct_off_52wk_high": -13.26,
+      "pct_from_ema200": 12.23,
+      "rsi14": 65.06,
+      "atr14": 10.83,
+      "entry_zone_low": 375.64,
+      "entry_zone_high": 381.05,
+      "stop_loss": 367.51,
+      "target_1": 394.59,
+      "target_2": 405.42,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.81,
+      "adtv_value_inr_approx": 3372159647.0,
+      "f_score": 8.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 8.46,
+      "trailing_pe": 11.15,
+      "delivery_value_inr": 628825343.4949951,
+      "delivery_qty": 1647002.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-05",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 2450650521.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 15.92,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 1.45,
+      "swing_high_63d": 444.5,
+      "atr_expansion_ratio": 0.84,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 51.28,
+      "holdings_fii_pct": 22.27,
+      "holdings_dii_pct": 10.75,
+      "holdings_conviction_pct": 84.3,
+      "holdings_source_status": "fallback_used",
+      "holdings_source": "screener.in(standalone)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": 0.86,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -13.26 outside [-40.0,-15.0]; rsi 65.06 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -13.26 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 65.06 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 27.8,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.8888888888888888,
+        "conviction_holding": 1.0
       },
       "earnings_date": null,
       "earnings_within_days": null,
@@ -44196,114 +44196,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "GLAXO",
-      "company_name": "Glaxosmithkline Pharmaceuticals Ltd.",
-      "industry": "Healthcare",
-      "yf_ticker": "GLAXO.NS",
-      "current_price": 2629.6,
-      "fifty_two_wk_high": 2792.71,
-      "pct_off_52wk_high": -5.84,
-      "pct_from_ema200": 7.85,
-      "rsi14": 66.01,
-      "atr14": 64.25,
-      "entry_zone_low": 2597.48,
-      "entry_zone_high": 2629.6,
-      "stop_loss": 2549.29,
-      "target_1": 2709.91,
-      "target_2": 2774.16,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.12,
-      "adtv_value_inr_approx": 209460270.0,
-      "f_score": 6.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 43.48,
-      "trailing_pe": 43.06,
-      "delivery_value_inr": 12665857.5,
-      "delivery_qty": 4815.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-05",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 180851552.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -1.88,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.99,
-      "swing_high_63d": 2679.0,
-      "atr_expansion_ratio": 1.17,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": 0.86,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -5.84 outside [-40.0,-15.0]; rsi 66.01 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -5.84 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 66.01 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 16.0,
-      "sub_scores": {
-        "valuation_compression": 0.024149034038638145,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.06000000000000005,
-        "quality_composite": 0.6666666666666666,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "MEDANTA",
       "company_name": "Global Health Ltd.",
       "industry": "Healthcare",
@@ -44404,6 +44296,114 @@
         "support_proximity": 0.0,
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.10499999999999998,
+        "quality_composite": 0.6666666666666666,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "GLAXO",
+      "company_name": "Glaxosmithkline Pharmaceuticals Ltd.",
+      "industry": "Healthcare",
+      "yf_ticker": "GLAXO.NS",
+      "current_price": 2629.6,
+      "fifty_two_wk_high": 2792.71,
+      "pct_off_52wk_high": -5.84,
+      "pct_from_ema200": 7.85,
+      "rsi14": 66.01,
+      "atr14": 64.25,
+      "entry_zone_low": 2597.48,
+      "entry_zone_high": 2629.6,
+      "stop_loss": 2549.29,
+      "target_1": 2709.91,
+      "target_2": 2774.16,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.12,
+      "adtv_value_inr_approx": 209460270.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 43.48,
+      "trailing_pe": 43.06,
+      "delivery_value_inr": 12665857.5,
+      "delivery_qty": 4815.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-05",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 180851552.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -1.88,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.99,
+      "swing_high_63d": 2679.0,
+      "atr_expansion_ratio": 1.17,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": 0.86,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -5.84 outside [-40.0,-15.0]; rsi 66.01 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -5.84 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 66.01 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 16.0,
+      "sub_scores": {
+        "valuation_compression": 0.024149034038638145,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.06000000000000005,
         "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
@@ -50784,114 +50784,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "RBLBANK",
-      "company_name": "RBL Bank Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "RBLBANK.NS",
-      "current_price": 382.6,
-      "fifty_two_wk_high": 382.6,
-      "pct_off_52wk_high": 0.0,
-      "pct_from_ema200": 16.39,
-      "rsi14": 61.63,
-      "atr14": 9.28,
-      "entry_zone_low": 377.96,
-      "entry_zone_high": 382.6,
-      "stop_loss": 371.0,
-      "target_1": 394.2,
-      "target_2": 403.48,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.72,
-      "adtv_value_inr_approx": 2353844320.0,
-      "f_score": 4.0,
-      "f_score_components_available": 7,
-      "avg_pe_5y": 13.98,
-      "trailing_pe": 31.52,
-      "delivery_value_inr": 354491707.5,
-      "delivery_qty": 929205.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-05",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 2393436718.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 2.64,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.34,
-      "swing_high_63d": 384.5,
-      "atr_expansion_ratio": 0.94,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": 0.86,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; pct_off_high 0.0 outside [-40.0,-15.0]; rsi 61.63 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high 0.0 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 61.63 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 9.9,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "RECLTD",
       "company_name": "REC Ltd.",
       "industry": "Financial Services",
@@ -50963,6 +50855,114 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 62.48 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 9.9,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.4444444444444444,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "RBLBANK",
+      "company_name": "RBL Bank Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "RBLBANK.NS",
+      "current_price": 382.6,
+      "fifty_two_wk_high": 382.6,
+      "pct_off_52wk_high": 0.0,
+      "pct_from_ema200": 16.39,
+      "rsi14": 61.63,
+      "atr14": 9.28,
+      "entry_zone_low": 377.96,
+      "entry_zone_high": 382.6,
+      "stop_loss": 371.0,
+      "target_1": 394.2,
+      "target_2": 403.48,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.72,
+      "adtv_value_inr_approx": 2353844320.0,
+      "f_score": 4.0,
+      "f_score_components_available": 7,
+      "avg_pe_5y": 13.98,
+      "trailing_pe": 31.52,
+      "delivery_value_inr": 354491707.5,
+      "delivery_qty": 929205.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-05",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 2393436718.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 2.64,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.34,
+      "swing_high_63d": 384.5,
+      "atr_expansion_ratio": 0.94,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": 0.86,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; pct_off_high 0.0 outside [-40.0,-15.0]; rsi 61.63 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high 0.0 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 61.63 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
