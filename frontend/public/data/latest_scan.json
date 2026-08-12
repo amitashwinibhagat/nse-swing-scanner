@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-12T09:44:59.055121+00:00",
+  "generated_at": "2026-08-12T10:47:28.568176+00:00",
   "universe_size": 500,
   "gate_pass_count": 17,
   "coverage": {
@@ -12012,114 +12012,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "PFOCUS",
-      "company_name": "Prime Focus Ltd.",
-      "industry": "Media Entertainment & Publication",
-      "yf_ticker": "PFOCUS.NS",
-      "current_price": 283.05,
-      "fifty_two_wk_high": 349.5,
-      "pct_off_52wk_high": -19.01,
-      "pct_from_ema200": 14.74,
-      "rsi14": 52.79,
-      "atr14": 13.99,
-      "entry_zone_low": 276.06,
-      "entry_zone_high": 283.05,
-      "stop_loss": 265.57,
-      "target_1": 300.53,
-      "target_2": 314.52,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.13,
-      "adtv_value_inr_approx": 207792666.0,
-      "f_score": 7.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 94840993.30981445,
-      "delivery_qty": 335068.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-12",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 250694626.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -10.07,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.78,
-      "swing_high_63d": 311.0,
-      "atr_expansion_ratio": 1.19,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 60.76,
-      "holdings_fii_pct": 3.67,
-      "holdings_dii_pct": 1.16,
-      "holdings_conviction_pct": 65.58999999999999,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": 0.22,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "rsi 52.79 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 52.79 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 41.4,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.8020000000000003,
-        "volume_capitulation": 0.06499999999999995,
-        "quality_composite": 0.7777777777777778,
-        "conviction_holding": 0.8897499999999997
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "PNB",
       "company_name": "Punjab National Bank",
       "industry": "Financial Services",
@@ -12222,6 +12114,114 @@
         "volume_capitulation": 0.0,
         "quality_composite": 0.4444444444444444,
         "conviction_holding": 1.0
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "PFOCUS",
+      "company_name": "Prime Focus Ltd.",
+      "industry": "Media Entertainment & Publication",
+      "yf_ticker": "PFOCUS.NS",
+      "current_price": 283.05,
+      "fifty_two_wk_high": 349.5,
+      "pct_off_52wk_high": -19.01,
+      "pct_from_ema200": 14.74,
+      "rsi14": 52.79,
+      "atr14": 13.99,
+      "entry_zone_low": 276.06,
+      "entry_zone_high": 283.05,
+      "stop_loss": 265.57,
+      "target_1": 300.53,
+      "target_2": 314.52,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.13,
+      "adtv_value_inr_approx": 207792666.0,
+      "f_score": 7.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": null,
+      "trailing_pe": null,
+      "delivery_value_inr": 94840993.30981445,
+      "delivery_qty": 335068.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-12",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 250694626.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -10.07,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.78,
+      "swing_high_63d": 311.0,
+      "atr_expansion_ratio": 1.19,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 60.76,
+      "holdings_fii_pct": 3.67,
+      "holdings_dii_pct": 1.16,
+      "holdings_conviction_pct": 65.58999999999999,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": 0.22,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "rsi 52.79 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 52.79 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 41.4,
+      "sub_scores": {
+        "valuation_compression": null,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.8020000000000003,
+        "volume_capitulation": 0.06499999999999995,
+        "quality_composite": 0.7777777777777778,
+        "conviction_holding": 0.8897499999999997
       },
       "earnings_date": null,
       "earnings_within_days": null,
