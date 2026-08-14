@@ -310,5 +310,13 @@
     "generated_at": "2026-08-13T13:21:03.128495+00:00",
     "universe_size": 500,
     "gate_pass_count": 20
+  },
+  {
+    "date": "2026-08-14",
+    "slot": "am",
+    "file": "2026-08-14-am.json",
+    "generated_at": "2026-08-14T03:30:52.042104+00:00",
+    "universe_size": 500,
+    "gate_pass_count": 18
   }
 ]
