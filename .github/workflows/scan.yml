@@ -302,9 +302,20 @@ jobs:
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "Scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           # Rebase+retry: outcome-tracker (or another scan) may land on main
-          # between checkout and push.
+          # between checkout and push. All reconciled paths are generated data
+          # artifacts; a concurrent commit's edits to them are never more
+          # authoritative than this run's fresh output. So resolve any rebase
+          # content conflicts in favour of our new commit (-X theirs, where
+          # "theirs" is the commit being replayed = this scan). Also abort+clean
+          # any stale rebase BEFORE each retry (a previous run of this loop never
+          # sees a fresh checkout) so a failed rebase can never leave the working
+          # tree in an unmergeable state that blocks the next attempt.
           for i in 1 2 3 4 5; do
-            git pull --rebase origin main && git push && exit 0
+            git rebase --abort 2>/dev/null || true
+            git reset --hard HEAD 2>/dev/null || true
+            if git pull --rebase -X theirs origin main && git push; then
+              exit 0
+            fi
             echo "push attempt $i failed; retrying…"
             sleep $((i * 3))
           done

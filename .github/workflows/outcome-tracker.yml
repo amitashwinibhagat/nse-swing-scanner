@@ -67,9 +67,17 @@ jobs:
           git add frontend/public/data/performance.json || true
           git diff --staged --quiet && echo "No changes to performance.json" && exit 0
           git commit -m "Performance update: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          # Rebase+retry against concurrent scan.yml commits on main.
+          ## Resolve any rebase conflicts in favour of our new commit
+          ## (-X theirs, where "theirs" is the commit being replayed = this
+          ## attribution), and abort+clean stale rebase state before each retry
+          ## so a failed rebase can't leave unmergeable files blocking the next
+          ## attempt.
           for i in 1 2 3 4 5; do
-            git pull --rebase origin main && git push && exit 0
+            git rebase --abort 2>/dev/null || true
+            git reset --hard HEAD 2>/dev/null || true
+            if git pull --rebase -X theirs origin main && git push; then
+              exit 0
+            fi
             echo "push attempt $i failed; retrying…"
             sleep $((i * 3))
           done
