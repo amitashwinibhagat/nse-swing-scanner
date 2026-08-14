@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T10:43:44.890704+00:00",
+  "generated_at": "2026-08-14T11:16:07.342364+00:00",
   "universe_size": 500,
   "gate_pass_count": 19,
   "coverage": {
@@ -42036,114 +42036,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "BAJFINANCE",
-      "company_name": "Bajaj Finance Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "BAJFINANCE.NS",
-      "current_price": 1090.8,
-      "fifty_two_wk_high": 1158.8,
-      "pct_off_52wk_high": -5.87,
-      "pct_from_ema200": 12.78,
-      "rsi14": 54.74,
-      "atr14": 27.99,
-      "entry_zone_low": 1076.81,
-      "entry_zone_high": 1090.8,
-      "stop_loss": 1055.82,
-      "target_1": 1125.78,
-      "target_2": 1153.77,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.66,
-      "adtv_value_inr_approx": 10250446184.0,
-      "f_score": 2.0,
-      "f_score_components_available": 7,
-      "avg_pe_5y": 29.56,
-      "trailing_pe": 33.45,
-      "delivery_value_inr": 2623577006.2407227,
-      "delivery_qty": 2405186.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-14",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 11215424808.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -2.56,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.52,
-      "swing_high_63d": 1176.4,
-      "atr_expansion_ratio": 1.16,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 54.71,
-      "holdings_fii_pct": 21.33,
-      "holdings_dii_pct": 15.1,
-      "holdings_conviction_pct": 91.13999999999999,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.11,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 2 < 6; pct_off_high -5.87 outside [-40.0,-15.0]; rsi 54.74 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 2 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -5.87 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 54.74 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 17.7,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.32999999999999996,
-        "quality_composite": 0.2222222222222222,
-        "conviction_holding": 1.0
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "BAJAJFINSV",
       "company_name": "Bajaj Finserv Ltd.",
       "industry": "Financial Services",
@@ -42244,6 +42136,114 @@
         "support_proximity": 0.0,
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.32499999999999996,
+        "quality_composite": 0.2222222222222222,
+        "conviction_holding": 1.0
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "BAJFINANCE",
+      "company_name": "Bajaj Finance Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "BAJFINANCE.NS",
+      "current_price": 1090.8,
+      "fifty_two_wk_high": 1158.8,
+      "pct_off_52wk_high": -5.87,
+      "pct_from_ema200": 12.78,
+      "rsi14": 54.74,
+      "atr14": 27.99,
+      "entry_zone_low": 1076.81,
+      "entry_zone_high": 1090.8,
+      "stop_loss": 1055.82,
+      "target_1": 1125.78,
+      "target_2": 1153.77,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.66,
+      "adtv_value_inr_approx": 10250446184.0,
+      "f_score": 2.0,
+      "f_score_components_available": 7,
+      "avg_pe_5y": 29.56,
+      "trailing_pe": 33.45,
+      "delivery_value_inr": 2623577006.2407227,
+      "delivery_qty": 2405186.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-14",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 11215424808.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -2.56,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.52,
+      "swing_high_63d": 1176.4,
+      "atr_expansion_ratio": 1.16,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 54.71,
+      "holdings_fii_pct": 21.33,
+      "holdings_dii_pct": 15.1,
+      "holdings_conviction_pct": 91.13999999999999,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.11,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 2 < 6; pct_off_high -5.87 outside [-40.0,-15.0]; rsi 54.74 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 2 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -5.87 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 54.74 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 17.7,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.32999999999999996,
         "quality_composite": 0.2222222222222222,
         "conviction_holding": 1.0
       },
