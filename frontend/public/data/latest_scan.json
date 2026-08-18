@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-18T10:55:34.049693+00:00",
+  "generated_at": "2026-08-18T11:45:55.477569+00:00",
   "universe_size": 500,
   "gate_pass_count": 23,
   "coverage": {
@@ -39876,114 +39876,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "ELGIEQUIP",
-      "company_name": "Elgi Equipments Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "ELGIEQUIP.NS",
-      "current_price": 624.2,
-      "fifty_two_wk_high": 624.2,
-      "pct_off_52wk_high": 0.0,
-      "pct_from_ema200": 15.49,
-      "rsi14": 66.06,
-      "atr14": 17.69,
-      "entry_zone_low": 615.36,
-      "entry_zone_high": 624.2,
-      "stop_loss": 602.09,
-      "target_1": 646.31,
-      "target_2": 663.99,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.9,
-      "adtv_value_inr_approx": 313432840.0,
-      "f_score": 6.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 43.61,
-      "trailing_pe": 42.93,
-      "delivery_value_inr": 873624095.0848389,
-      "delivery_qty": 1399590.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-18",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 371048031.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 19.72,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 4.08,
-      "swing_high_63d": 630.91,
-      "atr_expansion_ratio": 1.01,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.32,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high 0.0 outside [-40.0,-15.0]; rsi 66.06 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high 0.0 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 66.06 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 20.7,
-      "sub_scores": {
-        "valuation_compression": 0.03898188488878696,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.44999999999999996,
-        "quality_composite": 0.6666666666666666,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "ELECON",
       "company_name": "Elecon Engineering Co. Ltd.",
       "industry": "Capital Goods",
@@ -40085,6 +39977,114 @@
         "drawdown_sweetspot": 1.0,
         "volume_capitulation": 0.19999999999999996,
         "quality_composite": 0.3333333333333333,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "ELGIEQUIP",
+      "company_name": "Elgi Equipments Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "ELGIEQUIP.NS",
+      "current_price": 624.2,
+      "fifty_two_wk_high": 624.2,
+      "pct_off_52wk_high": 0.0,
+      "pct_from_ema200": 15.49,
+      "rsi14": 66.06,
+      "atr14": 17.69,
+      "entry_zone_low": 615.36,
+      "entry_zone_high": 624.2,
+      "stop_loss": 602.09,
+      "target_1": 646.31,
+      "target_2": 663.99,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.9,
+      "adtv_value_inr_approx": 313432840.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 43.61,
+      "trailing_pe": 42.93,
+      "delivery_value_inr": 873624095.0848389,
+      "delivery_qty": 1399590.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-18",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 371048031.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 19.72,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 4.08,
+      "swing_high_63d": 630.91,
+      "atr_expansion_ratio": 1.01,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.32,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high 0.0 outside [-40.0,-15.0]; rsi 66.06 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high 0.0 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 66.06 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 20.7,
+      "sub_scores": {
+        "valuation_compression": 0.03898188488878696,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.44999999999999996,
+        "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
       "earnings_date": null,
@@ -43980,114 +43980,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "UNITDSPR",
-      "company_name": "United Spirits Ltd.",
-      "industry": "Fast Moving Consumer Goods",
-      "yf_ticker": "UNITDSPR.NS",
-      "current_price": 1545.0,
-      "fifty_two_wk_high": 1548.7,
-      "pct_off_52wk_high": -0.24,
-      "pct_from_ema200": 13.9,
-      "rsi14": 67.88,
-      "atr14": 29.33,
-      "entry_zone_low": 1530.34,
-      "entry_zone_high": 1545.0,
-      "stop_loss": 1508.34,
-      "target_1": 1581.66,
-      "target_2": 1610.99,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.63,
-      "adtv_value_inr_approx": 1364154094.0,
-      "f_score": 7.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 52.5,
-      "trailing_pe": 64.51,
-      "delivery_value_inr": 561647670.0,
-      "delivery_qty": 363526.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-18",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 1317411593.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -1.58,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.48,
-      "swing_high_63d": 1548.7,
-      "atr_expansion_ratio": 1.01,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.32,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -0.24 outside [-40.0,-15.0]; rsi 67.88 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -0.24 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 67.88 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 17.3,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.7777777777777778,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "USHAMART",
       "company_name": "Usha Martin Ltd.",
       "industry": "Capital Goods",
@@ -44159,6 +44051,114 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 49.3 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 17.3,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.7777777777777778,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "UNITDSPR",
+      "company_name": "United Spirits Ltd.",
+      "industry": "Fast Moving Consumer Goods",
+      "yf_ticker": "UNITDSPR.NS",
+      "current_price": 1545.0,
+      "fifty_two_wk_high": 1548.7,
+      "pct_off_52wk_high": -0.24,
+      "pct_from_ema200": 13.9,
+      "rsi14": 67.88,
+      "atr14": 29.33,
+      "entry_zone_low": 1530.34,
+      "entry_zone_high": 1545.0,
+      "stop_loss": 1508.34,
+      "target_1": 1581.66,
+      "target_2": 1610.99,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.63,
+      "adtv_value_inr_approx": 1364154094.0,
+      "f_score": 7.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 52.5,
+      "trailing_pe": 64.51,
+      "delivery_value_inr": 561647670.0,
+      "delivery_qty": 363526.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-18",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 1317411593.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -1.58,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.48,
+      "swing_high_63d": 1548.7,
+      "atr_expansion_ratio": 1.01,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.32,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -0.24 outside [-40.0,-15.0]; rsi 67.88 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -0.24 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 67.88 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
