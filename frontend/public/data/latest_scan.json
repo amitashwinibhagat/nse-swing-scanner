@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-19T02:24:04.292491+00:00",
+  "generated_at": "2026-08-19T03:30:34.245326+00:00",
   "universe_size": 500,
   "gate_pass_count": 24,
   "coverage": {
@@ -21840,114 +21840,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "ECLERX",
-      "company_name": "eClerx Services Ltd.",
-      "industry": "Services",
-      "yf_ticker": "ECLERX.NS",
-      "current_price": 1848.9,
-      "fifty_two_wk_high": 2473.5,
-      "pct_off_52wk_high": -25.25,
-      "pct_from_ema200": 5.02,
-      "rsi14": 55.13,
-      "atr14": 87.26,
-      "entry_zone_low": 1805.27,
-      "entry_zone_high": 1848.9,
-      "stop_loss": 1739.82,
-      "target_1": 1957.98,
-      "target_2": 2045.24,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.68,
-      "adtv_value_inr_approx": 853492989.0,
-      "f_score": 8.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 19.84,
-      "trailing_pe": 23.36,
-      "delivery_value_inr": 318576567.60668945,
-      "delivery_qty": 172306.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-19",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 644269160.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": 1.72,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.52,
-      "swing_high_63d": 2025.0,
-      "atr_expansion_ratio": 1.03,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.16,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "rsi 55.13 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 55.13 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 34.6,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 1.0,
-        "volume_capitulation": 0.33999999999999997,
-        "quality_composite": 0.8888888888888888,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "INDHOTEL",
       "company_name": "Indian Hotels Co. Ltd.",
       "industry": "Consumer Services",
@@ -25512,6 +25404,114 @@
       "earnings_source_status": "not_applicable"
     },
     {
+      "symbol": "ECLERX",
+      "company_name": "eClerx Services Ltd.",
+      "industry": "Services",
+      "yf_ticker": "ECLERX.NS",
+      "current_price": 1848.9,
+      "fifty_two_wk_high": 2473.5,
+      "pct_off_52wk_high": -25.25,
+      "pct_from_ema200": 5.02,
+      "rsi14": 55.13,
+      "atr14": 87.26,
+      "entry_zone_low": 1805.27,
+      "entry_zone_high": 1848.9,
+      "stop_loss": 1739.82,
+      "target_1": 1957.98,
+      "target_2": 2045.24,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.68,
+      "adtv_value_inr_approx": 853492989.0,
+      "f_score": 7.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 19.84,
+      "trailing_pe": 23.36,
+      "delivery_value_inr": 318576567.60668945,
+      "delivery_qty": 172306.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-19",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 644269160.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": 1.72,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.52,
+      "swing_high_63d": 2025.0,
+      "atr_expansion_ratio": 1.03,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.16,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "rsi 55.13 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 55.13 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 32.2,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 1.0,
+        "volume_capitulation": 0.33999999999999997,
+        "quality_composite": 0.7777777777777778,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
       "symbol": "ANURAS",
       "company_name": "Anupam Rasayan India Ltd.",
       "industry": "Chemicals",
@@ -28205,6 +28205,114 @@
         "drawdown_sweetspot": 1.0,
         "volume_capitulation": 0.14500000000000002,
         "quality_composite": 0.5555555555555556,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "SCHNEIDER",
+      "company_name": "Schneider Electric Infrastructure Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "SCHNEIDER.NS",
+      "current_price": 1274.4,
+      "fifty_two_wk_high": 1501.0,
+      "pct_off_52wk_high": -15.1,
+      "pct_from_ema200": 14.92,
+      "rsi14": 43.42,
+      "atr14": 68.79,
+      "entry_zone_low": 1240.0,
+      "entry_zone_high": 1274.4,
+      "stop_loss": 1188.41,
+      "target_1": 1360.39,
+      "target_2": 1429.18,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 5.99,
+      "adtv_value_inr_approx": 485345479.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 72.0,
+      "trailing_pe": 166.81,
+      "delivery_value_inr": 1535841915.022583,
+      "delivery_qty": 1205149.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-19",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 536560047.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -8.88,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 3.12,
+      "swing_high_63d": 1548.0,
+      "atr_expansion_ratio": 1.03,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.16,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "rsi 43.42 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 43.42 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 29.9,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.22571428571428548,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.019999999999999928,
+        "volume_capitulation": 1.0,
+        "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
       "earnings_date": null,
@@ -31553,114 +31661,6 @@
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.10999999999999999,
         "quality_composite": 0.8888888888888888,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
-      "symbol": "SCHNEIDER",
-      "company_name": "Schneider Electric Infrastructure Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "SCHNEIDER.NS",
-      "current_price": 1274.4,
-      "fifty_two_wk_high": 1501.0,
-      "pct_off_52wk_high": -15.1,
-      "pct_from_ema200": 14.92,
-      "rsi14": 43.42,
-      "atr14": 68.79,
-      "entry_zone_low": 1240.0,
-      "entry_zone_high": 1274.4,
-      "stop_loss": 1188.41,
-      "target_1": 1360.39,
-      "target_2": 1429.18,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 5.99,
-      "adtv_value_inr_approx": 485345479.0,
-      "f_score": 5.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 72.0,
-      "trailing_pe": 166.81,
-      "delivery_value_inr": 1535841915.022583,
-      "delivery_qty": 1205149.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-19",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 536560047.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -8.88,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 3.12,
-      "swing_high_63d": 1548.0,
-      "atr_expansion_ratio": 1.03,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.16,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; rsi 43.42 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 43.42 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 27.4,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.22571428571428548,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.019999999999999928,
-        "volume_capitulation": 1.0,
-        "quality_composite": 0.5555555555555556,
         "conviction_holding": null
       },
       "earnings_date": null,
