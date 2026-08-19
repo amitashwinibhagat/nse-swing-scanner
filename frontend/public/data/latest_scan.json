@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-19T07:09:26.667063+00:00",
+  "generated_at": "2026-08-19T08:43:49.387383+00:00",
   "universe_size": 500,
   "gate_pass_count": 24,
   "coverage": {
@@ -8664,114 +8664,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "FACT",
-      "company_name": "Fertilisers and Chemicals Travancore Ltd.",
-      "industry": "Chemicals",
-      "yf_ticker": "FACT.NS",
-      "current_price": 793.25,
-      "fifty_two_wk_high": 1015.5,
-      "pct_off_52wk_high": -21.89,
-      "pct_from_ema200": -8.34,
-      "rsi14": 31.33,
-      "atr14": 19.95,
-      "entry_zone_low": 783.27,
-      "entry_zone_high": 793.25,
-      "stop_loss": 768.31,
-      "target_1": 818.19,
-      "target_2": 838.14,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 3.81,
-      "adtv_value_inr_approx": 80127399.0,
-      "f_score": 2.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 445.77,
-      "trailing_pe": null,
-      "delivery_value_inr": 74225195.75,
-      "delivery_qty": 93571.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-19",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 70480888.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": null,
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -8.72,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 2.04,
-      "swing_high_63d": 1058.6,
-      "atr_expansion_ratio": 0.77,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.16,
-      "market_correction_factor": 0.85,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 2 < 6; adv 70480888 < 100000000",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 2 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": false,
-          "reason": "adv 70480888 < 100000000"
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 46.2,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.904285714285714,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 1.0,
-        "volume_capitulation": 1.0,
-        "quality_composite": 0.2222222222222222,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "FSL",
       "company_name": "Firstsource Solutions Ltd.",
       "industry": "Services",
@@ -8873,6 +8765,114 @@
         "drawdown_sweetspot": 1.0,
         "volume_capitulation": 1.0,
         "quality_composite": 0.7777777777777778,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "FACT",
+      "company_name": "Fertilisers and Chemicals Travancore Ltd.",
+      "industry": "Chemicals",
+      "yf_ticker": "FACT.NS",
+      "current_price": 793.25,
+      "fifty_two_wk_high": 1015.5,
+      "pct_off_52wk_high": -21.89,
+      "pct_from_ema200": -8.34,
+      "rsi14": 31.33,
+      "atr14": 19.95,
+      "entry_zone_low": 783.27,
+      "entry_zone_high": 793.25,
+      "stop_loss": 768.31,
+      "target_1": 818.19,
+      "target_2": 838.14,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 3.81,
+      "adtv_value_inr_approx": 80127399.0,
+      "f_score": 2.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 445.77,
+      "trailing_pe": null,
+      "delivery_value_inr": 74225195.75,
+      "delivery_qty": 93571.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-19",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 70480888.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": null,
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -8.72,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 2.04,
+      "swing_high_63d": 1058.6,
+      "atr_expansion_ratio": 0.77,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.16,
+      "market_correction_factor": 0.85,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 2 < 6; adv 70480888 < 100000000",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 2 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": false,
+          "reason": "adv 70480888 < 100000000"
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 46.2,
+      "sub_scores": {
+        "valuation_compression": null,
+        "oversold_positioning": 0.904285714285714,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 1.0,
+        "volume_capitulation": 1.0,
+        "quality_composite": 0.2222222222222222,
         "conviction_holding": null
       },
       "earnings_date": null,
@@ -41172,114 +41172,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "ELGIEQUIP",
-      "company_name": "Elgi Equipments Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "ELGIEQUIP.NS",
-      "current_price": 614.2,
-      "fifty_two_wk_high": 624.2,
-      "pct_off_52wk_high": -1.6,
-      "pct_from_ema200": 13.49,
-      "rsi14": 60.84,
-      "atr14": 17.57,
-      "entry_zone_low": 605.42,
-      "entry_zone_high": 614.2,
-      "stop_loss": 592.24,
-      "target_1": 636.16,
-      "target_2": 653.72,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.87,
-      "adtv_value_inr_approx": 313325107.0,
-      "f_score": 6.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 43.61,
-      "trailing_pe": 43.35,
-      "delivery_value_inr": 374319283.83947754,
-      "delivery_qty": 609442.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-19",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 381891175.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": 13.93,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 4.21,
-      "swing_high_63d": 630.91,
-      "atr_expansion_ratio": 1.01,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.16,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -1.6 outside [-40.0,-15.0]; rsi 60.84 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -1.6 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 60.84 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 20.0,
-      "sub_scores": {
-        "valuation_compression": 0.014904838339830199,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.43500000000000005,
-        "quality_composite": 0.6666666666666666,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "EMCURE",
       "company_name": "Emcure Pharmaceuticals Ltd.",
       "industry": "Healthcare",
@@ -41380,6 +41272,114 @@
         "support_proximity": 0.0,
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.42000000000000004,
+        "quality_composite": 0.6666666666666666,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "ELGIEQUIP",
+      "company_name": "Elgi Equipments Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "ELGIEQUIP.NS",
+      "current_price": 614.2,
+      "fifty_two_wk_high": 624.2,
+      "pct_off_52wk_high": -1.6,
+      "pct_from_ema200": 13.49,
+      "rsi14": 60.84,
+      "atr14": 17.57,
+      "entry_zone_low": 605.42,
+      "entry_zone_high": 614.2,
+      "stop_loss": 592.24,
+      "target_1": 636.16,
+      "target_2": 653.72,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.87,
+      "adtv_value_inr_approx": 313325107.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 43.61,
+      "trailing_pe": 43.35,
+      "delivery_value_inr": 374319283.83947754,
+      "delivery_qty": 609442.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-19",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 381891175.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": 13.93,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 4.21,
+      "swing_high_63d": 630.91,
+      "atr_expansion_ratio": 1.01,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.16,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -1.6 outside [-40.0,-15.0]; rsi 60.84 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -1.6 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 60.84 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 20.0,
+      "sub_scores": {
+        "valuation_compression": 0.014904838339830199,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.43500000000000005,
         "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
