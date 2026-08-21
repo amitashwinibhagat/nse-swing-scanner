@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-21T06:55:25.674545+00:00",
+  "generated_at": "2026-08-21T07:48:43.514043+00:00",
   "universe_size": 500,
   "gate_pass_count": 27,
   "coverage": {
@@ -18708,114 +18708,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "CENTRALBK",
-      "company_name": "Central Bank of India",
-      "industry": "Financial Services",
-      "yf_ticker": "CENTRALBK.NS",
-      "current_price": 31.07,
-      "fifty_two_wk_high": 39.79,
-      "pct_off_52wk_high": -21.91,
-      "pct_from_ema200": -8.05,
-      "rsi14": 44.71,
-      "atr14": 0.47,
-      "entry_zone_low": 30.83,
-      "entry_zone_high": 31.07,
-      "stop_loss": 30.48,
-      "target_1": 31.66,
-      "target_2": 32.13,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.81,
-      "adtv_value_inr_approx": 239375100.0,
-      "f_score": 4.0,
-      "f_score_components_available": 7,
-      "avg_pe_5y": 11.52,
-      "trailing_pe": 6.16,
-      "delivery_value_inr": 92962775.09690094,
-      "delivery_qty": 2992043.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-08-21",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 152713578.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -1.88,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.64,
-      "swing_high_63d": 34.48,
-      "atr_expansion_ratio": 0.56,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -0.88,
-      "market_correction_factor": 0.85,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; rsi 44.71 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 44.71 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 37.3,
-      "sub_scores": {
-        "valuation_compression": 1.0,
-        "oversold_positioning": 0.04142857142857131,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 1.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "CEMPRO",
       "company_name": "Cemindia Projects Ltd.",
       "industry": "Construction",
@@ -18917,6 +18809,114 @@
         "drawdown_sweetspot": 1.0,
         "volume_capitulation": 0.32499999999999996,
         "quality_composite": 0.7777777777777778,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "CENTRALBK",
+      "company_name": "Central Bank of India",
+      "industry": "Financial Services",
+      "yf_ticker": "CENTRALBK.NS",
+      "current_price": 31.07,
+      "fifty_two_wk_high": 39.79,
+      "pct_off_52wk_high": -21.91,
+      "pct_from_ema200": -8.05,
+      "rsi14": 44.71,
+      "atr14": 0.47,
+      "entry_zone_low": 30.83,
+      "entry_zone_high": 31.07,
+      "stop_loss": 30.48,
+      "target_1": 31.66,
+      "target_2": 32.13,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.81,
+      "adtv_value_inr_approx": 239375100.0,
+      "f_score": 4.0,
+      "f_score_components_available": 7,
+      "avg_pe_5y": 11.52,
+      "trailing_pe": 6.16,
+      "delivery_value_inr": 92962775.09690094,
+      "delivery_qty": 2992043.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-08-21",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 152713578.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -1.88,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.64,
+      "swing_high_63d": 34.48,
+      "atr_expansion_ratio": 0.56,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -0.88,
+      "market_correction_factor": 0.85,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; rsi 44.71 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 44.71 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 37.3,
+      "sub_scores": {
+        "valuation_compression": 1.0,
+        "oversold_positioning": 0.04142857142857131,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 1.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.4444444444444444,
         "conviction_holding": null
       },
       "earnings_date": null,
