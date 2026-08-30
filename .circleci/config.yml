@@ -1,0 +1,514 @@
+version: 2.1
+
+# Port of all four .github/workflows (ci, scan, outcome-tracker, watchdog).
+#
+# Scheduling model: CircleCI scheduled pipelines fire on the cron list below
+# and inject pipeline parameters. Each workflow then gates on those params,
+# so a scheduled run only executes its own workflow. Manual triggers
+# (replacing workflow_dispatch) call the API with explicit parameters:
+#
+#   curl -X POST https://circleci.com/api/v2/project/gh/<org>/<repo>/pipeline \
+#     -H "Circle-Token: $CIRCLECI_API_TOKEN" \
+#     -d '{"branch":"main","parameters":{"task":"scan","slot":"am"}}'
+#
+# Push-back to main (scan + outcome-tracker): requires a WRITE-enabled
+# checkout key. CircleCI's default deploy key is read-only — add a write
+# deploy key or user key in Project Settings → SSH Keys.
+#
+# Secrets live in the "nse-swing-secrets" context:
+#   HEALTHCHECK_PING_URL_MORNING, HEALTHCHECK_PING_URL_EVENING,
+#   HEALTHCHECK_PING_URL_CANCELLED, HEALTHCHECK_WATCHDOG_URL,
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, NETLIFY_AUTH_TOKEN,
+#   NETLIFY_SITE_ID, GITHUB_TOKEN (watchdog staleness check),
+#   CIRCLECI_API_TOKEN (watchdog → trigger scan)
+
+parameters:
+  task:
+    type: string
+    default: ""
+  slot:
+    type: string
+    default: ""
+
+executors:
+  python:
+    docker:
+      - image: cimg/python:3.11
+  node:
+    docker:
+      - image: cimg/node:20
+  base:
+    docker:
+      - image: cimg/base:stable
+
+commands:
+  pip-with-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - pip-backend-v1-{{ checksum "backend/requirements.txt" }}
+            - pip-backend-v1-
+      - run:
+          name: Install backend deps
+          working_directory: backend
+          command: pip install -r requirements.txt
+      - save_cache:
+          key: pip-backend-v1-{{ checksum "backend/requirements.txt" }}
+          paths:
+            - ~/.cache/pip
+
+  commit-and-push:
+    description: "Commit generated data files and push to main with rebase retry"
+    parameters:
+      message:
+        type: string
+      paths:
+        type: string
+    steps:
+      - run:
+          name: Commit and push (<< parameters.message >>)
+          command: |
+            git config user.name "nse-swing-scanner-bot"
+            git config user.email "actions@users.noreply.github.com"
+            << parameters.paths >>
+            git diff --staged --quiet && echo "No changes to commit" && exit 0
+            git commit -m "<< parameters.message >>"
+            # Rebase+retry: another scheduled job may land on main between
+            # checkout and push. All reconciled paths are generated data
+            # artifacts; resolve rebase conflicts in favour of this run
+            # (-X theirs, where "theirs" is this scan's replayed commit).
+            # Abort+clean stale rebase state before each retry.
+            for i in 1 2 3 4 5; do
+              git rebase --abort 2>/dev/null || true
+              git reset --hard HEAD 2>/dev/null || true
+              if git pull --rebase -X theirs origin main && git push; then
+                exit 0
+              fi
+              echo "push attempt $i failed; retrying…"
+              sleep $((i * 3))
+            done
+            echo "ERROR: failed to push after retries"
+            exit 1
+
+jobs:
+  backend:
+    executor: python
+    working_directory: ~/nse-swing-scanner
+    steps:
+      - checkout
+      - pip-with-cache
+      - run:
+          name: Check cron consistency (scan.yml vs WINDOWS)
+          working_directory: backend
+          command: python scripts/check_cron_consistency.py
+      - run:
+          name: Check workflow scripts import under CI invocation
+          working_directory: backend
+          command: python scripts/check_workflow_scripts.py
+      - run:
+          name: Run pytest
+          working_directory: backend
+          command: pytest -q
+      - run:
+          name: Smoke scan (5 stocks, no holdings, no corp actions)
+          working_directory: backend
+          command: |
+            python scanner.py --sample 5 --sleep 0 --skip-holdings --skip-corporate-actions --output /tmp/scan.json
+            python -c "import json; d=json.load(open('/tmp/scan.json')); assert d['universe_size']==5; assert 'config' in d; print('smoke ok')"
+
+  frontend:
+    executor: node
+    working_directory: ~/nse-swing-scanner
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-frontend-{{ checksum "frontend/package-lock.json" }}
+            - npm-frontend-
+      - run:
+          name: Install frontend deps
+          working_directory: frontend
+          command: npm ci || npm install
+      - save_cache:
+          key: npm-frontend-{{ checksum "frontend/package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run:
+          name: Build
+          working_directory: frontend
+          command: npm run build
+
+  scan:
+    executor: python
+    working_directory: ~/nse-swing-scanner
+    steps:
+      - checkout
+      - pip-with-cache
+      - restore_cache:
+          keys:
+            - nse-swing-cache-{{ epoch }}
+            - nse-swing-cache-
+
+      - run:
+          name: Run full scan
+          working_directory: backend
+          # Nifty 500: 4 workers + 0.5s sleep + 429 retry + serial recovery
+          # pass for rate-limited symbols. scanner exits 2 when
+          # coverage.pct < 0.85. --lenient-external-gates: holdings gate
+          # passes on source_failed (Screener captcha).
+          command: python scanner.py --top-n 500 --workers 4 --sleep 0.5 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
+          no_output_timeout: 60m
+      - save_cache:
+          key: nse-swing-cache-{{ epoch }}
+          paths:
+            - backend/cache
+
+      - run:
+          name: Ping healthchecks.io (scan started)
+          # Proves the cron fired. Empty slot => manual/API trigger => skip.
+          when: on_success
+          command: |
+            set +e
+            case "<< pipeline.parameters.slot >>" in
+              am)      url="$HEALTHCHECK_PING_URL_MORNING"; label="morning";;
+              pm)      url="$HEALTHCHECK_PING_URL_EVENING"; label="evening";;
+              *) echo "no scheduled slot; skipping healthchecks.io ping."; exit 0;;
+            esac
+            if [ -z "$url" ]; then
+              echo "HEALTHCHECK_PING_URL_${label^^} not set; skipping ping."
+              exit 0
+            fi
+            curl -fsS -m 10 --retry 3 "${url}/start" || echo "warning: start ping failed"
+
+      - run:
+          name: Ping healthchecks.io (scan failed)
+          when: on_fail
+          command: |
+            case "<< pipeline.parameters.slot >>" in
+              am) url="$HEALTHCHECK_PING_URL_MORNING";;
+              pm) url="$HEALTHCHECK_PING_URL_EVENING";;
+              *)  exit 0;;
+            esac
+            if [ -n "$url" ]; then
+              curl -fsS -m 10 --retry 3 "${url}/fail" || echo "warning: fail ping failed"
+            fi
+
+      - run:
+          name: Validate JSON contract
+          working_directory: backend
+          command: |
+            python -c "
+            import json, sys
+            p=json.load(open('../frontend/public/data/latest_scan.json'))
+            assert 'generated_at' in p and 'stocks' in p and p['stocks'], 'invalid scan contract'
+            cov=p.get('coverage') or {}
+            assert 'priced' in cov and 'pct' in cov, 'missing coverage block'
+            if cov.get('pct', 0) < 0.85:
+                print(f'ERROR: coverage {cov.get(\"pct\")} < 0.85', file=sys.stderr)
+                sys.exit(1)
+            print('contract ok:', len(p['stocks']), 'stocks; coverage', cov)
+            "
+
+      - run:
+          name: Write dated snapshot + history index (B1)
+          # Persists YYYY-MM-DD-{am|pm}.json (minified) and updates
+          # snapshots/history_index.json. Rolling 90-day prune included.
+          # Slot derived from generated_at hour: <8 UTC = am, >=8 UTC = pm.
+          working_directory: backend
+          command: |
+            python scripts/snapshot_writer.py \
+              --latest ../frontend/public/data/latest_scan.json \
+              --snapshots ../frontend/public/data/snapshots \
+              --retention-days 90
+
+      - run:
+          name: Write scan_status.json
+          # Best-effort metadata; errors surface as warnings only.
+          working_directory: backend
+          command: |
+            python - <<'PY'
+            import json, datetime, os, sys, traceback
+
+            # MUST match the `triggers:` schedules in .circleci/config.yml.
+            WINDOWS = [(3, 30), (10, 30)]   # (hour_utc, minute_utc)
+
+            try:
+                event = "schedule" if "<< pipeline.schedule.name >>" else "manual"
+                scan = json.load(open("../frontend/public/data/latest_scan.json"))
+                now = datetime.datetime.now(datetime.timezone.utc)
+                triggered_at = now.isoformat()
+
+                scheduled_window_utc = None
+                drift_minutes = None
+                if event == "schedule":
+                    today = now.date()
+
+                    def clock_minute_delta(a, b):
+                        a_m = a.hour * 60 + a.minute
+                        b_m = b.hour * 60 + b.minute
+                        return min(abs(a_m - b_m), 1440 - abs(a_m - b_m))
+
+                    cands = []
+                    for h, m in WINDOWS:
+                        cands.append((datetime.datetime.combine(today, datetime.time(h, m), tzinfo=datetime.timezone.utc), f"{h:02d}:{m:02d}"))
+                    last_h, last_m = WINDOWS[-1]
+                    cands.append((
+                        datetime.datetime.combine(today - datetime.timedelta(days=1), datetime.time(last_h, last_m), tzinfo=datetime.timezone.utc),
+                        f"{last_h:02d}:{last_m:02d}",
+                    ))
+                    past = [(dt, label) for dt, label in cands if dt <= now]
+                    if past:
+                        chosen, scheduled_window_utc = min(past, key=lambda p: clock_minute_delta(now, p[0]))
+                        drift_minutes = int((now - chosen).total_seconds() // 60)
+
+                next_expected_utc = None
+                base_date = now.date()
+                for offset in range(7):
+                    cand_date = base_date + datetime.timedelta(days=offset)
+                    if cand_date.weekday() >= 5:
+                        continue
+                    for h, m in WINDOWS:
+                        cand_dt = datetime.datetime.combine(cand_date, datetime.time(h, m), tzinfo=datetime.timezone.utc)
+                        if cand_dt > now:
+                            next_expected_utc = cand_dt
+                            break
+                    if next_expected_utc is not None:
+                        break
+
+                scheduled_cron = ", ".join(f"{m} {h} * * 1-5" for h, m in WINDOWS)
+                status = {
+                    "generated_at": scan["generated_at"],
+                    "triggered_at": triggered_at,
+                    "commit_sha": os.environ.get("CIRCLE_SHA1", ""),
+                    "run_id": os.environ.get("CIRCLE_BUILD_NUM", ""),
+                    "trigger": event,
+                    "scheduled_window_utc": scheduled_window_utc,
+                    "scheduled_cron": scheduled_cron,
+                    "next_expected_utc": next_expected_utc.isoformat() if next_expected_utc else None,
+                    "drift_minutes": drift_minutes,
+                }
+                with open("../frontend/public/data/scan_status.json", "w") as f:
+                    json.dump(status, f, indent=2)
+                print("scan_status.json:", status)
+            except Exception as e:
+                print(f"warning: scan_status.json write failed: {e}")
+                traceback.print_exc()
+                sys.exit(0)
+            PY
+
+      - commit-and-push:
+          message: "Scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          paths: |
+            git add frontend/public/data/latest_scan.json
+            git add frontend/public/data/scan_status.json || true
+            git add frontend/public/data/snapshots/ || true
+
+      - run:
+          name: Ping healthchecks.io (scan succeeded)
+          when: on_success
+          command: |
+            case "<< pipeline.parameters.slot >>" in
+              am) url="$HEALTHCHECK_PING_URL_MORNING";;
+              pm) url="$HEALTHCHECK_PING_URL_EVENING";;
+              *)  exit 0;;
+            esac
+            if [ -n "$url" ]; then
+              curl -fsS -m 10 --retry 3 "${url}" || echo "warning: success ping failed"
+            fi
+
+      - run:
+          name: Send Telegram digest (C3)
+          # Soft-fails: the scan is the load-bearing artifact.
+          working_directory: backend
+          command: |
+            python scripts/send_digest.py \
+              --latest ../frontend/public/data/latest_scan.json \
+              --history ../frontend/public/data/snapshots/history_index.json
+
+      - persist_to_workspace:
+          root: ~/nse-swing-scanner
+          paths:
+            - frontend/dist
+
+  netlify-deploy:
+    executor: node
+    working_directory: ~/nse-swing-scanner
+    steps:
+      - attach_workspace:
+          at: ~/nse-swing-scanner
+      - run:
+          name: Trigger Netlify production deploy
+          command: |
+            if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+              echo "NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID not set; skipping Netlify deploy."
+              exit 0
+            fi
+            npm install --no-save netlify-cli@latest
+            npx netlify deploy --prod --dir=frontend/dist \
+              --auth="$NETLIFY_AUTH_TOKEN" --site="$NETLIFY_SITE_ID" \
+              --message="scan-$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
+  outcome-tracker:
+    executor: python
+    working_directory: ~/nse-swing-scanner
+    steps:
+      - checkout
+      - pip-with-cache
+      - run:
+          name: Compute performance
+          working_directory: backend
+          command: |
+            python scripts/compute_performance.py \
+              --output ../frontend/public/data/performance.json \
+              --cache-dir cache
+          no_output_timeout: 20m
+      - commit-and-push:
+          message: "Performance update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          paths: |
+            git add frontend/public/data/performance.json || true
+
+  watchdog:
+    executor: base
+    working_directory: ~/nse-swing-scanner
+    steps:
+      - run:
+          name: Check latest_scan.json freshness on main
+          command: |
+            set -e
+            echo "Fetching latest commit for frontend/public/data/latest_scan.json…"
+            latest=$(curl -fsSL \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits?path=frontend/public/data/latest_scan.json&per_page=1" \
+              | jq -r '.[0].commit.committer.date // empty')
+
+            if [ -z "$latest" ]; then
+              echo "ERROR: No scan commit found on main — first scan has not yet landed."
+              echo "stale=true" >> "$BASH_ENV"
+            else
+              echo "Latest scan committed at: $latest"
+              latest_ts=$(date -d "$latest" +%s)
+              now_ts=$(date -u +%s)
+              age_min=$(( (now_ts - latest_ts) / 60 ))
+              echo "Age: ${age_min} minutes"
+              # 45 min covers worst expected scan duration with margin.
+              if [ "$age_min" -gt 45 ]; then
+                echo "STALE — triggering scan pipeline."
+                echo "stale=true" >> "$BASH_ENV"
+              else
+                echo "FRESH — no action."
+                echo "stale=false" >> "$BASH_ENV"
+              fi
+              echo "age_min=$age_min" >> "$BASH_ENV"
+            fi
+      - run:
+          name: Trigger scan pipeline if stale
+          command: |
+            set -e
+            if [ "${stale:-false}" != "true" ]; then exit 0; fi
+            if [ -z "$CIRCLECI_API_TOKEN" ]; then
+              echo "ERROR: CIRCLECI_API_TOKEN not set; cannot trigger scan."
+              exit 1
+            fi
+            curl -fsS -X POST \
+              "https://circleci.com/api/v2/project/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pipeline" \
+              -H "Circle-Token: $CIRCLECI_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d '{"branch":"main","parameters":{"task":"scan","slot":""}}'
+            echo "Triggered scan pipeline via CircleCI API."
+      - run:
+          name: Ping healthchecks.io (watchdog status)
+          when: always
+          command: |
+            if [ -n "$HEALTHCHECK_WATCHDOG_URL" ]; then
+              ping_url="${HEALTHCHECK_WATCHDOG_URL}?stale=${stale:-unknown}&age_min=${age_min:-unknown}"
+              curl -fsS -m 10 --retry 3 "$ping_url" \
+                || echo "warning: healthchecks.io watchdog ping failed"
+            else
+              echo "HEALTHCHECK_WATCHDOG_URL not set; skipping watchdog ping."
+            fi
+
+# Two cron entries per slot keeps the same windows as GitHub Actions.
+# CircleCI schedules are far more reliable than GH's, so the watchdog is
+# now defense-in-depth rather than a workaround for cron drift.
+triggers:
+  - schedule:
+      name: scan-morning      # 09:00 IST pre-market
+      cron: "30 3 * * 1-5"
+      filters:
+        branches:
+          only: main
+      parameters:
+        task: scan
+        slot: am
+  - schedule:
+      name: scan-evening      # 16:00 IST post-market
+      cron: "30 10 * * 1-5"
+      filters:
+        branches:
+          only: main
+      parameters:
+        task: scan
+        slot: pm
+  - schedule:
+      name: outcome-tracker   # 09:30 IST Saturday
+      cron: "0 4 * * 6"
+      filters:
+        branches:
+          only: main
+      parameters:
+        task: outcome
+        slot: ""
+  - schedule:
+      name: watchdog          # every 15 min, 06:30-19:00 IST weekdays
+      cron: "*/15 1-13 * * 1-5"
+      filters:
+        branches:
+          only: main
+      parameters:
+        task: watchdog
+        slot: ""
+
+workflows:
+  ci:
+    when:
+      equal: ["", << pipeline.parameters.task >>]
+    jobs:
+      - backend
+      - frontend
+
+  scan-am:
+    when:
+      equal: [scan-morning, << pipeline.schedule.name >>]
+    jobs:
+      - scan:
+          context: nse-swing-secrets
+      - netlify-deploy:
+          context: nse-swing-secrets
+          requires:
+            - scan
+
+  scan-evening:
+    when:
+      equal: [scan-evening, << pipeline.schedule.name >>]
+    jobs:
+      - scan:
+          context: nse-swing-secrets
+      - netlify-deploy:
+          context: nse-swing-secrets
+          requires:
+            - scan
+
+  outcome:
+    when:
+      equal: [outcome-tracker, << pipeline.schedule.name >>]
+    jobs:
+      - outcome-tracker:
+          context: nse-swing-secrets
+
+  watchdog:
+    when:
+      equal: [watchdog, << pipeline.schedule.name >>]
+    jobs:
+      - watchdog:
+          context: nse-swing-secrets
