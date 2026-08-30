@@ -22,11 +22,9 @@ name: Outcome Tracker (forward-return attribution)
 #     and never silently dropped
 
 on:
-  schedule:
-    # 04:00 UTC Saturday = 09:30 IST Saturday — outside market hours, well
-    # after the Friday evening scan, and ahead of Monday's open so the
-    # refreshed view is live for the trading week.
-    - cron: "0 4 * * 6"
+  # Cron moved to CircleCI schedule trigger (2026-08-30) to avoid double-scan.
+  # schedule:
+  #   - cron: "0 4 * * 6"
   workflow_dispatch: {}
 
 permissions:
