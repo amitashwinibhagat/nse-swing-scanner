@@ -1,12 +1,11 @@
 name: NSE Swing Scan
 
 on:
-  schedule:
-    # Cron is UTC. IST = UTC+5:30.
-    # 09:00 IST pre-market -> 03:30 UTC
-    # 16:00 IST post-market -> 10:30 UTC
-    - cron: "30 3 * * 1-5"
-    - cron: "30 10 * * 1-5"
+  # Crons moved to CircleCI schedule triggers (2026-08-30) to avoid double-scan.
+  # Restore these if CircleCI schedules are disabled.
+  # schedule:
+  #   - cron: "30 3 * * 1-5"
+  #   - cron: "30 10 * * 1-5"
   workflow_dispatch: {}
 
 permissions:

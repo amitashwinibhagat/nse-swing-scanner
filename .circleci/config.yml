@@ -2,18 +2,16 @@ version: 2.1
 
 # Port of all four .github/workflows (ci, scan, outcome-tracker, watchdog).
 #
-# Scheduling model: CircleCI scheduled pipelines fire on the cron list below
-# and inject pipeline parameters. Each workflow then gates on those params,
-# so a scheduled run only executes its own workflow. Manual triggers
-# (replacing workflow_dispatch) call the API with explicit parameters:
+# Scheduling model: GitHub App orgs cannot use config.yml `triggers:`
+# (that's the legacy OAuth scheduled-pipeline syntax). Schedules live in
+# Project Settings → Triggers (provider=schedule) and inject pipeline
+# parameters. Each workflow gates on those params so a scheduled run only
+# executes its own workflow. Manual triggers (replacing workflow_dispatch):
 #
-#   curl -X POST https://circleci.com/api/v2/project/gh/<org>/<repo>/pipeline \
-#     -H "Circle-Token: $CIRCLECI_API_TOKEN" \
-#     -d '{"branch":"main","parameters":{"task":"scan","slot":"am"}}'
+#   circleci pipeline run --project circleci/DataDab/nse-swing-scanner \
+#     --branch main --param task=scan --param slot=am
 #
-# Push-back to main (scan + outcome-tracker): requires a WRITE-enabled
-# checkout key. CircleCI's default deploy key is read-only — add a write
-# deploy key or user key in Project Settings → SSH Keys.
+# Push-back to main (scan + outcome-tracker) uses GITHUB_TOKEN over HTTPS.
 #
 # Secrets live in the "nse-swing-secrets" context:
 #   HEALTHCHECK_PING_URL_MORNING, HEALTHCHECK_PING_URL_EVENING,
@@ -240,7 +238,7 @@ jobs:
             WINDOWS = [(3, 30), (10, 30)]   # (hour_utc, minute_utc)
 
             try:
-                event = "schedule" if "<< pipeline.schedule.name >>" else "manual"
+                event = "schedule" if "<< pipeline.parameters.slot >>" else "manual"
                 scan = json.load(open("../frontend/public/data/latest_scan.json"))
                 now = datetime.datetime.now(datetime.timezone.utc)
                 triggered_at = now.isoformat()
@@ -484,20 +482,11 @@ workflows:
       - backend
       - frontend
 
-  scan-am:
+  # Morning + evening schedules both set task=scan (slot=am|pm for
+  # healthchecks). Watchdog recovery uses task=scan with empty slot.
+  scan:
     when:
-      equal: [scan-morning, << pipeline.schedule.name >>]
-    jobs:
-      - scan:
-          context: nse-swing-secrets
-      - netlify-deploy:
-          context: nse-swing-secrets
-          requires:
-            - scan
-
-  scan-evening:
-    when:
-      equal: [scan-evening, << pipeline.schedule.name >>]
+      equal: [scan, << pipeline.parameters.task >>]
     jobs:
       - scan:
           context: nse-swing-secrets
@@ -508,14 +497,14 @@ workflows:
 
   outcome:
     when:
-      equal: [outcome-tracker, << pipeline.schedule.name >>]
+      equal: [outcome, << pipeline.parameters.task >>]
     jobs:
       - outcome-tracker:
           context: nse-swing-secrets
 
   watchdog:
     when:
-      equal: [watchdog, << pipeline.schedule.name >>]
+      equal: [watchdog, << pipeline.parameters.task >>]
     jobs:
       - watchdog:
           context: nse-swing-secrets
