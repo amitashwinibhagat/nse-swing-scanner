@@ -73,6 +73,13 @@ commands:
             << parameters.paths >>
             git diff --staged --quiet && echo "No changes to commit" && exit 0
             git commit -m "<< parameters.message >>"
+            # Push over HTTPS using the GITHUB_TOKEN context secret (classic
+            # PAT with repo scope) — avoids needing a write-enabled checkout key.
+            if [ -z "$GITHUB_TOKEN" ]; then
+              echo "ERROR: GITHUB_TOKEN not set (nse-swing-secrets context); cannot push."
+              exit 1
+            fi
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git"
             # Rebase+retry: another scheduled job may land on main between
             # checkout and push. All reconciled paths are generated data
             # artifacts; resolve rebase conflicts in favour of this run
