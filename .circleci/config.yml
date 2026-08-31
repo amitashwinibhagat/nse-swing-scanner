@@ -428,15 +428,26 @@ jobs:
             set -e
             if [ "${stale:-false}" != "true" ]; then exit 0; fi
             if [ -z "$CIRCLECI_API_TOKEN" ]; then
-              echo "ERROR: CIRCLECI_API_TOKEN not set; cannot trigger scan."
-              exit 1
+              echo "WARNING: CIRCLECI_API_TOKEN not set; cannot trigger scan (next scheduled scan will recover)."
+              exit 0
             fi
-            curl -fsS -X POST \
+            echo "Triggering scan pipeline via CircleCI API..."
+            # Soft-fail: a 400/403 here should not fail the watchdog job — the
+            # next scheduled scan (30 3 / 30 10 UTC) or next watchdog tick will retry.
+            # Use -s and capture HTTP code instead of -f which exits 22 on 4xx.
+            http_code=$(curl -s -o /tmp/circle_trigger.json -w "%{http_code}" -X POST \
               "https://circleci.com/api/v2/project/circleci/Eqg2ake4CDQjceFCAPG8vv/RKE45AYG9XMGCM9KZu3nYW/pipeline" \
               -H "Circle-Token: $CIRCLECI_API_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"branch":"main","parameters":{"task":"scan","slot":""}}'
-            echo "Triggered scan pipeline via CircleCI API."
+              -d '{"branch":"main","parameters":{"task":"scan","slot":""}}' || true)
+            cat /tmp/circle_trigger.json 2>/dev/null || true
+            echo "HTTP code: $http_code"
+            if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+              echo "Triggered scan pipeline via CircleCI API."
+            else
+              echo "WARNING: CircleCI trigger returned $http_code (will retry on next watchdog tick)."
+              cat /tmp/circle_trigger.json 2>/dev/null || true
+            fi
       - run:
           name: Ping healthchecks.io (watchdog status)
           when: always
