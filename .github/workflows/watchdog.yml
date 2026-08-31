@@ -19,9 +19,11 @@ name: Watchdog (cron drift detector)
 #   during a UTC weekday business window)
 
 on:
-  # Cron moved to CircleCI schedule trigger (2026-08-30) to avoid double-scan.
-  # schedule:
-  #   - cron: "*/15 1-13 * * 1-5"
+  # Restored 2026-08-31 with scan.yml crons. CircleCI config.yml `triggers:`
+  # never fired on this GitHub App project. Do NOT also create CircleCI UI
+  # schedule triggers while this cron is live (double-scan).
+  schedule:
+    - cron: "*/15 1-13 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
