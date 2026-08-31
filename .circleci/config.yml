@@ -77,7 +77,7 @@ commands:
               echo "ERROR: GITHUB_TOKEN not set (nse-swing-secrets context); cannot push."
               exit 1
             fi
-            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git"
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/amitashwinibhagat/nse-swing-scanner.git"
             # Rebase+retry: another scheduled job may land on main between
             # checkout and push. All reconciled paths are generated data
             # artifacts; resolve rebase conflicts in favour of this run
@@ -231,7 +231,7 @@ jobs:
           # Best-effort metadata; errors surface as warnings only.
           working_directory: backend
           command: |
-            python - <<'PY'
+            python - \<<'PY'
             import json, datetime, os, sys, traceback
 
             # MUST match the `triggers:` schedules in .circleci/config.yml.
@@ -377,15 +377,31 @@ jobs:
     working_directory: ~/nse-swing-scanner
     steps:
       - run:
+          name: Install jq (cimg/base is minimal)
+          command: |
+            if ! command -v jq >/dev/null 2>&1; then
+              sudo apt-get update && sudo apt-get install -y jq
+            fi
+      - run:
           name: Check latest_scan.json freshness on main
           command: |
             set -e
             echo "Fetching latest commit for frontend/public/data/latest_scan.json…"
-            latest=$(curl -fsSL \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits?path=frontend/public/data/latest_scan.json&per_page=1" \
-              | jq -r '.[0].commit.committer.date // empty')
+            # Public repo: try with Bearer token first (fine-grained PATs need Bearer),
+            # then fall back to unauthenticated. Never fail the step on curl 404/401 —
+            # treat unreachable as stale so watchdog can still trigger a scan.
+            latest=""
+            if [ -n "$GITHUB_TOKEN" ]; then
+              latest=$(curl -fsSL -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/amitashwinibhagat/nse-swing-scanner/commits?path=frontend/public/data/latest_scan.json&per_page=1" 2>/dev/null | jq -r '.[0].commit.committer.date // empty' 2>/dev/null) || true
+              if [ "$latest" = "null" ]; then latest=""; fi
+            fi
+            if [ -z "$latest" ]; then
+              latest=$(curl -fsSL -H "Accept: application/vnd.github+json" "https://api.github.com/repos/amitashwinibhagat/nse-swing-scanner/commits?path=frontend/public/data/latest_scan.json&per_page=1" 2>/dev/null | jq -r '.[0].commit.committer.date // empty' 2>/dev/null) || true
+              if [ "$latest" = "null" ]; then latest=""; fi
+            fi
+            if [ -z "$latest" ]; then
+              echo "WARNING: GitHub API returned no commit (auth fallback failed) — treating as stale."
+            fi
 
             if [ -z "$latest" ]; then
               echo "ERROR: No scan commit found on main — first scan has not yet landed."
@@ -416,7 +432,7 @@ jobs:
               exit 1
             fi
             curl -fsS -X POST \
-              "https://circleci.com/api/v2/project/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pipeline" \
+              "https://circleci.com/api/v2/project/circleci/Eqg2ake4CDQjceFCAPG8vv/RKE45AYG9XMGCM9KZu3nYW/pipeline" \
               -H "Circle-Token: $CIRCLECI_API_TOKEN" \
               -H "Content-Type: application/json" \
               -d '{"branch":"main","parameters":{"task":"scan","slot":""}}'
