@@ -2,11 +2,12 @@ version: 2.1
 
 # Port of all four .github/workflows (ci, scan, outcome-tracker, watchdog).
 #
-# Scheduling model: GitHub App orgs cannot use config.yml `triggers:`
-# (that's the legacy OAuth scheduled-pipeline syntax). Schedules live in
-# Project Settings → Triggers (provider=schedule) and inject pipeline
-# parameters. Each workflow gates on those params so a scheduled run only
-# executes its own workflow. Manual triggers (replacing workflow_dispatch):
+# Scheduling: GitHub Actions crons (scan.yml / watchdog.yml /
+# outcome-tracker.yml) are the live schedule as of 2026-08-31.
+# GitHub App orgs cannot use config.yml `triggers:` (legacy OAuth syntax),
+# and no CircleCI UI Triggers were created — so the CircleCI cutover
+# silently dropped every weekday scan. Do NOT add Project Settings →
+# Triggers while GHA crons are live. Manual CircleCI trigger:
 #
 #   circleci pipeline run --project circleci/DataDab/nse-swing-scanner \
 #     --branch main --param task=scan --param slot=am
@@ -460,9 +461,12 @@ jobs:
               echo "HEALTHCHECK_WATCHDOG_URL not set; skipping watchdog ping."
             fi
 
-# Two cron entries per slot keeps the same windows as GitHub Actions.
-# CircleCI schedules are far more reliable than GH's, so the watchdog is
-# now defense-in-depth rather than a workaround for cron drift.
+# INERT on GitHub App projects: config.yml `triggers:` is the legacy OAuth
+# scheduled-pipeline syntax and is ignored here. GitHub Actions crons were
+# restored 2026-08-31 after the Monday 03:30 UTC scan never fired. Do NOT
+# also create Project Settings → Triggers while GHA crons are live — that
+# would double-scan. These entries stay as documentation of the intended
+# windows (and for check_cron_consistency.py).
 triggers:
   - schedule:
       name: scan-morning      # 09:00 IST pre-market

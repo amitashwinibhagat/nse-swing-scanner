@@ -1,11 +1,13 @@
 name: NSE Swing Scan
 
 on:
-  # Crons moved to CircleCI schedule triggers (2026-08-30) to avoid double-scan.
-  # Restore these if CircleCI schedules are disabled.
-  # schedule:
-  #   - cron: "30 3 * * 1-5"
-  #   - cron: "30 10 * * 1-5"
+  # Restored 2026-08-31: CircleCI config.yml `triggers:` are ignored for
+  # GitHub App projects, and no Project Settings → Triggers were created,
+  # so the 03:30 UTC Monday scan never fired. Do NOT also create CircleCI
+  # UI schedule triggers while these crons are live (double-scan).
+  schedule:
+    - cron: "30 3 * * 1-5"
+    - cron: "30 10 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
