@@ -7,10 +7,7 @@ version: 2.1
 # GitHub App orgs cannot use config.yml `triggers:` (legacy OAuth syntax),
 # and no CircleCI UI Triggers were created — so the CircleCI cutover
 # silently dropped every weekday scan. Do NOT add Project Settings →
-# Triggers while GHA crons are live. Manual CircleCI trigger:
-#
-#   circleci pipeline run --project circleci/DataDab/nse-swing-scanner \
-#     --branch main --param task=scan --param slot=am
+# Triggers while GHA crons are live.
 #
 # Push-back to main (scan + outcome-tracker) uses GITHUB_TOKEN over HTTPS.
 #
@@ -20,6 +17,13 @@ version: 2.1
 #   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, NETLIFY_AUTH_TOKEN,
 #   NETLIFY_SITE_ID, GITHUB_TOKEN (watchdog staleness check),
 #   CIRCLECI_API_TOKEN (watchdog → trigger scan)
+#
+# Manual/API trigger — name-based slugs (circleci/DataDab/nse-swing-scanner)
+# are INVALID on GitHub App orgs; use the UUID slug (same one the watchdog
+# step uses):
+#
+#   circleci run trigger --project circleci/Eqg2ake4CDQjceFCAPG8vv/RKE45AYG9XMGCM9KZu3nYW \
+#     --branch main --parameter task=scan --parameter slot=am
 
 parameters:
   task:
