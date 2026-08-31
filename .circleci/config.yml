@@ -331,6 +331,17 @@ jobs:
               --latest ../frontend/public/data/latest_scan.json \
               --history ../frontend/public/data/snapshots/history_index.json
 
+      # dist/ is gitignored and nothing above builds it, but persist_to_workspace
+      # below needs it for netlify-deploy. Build AFTER the scan wrote
+      # frontend/public/data/latest_scan.json so the fresh data is copied into
+      # dist by Vite. (Same order-of-operations bug existed in scan.yml on GHA.)
+      - run:
+          name: Build frontend (for Netlify deploy)
+          working_directory: frontend
+          command: |
+            npm ci || npm install
+            npm run build
+
       - persist_to_workspace:
           root: ~/nse-swing-scanner
           paths:

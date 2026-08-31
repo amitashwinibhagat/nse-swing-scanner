@@ -337,6 +337,16 @@ jobs:
             --latest ../frontend/public/data/latest_scan.json \
             --history ../frontend/public/data/snapshots/history_index.json
 
+      - name: Build frontend (for Netlify deploy)
+        # dist/ is gitignored and nothing above builds it. Run AFTER the scan
+        # wrote frontend/public/data/latest_scan.json so the fresh data is
+        # copied into dist by Vite. Mirrors the fix in .circleci/config.yml.
+        if: success()
+        working-directory: frontend
+        run: |
+          npm ci || npm install
+          npm run build
+
       - name: Trigger Netlify production deploy
         if: success()
         env:
