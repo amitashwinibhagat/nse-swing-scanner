@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-01T11:44:00.923543+00:00",
+  "generated_at": "2026-09-01T15:07:59.902985+00:00",
   "universe_size": 500,
   "gate_pass_count": 38,
   "coverage": {
@@ -40308,114 +40308,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "AUBANK",
-      "company_name": "AU Small Finance Bank Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "AUBANK.NS",
-      "current_price": 1068.5,
-      "fifty_two_wk_high": 1128.6,
-      "pct_off_52wk_high": -5.33,
-      "pct_from_ema200": 9.13,
-      "rsi14": 48.11,
-      "atr14": 24.33,
-      "entry_zone_low": 1056.34,
-      "entry_zone_high": 1068.5,
-      "stop_loss": 1038.09,
-      "target_1": 1098.91,
-      "target_2": 1123.23,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.52,
-      "adtv_value_inr_approx": 1851939800.0,
-      "f_score": 5.0,
-      "f_score_components_available": 7,
-      "avg_pe_5y": 23.52,
-      "trailing_pe": 28.34,
-      "delivery_value_inr": 370692568.0,
-      "delivery_qty": 346928.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-01",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 1770588747.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -14.16,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.44,
-      "swing_high_63d": 1144.1,
-      "atr_expansion_ratio": 0.89,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 22.76,
-      "holdings_fii_pct": 37.27,
-      "holdings_dii_pct": 31.3,
-      "holdings_conviction_pct": 91.33,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.76,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; pct_off_high -5.33 outside [-40.0,-15.0]; rsi 48.11 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -5.33 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 48.11 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 21.1,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.5555555555555556,
-        "conviction_holding": 1.0
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "ACMESOLAR",
       "company_name": "ACME Solar Holdings Ltd.",
       "industry": "Power",
@@ -40487,6 +40379,114 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 59.38 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 21.1,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.5555555555555556,
+        "conviction_holding": 1.0
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "AUBANK",
+      "company_name": "AU Small Finance Bank Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "AUBANK.NS",
+      "current_price": 1068.5,
+      "fifty_two_wk_high": 1128.6,
+      "pct_off_52wk_high": -5.33,
+      "pct_from_ema200": 9.13,
+      "rsi14": 48.11,
+      "atr14": 24.33,
+      "entry_zone_low": 1056.34,
+      "entry_zone_high": 1068.5,
+      "stop_loss": 1038.09,
+      "target_1": 1098.91,
+      "target_2": 1123.23,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.52,
+      "adtv_value_inr_approx": 1851939800.0,
+      "f_score": 5.0,
+      "f_score_components_available": 7,
+      "avg_pe_5y": 23.52,
+      "trailing_pe": 28.34,
+      "delivery_value_inr": 370692568.0,
+      "delivery_qty": 346928.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-01",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 1770588747.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -14.16,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.44,
+      "swing_high_63d": 1144.1,
+      "atr_expansion_ratio": 0.89,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 22.76,
+      "holdings_fii_pct": 37.27,
+      "holdings_dii_pct": 31.3,
+      "holdings_conviction_pct": 91.33,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.76,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 5 < 6; pct_off_high -5.33 outside [-40.0,-15.0]; rsi 48.11 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 5 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -5.33 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 48.11 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
