@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-03T08:15:55.325447+00:00",
+  "generated_at": "2026-09-03T10:09:45.345031+00:00",
   "universe_size": 500,
   "gate_pass_count": 42,
   "coverage": {
@@ -39876,114 +39876,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "ACMESOLAR",
-      "company_name": "ACME Solar Holdings Ltd.",
-      "industry": "Power",
-      "yf_ticker": "ACMESOLAR.NS",
-      "current_price": 401.75,
-      "fifty_two_wk_high": 409.15,
-      "pct_off_52wk_high": -1.81,
-      "pct_from_ema200": 25.6,
-      "rsi14": 59.78,
-      "atr14": 15.13,
-      "entry_zone_low": 394.18,
-      "entry_zone_high": 401.75,
-      "stop_loss": 382.84,
-      "target_1": 420.66,
-      "target_2": 435.79,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.89,
-      "adtv_value_inr_approx": 845680536.0,
-      "f_score": 5.0,
-      "f_score_components_available": 8,
-      "avg_pe_5y": 37.18,
-      "trailing_pe": 42.02,
-      "delivery_value_inr": 101225069.12469482,
-      "delivery_qty": 251929.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-03",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 730634508.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -1.34,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.75,
-      "swing_high_63d": 411.5,
-      "atr_expansion_ratio": 1.05,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 71.48,
-      "holdings_fii_pct": 3.93,
-      "holdings_dii_pct": 19.07,
-      "holdings_conviction_pct": 94.48000000000002,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.75,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; pct_off_high -1.81 outside [-40.0,-15.0]; rsi 59.78 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -1.81 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 59.78 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 21.1,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.5555555555555556,
-        "conviction_holding": 1.0
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "AUBANK",
       "company_name": "AU Small Finance Bank Ltd.",
       "industry": "Financial Services",
@@ -40055,6 +39947,114 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 47.99 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 21.1,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.5555555555555556,
+        "conviction_holding": 1.0
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "ACMESOLAR",
+      "company_name": "ACME Solar Holdings Ltd.",
+      "industry": "Power",
+      "yf_ticker": "ACMESOLAR.NS",
+      "current_price": 401.75,
+      "fifty_two_wk_high": 409.15,
+      "pct_off_52wk_high": -1.81,
+      "pct_from_ema200": 25.6,
+      "rsi14": 59.78,
+      "atr14": 15.13,
+      "entry_zone_low": 394.18,
+      "entry_zone_high": 401.75,
+      "stop_loss": 382.84,
+      "target_1": 420.66,
+      "target_2": 435.79,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.89,
+      "adtv_value_inr_approx": 845680536.0,
+      "f_score": 5.0,
+      "f_score_components_available": 8,
+      "avg_pe_5y": 37.18,
+      "trailing_pe": 42.02,
+      "delivery_value_inr": 101225069.12469482,
+      "delivery_qty": 251929.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-03",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 730634508.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -1.34,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.75,
+      "swing_high_63d": 411.5,
+      "atr_expansion_ratio": 1.05,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 71.48,
+      "holdings_fii_pct": 3.93,
+      "holdings_dii_pct": 19.07,
+      "holdings_conviction_pct": 94.48000000000002,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.75,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 5 < 6; pct_off_high -1.81 outside [-40.0,-15.0]; rsi 59.78 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 5 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -1.81 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 59.78 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
@@ -44520,114 +44520,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "GLAXO",
-      "company_name": "Glaxosmithkline Pharmaceuticals Ltd.",
-      "industry": "Healthcare",
-      "yf_ticker": "GLAXO.NS",
-      "current_price": 2938.6,
-      "fifty_two_wk_high": 3106.4,
-      "pct_off_52wk_high": -5.4,
-      "pct_from_ema200": 16.76,
-      "rsi14": 59.36,
-      "atr14": 82.1,
-      "entry_zone_low": 2897.55,
-      "entry_zone_high": 2938.6,
-      "stop_loss": 2835.98,
-      "target_1": 3041.22,
-      "target_2": 3123.32,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.36,
-      "adtv_value_inr_approx": 443016886.0,
-      "f_score": 6.0,
-      "f_score_components_available": 9,
-      "avg_pe_5y": 43.48,
-      "trailing_pe": 47.44,
-      "delivery_value_inr": 92773448.68359375,
-      "delivery_qty": 31576.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-03",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 557660191.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -11.52,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.32,
-      "swing_high_63d": 3120.7,
-      "atr_expansion_ratio": 1.16,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -1.75,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -5.4 outside [-40.0,-15.0]; rsi 59.36 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -5.4 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 59.36 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 16.8,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.18000000000000005,
-        "quality_composite": 0.6666666666666666,
-        "conviction_holding": null
-      },
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "MEDANTA",
       "company_name": "Global Health Ltd.",
       "industry": "Healthcare",
@@ -44728,6 +44620,114 @@
         "support_proximity": 0.0,
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.17500000000000004,
+        "quality_composite": 0.6666666666666666,
+        "conviction_holding": null
+      },
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "GLAXO",
+      "company_name": "Glaxosmithkline Pharmaceuticals Ltd.",
+      "industry": "Healthcare",
+      "yf_ticker": "GLAXO.NS",
+      "current_price": 2938.6,
+      "fifty_two_wk_high": 3106.4,
+      "pct_off_52wk_high": -5.4,
+      "pct_from_ema200": 16.76,
+      "rsi14": 59.36,
+      "atr14": 82.1,
+      "entry_zone_low": 2897.55,
+      "entry_zone_high": 2938.6,
+      "stop_loss": 2835.98,
+      "target_1": 3041.22,
+      "target_2": 3123.32,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.36,
+      "adtv_value_inr_approx": 443016886.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9,
+      "avg_pe_5y": 43.48,
+      "trailing_pe": 47.44,
+      "delivery_value_inr": 92773448.68359375,
+      "delivery_qty": 31576.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-03",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 557660191.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -11.52,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.32,
+      "swing_high_63d": 3120.7,
+      "atr_expansion_ratio": 1.16,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -1.75,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -5.4 outside [-40.0,-15.0]; rsi 59.36 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -5.4 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 59.36 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 16.8,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.18000000000000005,
         "quality_composite": 0.6666666666666666,
         "conviction_holding": null
       },
