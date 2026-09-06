@@ -262,6 +262,35 @@ class TestRegimeAndPerName(unittest.TestCase):
         self.assertEqual(t20["risk_off"]["n"], 1)
         self.assertEqual(t20["risk_off"]["median"], -2.0)
 
+    def test_by_regime_buckets_cross_tab(self):
+        # Drawer table (1.4.0): per (window, bucket, regime) cells with
+        # cohort stats, regime tag from the scan, bucket from pass_v3.
+        snapshots = [
+            ("2026-07-14-pm", _scan([("X", 64), ("Z", 57)], idx_pct=3.0)),
+            ("2026-07-15-pm", _scan([("Y", 64)], idx_pct=-3.0)),
+        ]
+        forward = {
+            ("2026-07-14-pm", "X"): {w: _perf(4.0) for w in (5, 10, 20)},
+            ("2026-07-14-pm", "Z"): {w: _perf(1.0) for w in (5, 10, 20)},
+            ("2026-07-15-pm", "Y"): {w: _perf(-2.0) for w in (5, 10, 20)},
+        }
+        payload = performance.build_performance_payload(snapshots, forward)
+        cross = payload["windows"]["T+5"]["by_regime_buckets"]
+        self.assertEqual(cross["63+"]["risk_on"]["n"], 1)
+        self.assertEqual(cross["63+"]["risk_on"]["mean"], 4.0)
+        self.assertEqual(cross["63+"]["risk_off"]["n"], 1)
+        self.assertEqual(cross["63+"]["risk_off"]["mean"], -2.0)
+        self.assertEqual(cross["55-60"]["risk_on"]["n"], 1)
+        self.assertEqual(cross["55-60"]["risk_off"]["n"], 0)
+        # Every bucket label present, every regime key present (frontend
+        # iterates both unconditionally).
+        for b in performance.BUCKET_ORDER:
+            self.assertIn(b, cross)
+            for rg in ("risk_on", "neutral", "risk_off", "unknown"):
+                self.assertIn(rg, cross[b])
+        # CI present on populated cells (n=1 < MIN_N so None here)
+        self.assertIsNone(cross["63+"]["risk_on"]["ci95"])
+
     def test_per_name_untrackable_marked(self):
         snapshots = [("2026-07-15-pm", _scan([("A", 62)]))]
         payload = performance.build_performance_payload(snapshots, {})

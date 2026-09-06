@@ -187,6 +187,44 @@ export function earningsChip(stock) {
 }
 
 /**
+ * 1.4.0: Score-band evidence chip from the forward-return tracker.
+ *
+ * Maps the swing score to its pass_v3 band and surfaces what the outcome
+ * tracker actually measured (as of 2026-09-05: 69 snapshots, n=1454):
+ *   - 63+: mean excess vs Nifty has a 95% bootstrap CI above zero at
+ *     T+5, T+10 AND T+20 — the only band with an established edge.
+ *   - 55-60: mean excess CI BELOW zero at T+5 and flat elsewhere —
+ *     this band underperformed the index at the short horizon.
+ *   - mid/low bands: CIs straddle zero — no established edge, so no chip
+ *     (absence of a chip is the honest signal for a coin flip).
+ *
+ * Deliberately NOT a gate: single market regime, ~6 weeks of data, and the
+ * 1.3.0 rule stands — no new hard gates until existing ones are validated.
+ * Revisit as cohorts accumulate; the tracker owns the truth, this only
+ * mirrors it.
+ */
+export function scoreBandChip(score) {
+  if (!num(score)) return null;
+  if (score >= 63) {
+    return {
+      label: "Top band 63+",
+      tone: "success",
+      tooltip:
+        "Forward-return tracker: this band's mean excess vs Nifty has a 95% CI above zero at T+5, T+10 and T+20 (as of 2026-09-05; n=96/83/47). Only band with an established edge — single regime, ~6 weeks of data, descriptive not predictive.",
+    };
+  }
+  if (score >= 55 && score < 60) {
+    return {
+      label: "Weak band 55-60",
+      tone: "warning",
+      tooltip:
+        "Forward-return tracker: this band's mean excess vs Nifty was significantly NEGATIVE at T+5 (95% CI below zero) and flat at T+10/T+20 (as of 2026-09-05; n=150). A PASS here is by technicality, not evidenced edge — prefer 63+ names or demand confirmation before acting.",
+    };
+  }
+  return null;
+}
+
+/**
  * B4: Human-readable label for a gate_results entry's `gate` key.
  */
 export const GATE_LABELS = {

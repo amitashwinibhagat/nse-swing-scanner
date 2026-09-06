@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.4.1 — Analytics UI: band-evidence chips + band x regime cross-tab
+
+### Why
+
+The 1.4.0 CIs established that the 63+ band has an edge and the 55-60 band
+underperforms at T+5, but that evidence lived only in the dashboard's
+performance section — the cards and drawer where suggestions are actually
+consumed stayed silent. Separately, a single-regime sample cannot say
+whether the 63+ edge is regime-dependent; the by_regime aggregates existed
+but the band x regime cells did not.
+
+### Added
+
+- **Band-evidence chips** (`scanPlan.js: scoreBandChip`): cards and drawer
+  now show "Top band 63+" (success tone) or "Weak band 55-60" (warning
+  tone) with tooltips summarising the tracker evidence and its limits.
+  Deliberately NOT a gate (1.3.0 rule: no new hard gates until existing
+  ones are validated) — mid/low bands get no chip because no chip IS the
+  honest signal for a coin flip.
+- **Band x regime cross-tab** (`performance.py` -> `windows.T+*.by_regime_buckets`,
+  `DetailDrawer.jsx`): per-(bucket, regime) cells with mean, CI and n,
+  rendered at the bottom of the stock drawer. Cells with n < 5 render the
+  count only. First regime-dependent read on whether the 63+ edge holds
+  outside risk-on.
+- `performance.json` regenerated offline so both features are live
+  immediately.
+
+### Validation
+
+- 190 pytest passes (+1 cross-tab test); guards + frontend build green.
+
 ## 1.4.0 — Analytics: bootstrap CIs, pass_v3 buckets, per-symbol accuracy lookup
 
 ### Why

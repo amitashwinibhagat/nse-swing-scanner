@@ -7,6 +7,7 @@ import {
   confirmationChip,
   earningsChip,
   exitWarnings,
+  scoreBandChip,
   GATE_LABELS,
   relativeStrengthFactor,
   formatScanDate,
@@ -167,6 +168,22 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
 
   const entryState = computeEntryState(stock);
   const conf = confirmationChip(stock);
+  const band = scoreBandChip(stock.swing_score);
+  // Forward-return evidence for the band × regime cross-tab. Static data;
+  // fetched once per drawer mount and shared by all drawer opens.
+  const [perf, setPerf] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/data/performance.json", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (!cancelled && j) setPerf(j);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const exits = exitWarnings(stock);
   const ea = earningsChip(stock);
   const watched = watchlist?.has?.(stock.symbol) ?? false;
@@ -304,6 +321,18 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
             </div>
             <ScoreRing score={stock.swing_score} size={104} strokeWidth={7} />
           </section>
+
+          {band && (
+            <section className="drawer-section">
+              <div
+                className={`entry-state lg entry-${band.tone}`}
+                title={band.tooltip}
+              >
+                <span className="entry-state-dot" aria-hidden="true" />
+                {band.label}
+              </div>
+            </section>
+          )}
 
           <div className="detail-grid">
             <div>
@@ -526,11 +555,90 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
               marketCorrectionFactor={rsFactor}
             />
           </section>
+
+          <section className="drawer-section">
+            <h4>Score band × regime (tracker evidence)</h4>
+            <p className="plan-asof">
+              Mean excess return vs Nifty 50 with 95% bootstrap CI, from the
+              forward-return tracker (T+5). n per cell; cells with n &lt; 5
+              are suppressed. Single 90-day window — directional only.
+            </p>
+            <div className="perf-table-wrap">
+              <table className="perf-table">
+                <thead>
+                  <tr>
+                    <th>Band</th>
+                    {REGIMES.map((rg) => (
+                      <th key={rg.key}>{rg.label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {BANDS.map((b) => (
+                    <tr key={b.key}>
+                      <td>{b.label}</td>
+                      {REGIMES.map((rg) => {
+                        const c =
+                          perf?.windows?.["T+5"]?.by_regime_buckets?.[b.key]?.[
+                            rg.key
+                          ];
+                        if (!c || c.n === 0) return <td key={rg.key}>—</td>;
+                        if (c.n < 5) {
+                          return (
+                            <td key={rg.key} className="perf-fineprint">
+                              n={c.n}
+                            </td>
+                          );
+                        }
+                        return (
+                          <td
+                            key={rg.key}
+                            className={
+                              c.mean > 0
+                                ? "positive"
+                                : c.mean < 0
+                                  ? "negative"
+                                  : ""
+                            }
+                          >
+                            {c.mean > 0 ? "+" : ""}
+                            {c.mean.toFixed(2)}%
+                            {c.ci95 && (
+                              <span className="perf-fineprint">
+                                {` [${c.ci95.low > 0 ? "+" : ""}${c.ci95.low}, ${
+                                  c.ci95.high > 0 ? "+" : ""
+                                }${c.ci95.high}]`}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </aside>
     </div>
   );
 }
+
+// Module-level band/regime keys for the evidence cross-tab. Keys match
+// performance.json bucket labels (pass_v3) and regime_tag values.
+const BANDS = [
+  { key: "63+", label: "63+" },
+  { key: "60-63", label: "60-63" },
+  { key: "55-60", label: "55-60" },
+  { key: "45-55", label: "45-55" },
+  { key: "<45", label: "<45" },
+];
+const REGIMES = [
+  { key: "risk_on", label: "Risk-on" },
+  { key: "neutral", label: "Neutral" },
+  { key: "risk_off", label: "Risk-off" },
+];
 
 // Compact inline value shown next to each gate's ✓/✗ so the underlying
 // numbers (F-Score, ADV, holdings %, etc.) stay one glance away.

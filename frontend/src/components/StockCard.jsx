@@ -1,5 +1,5 @@
 import ScoreRing from "./ScoreRing.jsx";
-import { computeEntryState, confirmationChip, earningsChip } from "../utils/scanPlan.js";
+import { computeEntryState, confirmationChip, earningsChip, scoreBandChip } from "../utils/scanPlan.js";
 
 const fmtINR = (v) =>
   v == null ? "—" : `₹${v.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
@@ -55,6 +55,7 @@ export default function StockCard({ stock, expanded, onToggle, watchlist }) {
   const entryState = computeEntryState(stock);
   const conf = confirmationChip(stock);
   const ea = earningsChip(stock);
+  const band = scoreBandChip(swing_score);
   const watched = watchlist?.has?.(symbol) ?? false;
 
   return (
@@ -137,6 +138,16 @@ export default function StockCard({ stock, expanded, onToggle, watchlist }) {
         >
           <span className="entry-state-dot" aria-hidden="true" />
           {conf.label}
+        </div>
+      )}
+
+      {band && (
+        <div
+          className={`entry-state entry-${band.tone}`}
+          title={band.tooltip}
+        >
+          <span className="entry-state-dot" aria-hidden="true" />
+          {band.label}
         </div>
       )}
 
