@@ -1,5 +1,48 @@
 # Changelog
 
+## 1.4.2 — Trust surface: receipts banner + recent-picks scorecard
+
+### Why
+
+The strongest product asset — the outcome tracker's published hit rates —
+sat below the fold, and a user had to cross-reference two snapshots	hemselves to answer "what happened to the last batch of picks?". The
+dashboard led with today's suggestions but never showed its own scoreboard
+next to them.
+
+### Added
+
+- **Receipts banner** (`ReceiptsBanner` in `RecentPicksStrip.jsx`): one line
+  above the filter bar, rendered from `performance.json` at runtime (never
+  hardcoded): "Suggestions with a score of 63+ have beaten the Nifty 50 by
+  +3.8% on average within 5 sessions (95% CI +2.6 to +5.0, n=96)" with a
+  link to the forward-return section. Self-cancelling by construction —
+  the banner renders ONLY when the top band's T+5 CI is entirely above
+  zero and n >= 20, so a regime change that erases the edge silently
+  removes the claim. Anchors to `#perf-heading`.
+- **Recent-picks scorecard** (`RecentPicksStrip` + `utils/recentPicks.js`):
+  "Last scan's picks, tracked" strip next to the delta strip. Joins the
+  previous snapshot's gate-passed cohort against the latest scan's prices
+  and classifies each pick with the existing `computeEntryState` engine —
+  same labels, tones and ordering as the cards. Summary line ("26 in entry
+  zone · 1 below zone · 1 at T1 · 12 extended"), up to 14 chips with
+  per-symbol change %, and a fineprint noting it is a scoreboard, not
+  advice. No pick is ever silently dropped: unpriced names show as
+  "unpriced" (new muted entry-state tone).
+- `frontend/src/utils/recentPicks.js` — pure join/classify helpers
+  (mirrors `delta.js` pattern), including `resolveIndexEntry` extracted
+  from DeltaStrip's inline heuristic for reuse.
+
+### Notes
+
+- The strip prefers the immediate prior snapshot (am-or-pm) rather than
+  DeltaStrip's evening-to-evening rule: a morning cohort judged against
+  tonight's prices is a legitimate receipts line, and the dismissal
+  state is per-strip.
+- The banner claims only what the tracker measured under one market
+  regime (~6 weeks of data); the wording keeps "on average within 5
+  sessions" scoped to the T+5 window rather than implying a general
+  edge.
+
 ## 1.4.1 — Analytics UI: band-evidence chips + band x regime cross-tab
 
 ### Why

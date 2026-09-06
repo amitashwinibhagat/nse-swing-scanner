@@ -1837,3 +1837,95 @@ body {
   outline-offset: 4px;
   border-radius: 2px;
 }
+
+/* ==========================================================================
+   Recent picks + receipts banner (1.4.2)
+   ========================================================================= */
+
+.receipts-banner {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--accent-dim);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: var(--r-md);
+}
+
+.receipts-tag {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent-bright);
+  white-space: nowrap;
+}
+
+.receipts-banner p {
+  margin: 0;
+  font-size: var(--t-body);
+  color: var(--text);
+}
+
+.receipts-banner b {
+  color: var(--accent-bright);
+}
+
+.receipts-banner a {
+  color: var(--accent-bright);
+}
+
+.receipts-ci {
+  color: var(--text-dim);
+}
+
+.recent-picks .recent-picks-since {
+  color: var(--text-faint);
+  font-weight: 400;
+  font-size: var(--t-meta);
+}
+
+.recent-picks-summary {
+  margin: 0 0 var(--sp-2);
+  color: var(--text-dim);
+  font-size: var(--t-meta);
+}
+
+.recent-picks-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.recent-pick {
+  gap: 6px;
+}
+
+.recent-pick-sym {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.recent-pick-state {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.recent-pick-chg {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  opacity: 0.75;
+}
+
+.recent-picks-fineprint {
+  margin: var(--sp-2) 0 0;
+  color: var(--text-faint);
+  font-size: var(--t-micro);
+}
+
+.entry-state.entry-muted {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  border-color: var(--border-subtle);
+}
