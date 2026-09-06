@@ -45,6 +45,9 @@ CORPORATE_ACTION_LOOKAHEAD_DAYS = 30
 
 # Soft score weights — sum to 1.0. See README/methodology for rationale.
 # `conviction_holding` activates once holdings data is wired in.
+# Bump SCORE_VERSION whenever WEIGHTS changes: snapshots stamp it per row
+# (scanner.to_json_records) so the tracker can attribute score-regime
+# changes to a date. Promotion protocol: docs/feedback + evaluate_feedback.
 WEIGHTS = {
     "valuation_compression": 0.20,
     "oversold_positioning": 0.15,
@@ -54,6 +57,8 @@ WEIGHTS = {
     "quality_composite": 0.20,
     "conviction_holding": 0.10,
 }
+
+SCORE_VERSION = "weights-2026-06-v1"
 
 # Scheduled scan windows — SINGLE SOURCE OF TRUTH for the twice-daily cadence.
 # Consumed by:
