@@ -10,8 +10,6 @@ UNIVERSE_DEFAULT_WORKERS = 8                # default thread-pool size for per-s
 UNIVERSE_DEFAULT_SLEEP_BETWEEN_CALLS = 0.3  # seconds, per-yfinance-call courtesy delay
 
 # Hard gate thresholds (non-negotiable safety filters)
-MIN_MARKET_CAP_CR = 500            # Rs crore
-MAX_DE_RATIO = 1.0
 MIN_F_SCORE = 6                    # relaxed from spec ">7" — see README
 MIN_DELIVERY_VALUE_INR = 5_00_00_000   # Rs 5 crore, latest available trading day (only used when delivery_kind == "actual")
 MIN_HOLDINGS_CONVICTION_PCT = 50   # promoter + FII + DII > 50%
@@ -56,6 +54,15 @@ WEIGHTS = {
     "quality_composite": 0.20,
     "conviction_holding": 0.10,
 }
+
+# Scheduled scan windows — SINGLE SOURCE OF TRUTH for the twice-daily cadence.
+# Consumed by:
+#   - scan.yml's "Write scan_status.json" heredoc (imports this module)
+#   - backend/scripts/check_cron_consistency.py (CI guard vs the YAML crons)
+#   - backend/scripts/watchdog_check.py (next-expected-window staleness logic)
+# If you change the cron schedule in .github/workflows/scan.yml, change it here
+# in the same commit — the CI guard fails until both agree.
+SCAN_WINDOWS_UTC = [(3, 30), (10, 30)]   # (hour_utc, minute_utc), Mon-Fri
 
 # Source-cache TTLs (seconds)
 HOLDINGS_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30 * 3   # ~90 days (quarterly-ish)

@@ -1,5 +1,78 @@
 # Changelog
 
+## 1.3.3 — Ops: watchdog dedup, single CI pipeline, schedule source of truth
+
+### Why
+
+A project review (2026-09-06) found four operational issues:
+
+1. **Watchdog over-triggering.** The watchdog fired `gh workflow run
+   scan.yml` on EVERY 15-min tick while `latest_scan.json` was >45 min
+   old. Because scan.yml's concurrency group queues rather than cancels,
+   one drifted scan produced 1 scheduled run plus 3-4 queued watchdog
+   duplicates — 10-12 scan commits/day vs the intended 2 (peaked at 12
+   commits on 2026-08-24 and 20+ on 2026-08-26). Each duplicate re-hits
+   yfinance/Screener from shared GHA egress, feeding the 429 problem.
+2. **Dual CI pipelines.** `.circleci/config.yml` (a 500-line port of all
+   four GHA workflows) was maintained alongside the live GHA workflows,
+   even though its `triggers:` are inert on GitHub App projects — the
+   cutover silently dropped every scheduled scan until the GHA crons were
+   restored on 2026-08-31. Its cron guard validated the INERT CircleCI
+   schedule, not the live one.
+3. **Schedule defined in 2+ places.** The WINDOWS list lived inline in
+   scan.yml's heredoc (and previously in the CircleCI heredoc too), with
+   the cron expressions duplicated in the workflow YAML — drift between
+   them silently misattributes `scheduled_window_utc`.
+4. **Dead config.** `MIN_MARKET_CAP_CR` and `MAX_DE_RATIO` were defined in
+   settings.py and documented as hard gates but imported nowhere — no
+   market-cap or D/E gate has ever existed in scanner.py.
+
+### Fixed
+
+**Watchdog dedup (the load-bearing fix)**
+- New `backend/scripts/watchdog_check.py`: pure, unit-tested decision
+  logic. A scan is "late" only past `next_expected_utc` + 30 min grace
+  (weekend/holiday aware — replaces the raw 45-min commit-age threshold
+  that false-positived on every legitimately slow/delayed scan). The
+  trigger fires ONLY when (a) no scan.yml run is queued or in-flight
+  (`gh run list`, any run occupying the queue counts), (b) the watchdog's
+  own 45-min cooldown has expired (marker file committed to
+  `.github/.watchdog_last_trigger`, covering the queued-but-not-yet-
+  visible gap `gh run list` misses), and (c) the scan is actually late.
+- `watchdog.yml` rewritten: checkout + Python, `gh run list` state
+  derivation, decision step (exit 2 = trigger), marker commit, then
+  `gh workflow run`. healthchecks ping now carries `run_state` context.
+
+**Single CI pipeline**
+- `.circleci/config.yml` deleted. GHA is the pipeline. Do NOT re-add
+  CircleCI UI schedule triggers (double-scan).
+- `check_cron_consistency.py` repointed at the LIVE schedule: scan.yml's
+  crons vs `SCAN_WINDOWS_UTC` in settings.py, plus a watchdog-cron sanity
+  check.
+
+**Single source of truth for the schedule**
+- New `backend/scan_schedule.py`: `SCAN_WINDOWS_UTC` (in settings.py) +
+  window attribution, next-expected-window, and cron-string math, shared
+  by scan.yml's scan_status heredoc (now imports it instead of inlining),
+  watchdog_check.py, and the CI guard. Covered by `test_scan_schedule.py`
+  including a test that fails if scan.yml's crons drift from settings.
+
+**Dead config removed**
+- `MIN_MARKET_CAP_CR` / `MAX_DE_RATIO` removed from settings.py and the
+  AGENTS.md gates table; scanner.py's module docstring now lists the
+  actual 7 gates. Re-add the constant AND the gate together if the spec
+  is ever revisited (1.3.0 rule: no new hard gates until existing ones
+  are validated).
+
+**Hygiene**
+- `earnings.py`: replaced deprecated `datetime.utcnow()` (removes the
+  pytest DeprecationWarning).
+
+### Validation
+
+- 184 pytest passes (was 157): +11 scan_schedule, +16 watchdog_check.
+- Both CI guards green; frontend build green (208 KB JS / 30 KB CSS).
+
 ## 1.3.2 — Scan coverage: purge poisoned 429 cache + serial recovery
 
 ### Why

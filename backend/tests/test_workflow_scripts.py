@@ -21,6 +21,7 @@ class TestDiscover(unittest.TestCase):
             "compute_performance.py",
             "send_digest.py",
             "snapshot_writer.py",
+            "watchdog_check.py",
         ):
             self.assertIn(required, names)
         self.assertNotIn("check_workflow_scripts.py", names)

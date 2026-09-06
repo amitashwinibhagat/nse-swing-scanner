@@ -6,37 +6,50 @@ name: Watchdog (cron drift detector)
 # not fire at all. This watchdog is a redundant cron (every 15 min during
 # market hours) that:
 #
-#   1. Checks if the latest_scan.json on main is fresh.
-#   2. If stale, fires a `repository_dispatch` event that the scan.yml
-#      workflow can listen to (alternative: a `workflow_dispatch`).
+#   1. Checks if the latest_scan.json on main is fresh (next-window aware).
+#   2. If late, triggers scan.yml — but ONLY when no scan run is already
+#      queued/in-flight and our own cooldown has expired. Pre-1.3.3 the
+#      watchdog fired a trigger on EVERY stale tick; because scan.yml's
+#      concurrency group queues rather than cancels, one drifted scan
+#      produced 3-4 queued duplicate runs (10-12 scan commits/day).
 #   3. Pings healthchecks.io with its own UUID so we get alerted if THIS
 #      cron also drifts — defense in depth against the upstream issue.
 #
-# Recommended healthchecks.io configuration for the watchdog ping:
-#   Period: 1h
-#   Grace:  1h
-#   (i.e. an alert fires if no watchdog ping arrives within 2 hours
-#   during a UTC weekday business window)
+# The staleness/duplicate decision lives in backend/scripts/watchdog_check.py
+# (unit-tested); this workflow only does I/O: gh run list, gh workflow run,
+# and the healthchecks ping.
 
 on:
-  # Restored 2026-08-31 with scan.yml crons. CircleCI config.yml `triggers:`
-  # never fired on this GitHub App project. Do NOT also create CircleCI UI
-  # schedule triggers while this cron is live (double-scan).
+  # Live schedule (the .circleci port was removed in 1.3.3 — its `triggers:`
+  # are ignored on GitHub App projects). Do NOT also create CircleCI UI
+  # schedule triggers while this cron is live (double-run).
   schedule:
     - cron: "*/15 1-13 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
-  contents: read   # only needs to read main; scan.yml runs separately
+  contents: write  # commit + push the trigger marker (.github/.watchdog_last_trigger)
   actions: write   # to trigger scan.yml via gh workflow run if stale
+
+concurrency:
+  group: nse-swing-watchdog
+  cancel-in-progress: false
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Check latest_scan.json freshness on main
-        id: check
+      - name: Checkout (for watchdog_check.py)
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Determine scan run state + latest_scan.json age on main
+        id: state
         run: |
           set -e
           echo "Fetching latest commit for frontend/public/data/latest_scan.json…"
@@ -48,31 +61,99 @@ jobs:
 
           if [ -z "$latest" ]; then
             echo "::error::No scan commit found on main — first scan has not yet landed."
-            echo "stale=true" >> "$GITHUB_OUTPUT"
             echo "age_min=9999" >> "$GITHUB_OUTPUT"
+          else
+            echo "Latest scan committed at: $latest"
+            latest_ts=$(date -d "$latest" +%s)
+            now_ts=$(date -u +%s)
+            age_min=$(( (now_ts - latest_ts) / 60 ))
+            echo "Age: ${age_min} minutes"
+            echo "age_min=$age_min" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Scan run state: queued / in_progress / none. Any non-success,
+          # non-failure conclusion still occupying the queue counts as active
+          # so we never stack a trigger behind a hung run.
+          run_state=$(gh run list \
+            --repo "${{ github.repository }}" \
+            --workflow=scan.yml \
+            --limit 10 \
+            --json status,conclusion \
+            --jq '[.[] | select(.conclusion == "" or .conclusion == null)] | map(.status) | first // "none"' \
+            || echo "none")
+          # Normalise: a run that is "pending" (queued) or "in_progress".
+          case "$run_state" in
+            queued|pending|waiting|requested) run_state="queued" ;;
+            in_progress)                      run_state="in_progress" ;;
+            *)                                run_state="none" ;;
+          esac
+          echo "Scan run state: $run_state"
+          echo "run_state=$run_state" >> "$GITHUB_OUTPUT"
+
+      - name: Decide whether to trigger a recovery scan
+        id: decide
+        working-directory: backend
+        env:
+          RUN_STATE: ${{ steps.state.outputs.run_state }}
+          AGE_MIN: ${{ steps.state.outputs.age_min }}
+        # Exit 10 = trigger; exit 0 = skip. Any other exit code is a bug and
+        # defaults to skip (never auto-trigger on an unknown state). The step
+        # must not fail the workflow either way.
+        # The marker lives under .github/ (not frontend/public/) so Netlify
+        # never deploys it.
+        run: |
+          set +e
+          python scripts/watchdog_check.py \
+            --latest ../frontend/public/data/latest_scan.json \
+            --status ../frontend/public/data/scan_status.json \
+            --marker ../.github/.watchdog_last_trigger \
+            --run-state "$RUN_STATE" \
+            --grace-min 30 \
+            --cooldown-min 45 \
+            --age-min "$AGE_MIN"
+          code=$?
+          if [ "$code" -eq 10 ]; then
+            echo "trigger=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          elif [ "$code" -eq 0 ]; then
+            echo "trigger=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          else
+            echo "::warning::watchdog_check.py exited $code (unexpected); defaulting to no trigger."
+            echo "trigger=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "Latest scan committed at: $latest"
-          # GNU date on the runner handles ISO-8601 directly.
-          latest_ts=$(date -d "$latest" +%s)
-          now_ts=$(date -u +%s)
-          age_min=$(( (now_ts - latest_ts) / 60 ))
-          echo "Age: ${age_min} minutes"
-
-          # Threshold: 45 min covers the worst expected scan duration
-          # (cold-cache ~5-7 min + drift ~30 min) with margin.
-          if [ "$age_min" -gt 45 ]; then
-            echo "STALE — triggering scan.yml workflow_dispatch."
-            echo "stale=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "FRESH — no action."
-            echo "stale=false" >> "$GITHUB_OUTPUT"
+      - name: Commit watchdog trigger marker
+        # The marker must persist across ticks; commit it to main so the next
+        # tick sees the cooldown. Scan commits already push to main the same
+        # way. Soft-fail: if this push loses a race, worst case is one extra
+        # trigger — the gh-run-state check still guards duplicates.
+        if: steps.decide.outputs.trigger == 'true'
+        run: |
+          git config user.name "nse-swing-scanner-bot"
+          git config user.email "actions@users.noreply.github.com"
+          # Lives under .github/ (not frontend/public/) so Netlify never
+          # deploys it and the frontend's data dir stays clean.
+          git add .github/.watchdog_last_trigger
+          if git diff --staged --quiet; then
+            echo "Marker unchanged."
+            exit 0
           fi
-          echo "age_min=$age_min" >> "$GITHUB_OUTPUT"
+          git commit -m "Watchdog: trigger marker $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git rebase --abort 2>/dev/null || true
+            git reset --hard HEAD 2>/dev/null || true
+            if git pull --rebase -X theirs origin main && git push; then
+              exit 0
+            fi
+            echo "push attempt $i failed; retrying…"
+            sleep $((i * 3))
+          done
+          echo "::warning::failed to push trigger marker; cooldown may not persist."
 
-      - name: Trigger scan.yml workflow if stale
-        if: steps.check.outputs.stale == 'true'
+      - name: Trigger scan.yml workflow if decided
+        if: steps.decide.outputs.trigger == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -84,14 +165,15 @@ jobs:
       - name: Ping healthchecks.io (watchdog status)
         if: always()
         env:
-          STALE: ${{ steps.check.outputs.stale || 'unknown' }}
-          AGE_MIN: ${{ steps.check.outputs.age_min || 'unknown' }}
+          TRIGGER: ${{ steps.decide.outputs.trigger || 'false' }}
+          AGE_MIN: ${{ steps.state.outputs.age_min || 'unknown' }}
+          RUN_STATE: ${{ steps.state.outputs.run_state || 'unknown' }}
         continue-on-error: true
         run: |
           if [ -n "${{ secrets.HEALTHCHECK_WATCHDOG_URL }}" ]; then
             url="${{ secrets.HEALTHCHECK_WATCHDOG_URL }}"
             # Append query string so healthchecks.io logs the watchdog state.
-            ping_url="${url}?stale=${STALE}&age_min=${AGE_MIN}"
+            ping_url="${url}?stale=${TRIGGER}&age_min=${AGE_MIN}&run_state=${RUN_STATE}"
             curl -fsS -m 10 --retry 3 "$ping_url" \
               || echo "::warning::healthchecks.io watchdog ping failed"
           else
