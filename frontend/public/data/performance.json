@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-06T09:46:13.967978+00:00",
+  "generated_at": "2026-09-06T10:08:55.002944+00:00",
   "retention_days": 90,
   "windows": {
     "T+5": {
@@ -72,6 +72,251 @@
           "mean": null,
           "hit_rate": null,
           "ci95": null
+        }
+      },
+      "by_regime_buckets": {
+        "63+": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 96,
+            "median": 2.21,
+            "q1": -1.35,
+            "q3": 7.86,
+            "mean": 3.76,
+            "hit_rate": 0.604,
+            "ci95": {
+              "low": 2.56,
+              "high": 4.95
+            }
+          },
+          "risk_off": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "60-63": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 34,
+            "median": -0.17,
+            "q1": -1.41,
+            "q3": 0.94,
+            "mean": -0.42,
+            "hit_rate": 0.441,
+            "ci95": {
+              "low": -0.98,
+              "high": 0.18
+            }
+          },
+          "risk_off": {
+            "n": 4,
+            "median": 1.6,
+            "q1": 1.5,
+            "q3": 1.7,
+            "mean": 1.6,
+            "hit_rate": 1.0,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "55-60": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 140,
+            "median": -0.78,
+            "q1": -1.96,
+            "q3": 0.78,
+            "mean": -0.5,
+            "hit_rate": 0.4,
+            "ci95": {
+              "low": -0.9,
+              "high": -0.1
+            }
+          },
+          "risk_off": {
+            "n": 10,
+            "median": -2.03,
+            "q1": -2.68,
+            "q3": -0.84,
+            "mean": -1.19,
+            "hit_rate": 0.2,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "45-55": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 336,
+            "median": 0.24,
+            "q1": -1.04,
+            "q3": 1.86,
+            "mean": 0.55,
+            "hit_rate": 0.551,
+            "ci95": {
+              "low": 0.26,
+              "high": 0.86
+            }
+          },
+          "risk_off": {
+            "n": 28,
+            "median": -0.7,
+            "q1": -2.73,
+            "q3": 0.75,
+            "mean": -0.58,
+            "hit_rate": 0.357,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "<45": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 400,
+            "median": 0.13,
+            "q1": -1.36,
+            "q3": 2.04,
+            "mean": 0.75,
+            "hit_rate": 0.522,
+            "ci95": {
+              "low": 0.4,
+              "high": 1.1
+            }
+          },
+          "risk_off": {
+            "n": 16,
+            "median": -1.32,
+            "q1": -1.92,
+            "q3": -0.28,
+            "mean": -0.91,
+            "hit_rate": 0.25,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "unknown": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "risk_off": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
         }
       },
       "trackable_count": 1064,
@@ -153,6 +398,251 @@
           "ci95": null
         }
       },
+      "by_regime_buckets": {
+        "63+": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 83,
+            "median": 2.96,
+            "q1": -0.65,
+            "q3": 12.05,
+            "mean": 5.29,
+            "hit_rate": 0.687,
+            "ci95": {
+              "low": 3.77,
+              "high": 6.85
+            }
+          },
+          "risk_off": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "60-63": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 30,
+            "median": -0.2,
+            "q1": -1.83,
+            "q3": 2.49,
+            "mean": 0.84,
+            "hit_rate": 0.5,
+            "ci95": {
+              "low": -0.26,
+              "high": 2.17
+            }
+          },
+          "risk_off": {
+            "n": 4,
+            "median": 9.91,
+            "q1": 9.61,
+            "q3": 10.22,
+            "mean": 9.91,
+            "hit_rate": 1.0,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "55-60": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 103,
+            "median": -1.2,
+            "q1": -3.27,
+            "q3": 1.04,
+            "mean": -0.33,
+            "hit_rate": 0.33,
+            "ci95": {
+              "low": -1.07,
+              "high": 0.42
+            }
+          },
+          "risk_off": {
+            "n": 10,
+            "median": 1.22,
+            "q1": 0.27,
+            "q3": 7.58,
+            "mean": 3.92,
+            "hit_rate": 0.8,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "45-55": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 272,
+            "median": -0.03,
+            "q1": -2.02,
+            "q3": 2.52,
+            "mean": 0.6,
+            "hit_rate": 0.485,
+            "ci95": {
+              "low": 0.1,
+              "high": 1.11
+            }
+          },
+          "risk_off": {
+            "n": 28,
+            "median": -1.38,
+            "q1": -3.39,
+            "q3": 2.13,
+            "mean": -0.88,
+            "hit_rate": 0.429,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "<45": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 288,
+            "median": -0.28,
+            "q1": -1.94,
+            "q3": 2.84,
+            "mean": 0.87,
+            "hit_rate": 0.458,
+            "ci95": {
+              "low": 0.39,
+              "high": 1.39
+            }
+          },
+          "risk_off": {
+            "n": 16,
+            "median": -2.95,
+            "q1": -4.36,
+            "q3": 1.06,
+            "mean": -0.93,
+            "hit_rate": 0.375,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "unknown": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "risk_off": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        }
+      },
       "trackable_count": 834,
       "untrackable_count": 0,
       "window_not_closed_count": 620,
@@ -227,6 +717,248 @@
           "mean": null,
           "hit_rate": null,
           "ci95": null
+        }
+      },
+      "by_regime_buckets": {
+        "63+": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 47,
+            "median": 1.6,
+            "q1": -2.89,
+            "q3": 15.19,
+            "mean": 6.04,
+            "hit_rate": 0.596,
+            "ci95": {
+              "low": 2.89,
+              "high": 9.16
+            }
+          },
+          "risk_off": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "60-63": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 18,
+            "median": 1.8,
+            "q1": -1.82,
+            "q3": 3.87,
+            "mean": 1.41,
+            "hit_rate": 0.556,
+            "ci95": null
+          },
+          "risk_off": {
+            "n": 4,
+            "median": 6.49,
+            "q1": 6.11,
+            "q3": 6.86,
+            "mean": 6.49,
+            "hit_rate": 1.0,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "55-60": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 35,
+            "median": -1.69,
+            "q1": -5.55,
+            "q3": 1.83,
+            "mean": -0.93,
+            "hit_rate": 0.4,
+            "ci95": {
+              "low": -2.6,
+              "high": 1.18
+            }
+          },
+          "risk_off": {
+            "n": 10,
+            "median": -0.39,
+            "q1": -0.55,
+            "q3": 5.97,
+            "mean": 4.14,
+            "hit_rate": 0.4,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "45-55": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 136,
+            "median": 0.75,
+            "q1": -1.92,
+            "q3": 4.22,
+            "mean": 1.8,
+            "hit_rate": 0.574,
+            "ci95": {
+              "low": 0.75,
+              "high": 2.98
+            }
+          },
+          "risk_off": {
+            "n": 28,
+            "median": -1.04,
+            "q1": -3.04,
+            "q3": 1.13,
+            "mean": 0.03,
+            "hit_rate": 0.357,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "<45": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 130,
+            "median": -0.57,
+            "q1": -3.53,
+            "q3": 5.03,
+            "mean": 1.5,
+            "hit_rate": 0.485,
+            "ci95": {
+              "low": 0.32,
+              "high": 2.68
+            }
+          },
+          "risk_off": {
+            "n": 16,
+            "median": -3.48,
+            "q1": -4.25,
+            "q3": -0.99,
+            "mean": -2.39,
+            "hit_rate": 0.25,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "unknown": {
+          "risk_on": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "neutral": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "risk_off": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          },
+          "unknown": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
         }
       },
       "trackable_count": 424,

@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-09-06 (1.4.0).
+> Last updated: 2026-09-06 (1.4.1).
 
 ## Project Overview
 
@@ -153,7 +153,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ├── plans/                        # Older planning docs (kept for context)
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.4.0)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.4.1)
 └── AGENTS.md                     # ← you are here
 ```
 
@@ -581,7 +581,7 @@ list.
 ## See also
 
 - `README.md` — user-facing docs (setup, methodology, operational risks)
-- `CHANGELOG.md` — versioned release notes (current: 1.4.0)
+- `CHANGELOG.md` — versioned release notes (current: 1.4.1)
 - `netlify.toml` — build config + cache-control headers
 - `backend/scripts/check_cron_consistency.py` — CI guard (cron windows)
 - `backend/scripts/check_workflow_scripts.py` — CI guard (script import path)

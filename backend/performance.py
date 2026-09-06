@@ -240,6 +240,13 @@ def build_performance_payload(
         w: {"risk_on": [], "neutral": [], "risk_off": [], "unknown": []}
         for w in WINDOWS
     }
+    # Bucket x regime cross-tab (1.4.0 drawer table): per window,
+    # per score bucket, per regime — {w: {bucket: {regime: [excess, ...]}}}
+    by_regime_cross: Dict[int, Dict[str, Dict[str, List[float]]]] = {
+        w: {b: {rg: [] for rg in ("risk_on", "neutral", "risk_off", "unknown")}
+            for b in BUCKET_ORDER}
+        for w in WINDOWS
+    }
     per_scan: List[dict] = []
     per_name: List[dict] = []
 
@@ -295,6 +302,7 @@ def build_performance_payload(
                 per_window_buckets[w][bucket].append(excess)
                 bucket_excess[w][bucket].append(excess)
                 by_regime_buckets[w][scan_regime].append(excess)
+                by_regime_cross[w][bucket][scan_regime].append(excess)
                 name_row["windows"][_window_label(w)] = {
                     "excess_return_pct": excess,
                     "untrackable": False,
@@ -323,8 +331,18 @@ def build_performance_payload(
         bucket_stats = {}
         for b, vals in per_window_buckets[w].items():
             bucket_stats[b] = cohort_stats(vals)
+        regime_bucket_stats = {}
+        for b in BUCKET_ORDER:
+            regime_bucket_stats[b] = {
+                rg: cohort_stats(vals)
+                for rg, vals in by_regime_cross[w][b].items()
+            }
         out_windows[_window_label(w)] = {
             "buckets": bucket_stats,
+            # Bucket x regime cross-tab for the drawer evidence table.
+            # Regime cohorts are small — cells carry their own n so the
+            # frontend can suppress below its floor.
+            "by_regime_buckets": regime_bucket_stats,
             "trackable_count": per_window_trackable[w],
             "untrackable_count": per_window_untrackable[w],
             "window_not_closed_count": per_window_not_closed[w],
