@@ -16,7 +16,7 @@ Missing / source-failed status is returned honestly; the UI must fail-open
 (no chip rendered) rather than auto-blocking a PASS.
 """
 
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from typing import Optional
 
 from source_status import make_status
@@ -70,7 +70,7 @@ def _extract_next_earnings_date(yf_ticker: str) -> Optional[str]:
     except Exception:
         return None
 
-    today = datetime.utcnow().date()
+    today = datetime.now(timezone.utc).date()
 
     # Primary: Ticker.calendar
     try:
@@ -145,10 +145,10 @@ def _fetch_earnings_uncached(yf_ticker: str) -> dict:
             error=f"Unparseable earnings date from yfinance: {iso!r}",
         )
 
-    within = (ed - datetime.utcnow().date()).days
+    within = (ed - datetime.now(timezone.utc).date()).days
     return make_status(
         source="yfinance:earnings",
         status="ok",
-        as_of=datetime.utcnow().isoformat()[:10],
+        as_of=datetime.now(timezone.utc).isoformat()[:10],
         data={"earnings_date": iso, "within_days": within},
     )

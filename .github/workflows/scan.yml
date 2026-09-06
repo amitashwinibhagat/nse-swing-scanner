@@ -1,10 +1,13 @@
 name: NSE Swing Scan
 
 on:
-  # Restored 2026-08-31: CircleCI config.yml `triggers:` are ignored for
-  # GitHub App projects, and no Project Settings → Triggers were created,
-  # so the 03:30 UTC Monday scan never fired. Do NOT also create CircleCI
-  # UI schedule triggers while these crons are live (double-scan).
+  # The live scan schedule. The windows below MUST match SCAN_WINDOWS_UTC in
+  # backend/settings.py (single source of truth) — CI guard
+  # scripts/check_cron_consistency.py fails if they drift. The .circleci
+  # port was removed in 1.3.3: its `triggers:` are ignored on GitHub App
+  # projects and maintaining two pipelines duplicated every failure mode.
+  # Do NOT re-add CircleCI UI schedule triggers while these crons are live
+  # (double-scan).
   schedule:
     - cron: "30 3 * * 1-5"
     - cron: "30 10 * * 1-5"
@@ -188,12 +191,15 @@ jobs:
           GH_RUN_ID: ${{ github.run_id }}
         run: |
           python - <<'PY'
-          import json, datetime, os, sys, traceback
+          import datetime, json, os, sys, traceback
 
-          # Single source of truth for the schedule. MUST match `on.schedule`
-          # above. Adding a new window requires editing only this list — both
-          # `scheduled_cron` (JSON output) and the drift candidates are derived.
-          WINDOWS = [(3, 30), (10, 30)]   # (hour_utc, minute_utc)
+          # Schedule math (window attribution, next expected window, cron
+          # string) lives in backend/scan_schedule.py — the single source of
+          # truth alongside SCAN_WINDOWS_UTC in settings.py. The CI guard
+          # check_cron_consistency.py fails if the crons in `on.schedule`
+          # above drift from that list.
+          sys.path.insert(0, os.getcwd())   # ensure backend/ is importable
+          from scan_schedule import WINDOWS, attribute_window, next_scheduled_window, scheduled_cron_string
 
           try:
               event = os.environ["GH_EVENT_NAME"]
@@ -204,64 +210,11 @@ jobs:
               scheduled_window_utc = None
               drift_minutes = None
               if event == "schedule":
-                  today = now.date()
+                  scheduled_window_utc, drift_minutes = attribute_window(now)
 
-                  def clock_minute_delta(a, b):
-                      # Circular distance in minutes between two wall-clock HH:MM values.
-                      a_m = a.hour * 60 + a.minute
-                      b_m = b.hour * 60 + b.minute
-                      return min(abs(a_m - b_m), 1440 - abs(a_m - b_m))
+              next_expected_utc = next_scheduled_window(now)
 
-                  cands = []
-                  for h, m in WINDOWS:
-                      label = f"{h:02d}:{m:02d}"
-                      cands.append((datetime.datetime.combine(today, datetime.time(h, m), tzinfo=datetime.timezone.utc), label))
-                  # Only the LAST scheduled window of yesterday belongs in the
-                  # candidates list. Yesterday's earlier window (e.g. 03:30
-                  # when the schedule is [03:30, 10:30]) is too far back to
-                  # plausibly be "the most recent past cron" and including
-                  # it causes the clock-distance heuristic to misattribute
-                  # scans in the 00:00 - last-window-of-WINDOWS UTC window.
-                  last_h, last_m = WINDOWS[-1]
-                  cands.append((
-                      datetime.datetime.combine(today - datetime.timedelta(days=1), datetime.time(last_h, last_m), tzinfo=datetime.timezone.utc),
-                      f"{last_h:02d}:{last_m:02d}",
-                  ))
-                  past = [(dt, label) for dt, label in cands if dt <= now]
-                  if past:
-                      # Pick the past scheduled window whose HH:MM is closest to
-                      # now's wall-clock HH:MM. Handles on-time and small-drift
-                      # cases correctly. For multi-hour cron delays (rare), the
-                      # misattributed window is documented as a known limitation:
-                      # GitHub Actions does not expose which cron expression fired.
-                      chosen, scheduled_window_utc = min(
-                          past, key=lambda p: clock_minute_delta(now, p[0]),
-                      )
-                      drift_minutes = int((now - chosen).total_seconds() // 60)
-
-              # Next future scheduled window (Mon-Fri only — matches the cron's
-              # `* * 1-5` weekday constraint). The frontend uses this instead of
-              # a clock-time threshold so the staleness banner doesn't fire on
-              # weekends when no scan is expected.
-              # TODO: also skip NSE holidays (~14/yr) when a holiday list exists.
-              next_expected_utc = None
-              base_date = now.date()
-              for offset in range(7):
-                  cand_date = base_date + datetime.timedelta(days=offset)
-                  if cand_date.weekday() >= 5:   # 5 = Saturday, 6 = Sunday
-                      continue
-                  for h, m in WINDOWS:
-                      cand_dt = datetime.datetime.combine(
-                          cand_date, datetime.time(h, m),
-                          tzinfo=datetime.timezone.utc,
-                      )
-                      if cand_dt > now:
-                          next_expected_utc = cand_dt
-                          break
-                  if next_expected_utc is not None:
-                      break
-
-              scheduled_cron = ", ".join(f"{m} {h} * * 1-5" for h, m in WINDOWS)
+              scheduled_cron = scheduled_cron_string()
               status = {
                   "generated_at": scan["generated_at"],
                   "triggered_at": triggered_at,
@@ -340,7 +293,7 @@ jobs:
       - name: Build frontend (for Netlify deploy)
         # dist/ is gitignored and nothing above builds it. Run AFTER the scan
         # wrote frontend/public/data/latest_scan.json so the fresh data is
-        # copied into dist by Vite. Mirrors the fix in .circleci/config.yml.
+        # copied into dist by Vite.
         if: success()
         working-directory: frontend
         run: |

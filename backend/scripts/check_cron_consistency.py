@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 """
 CI guard: assert that the weekday scan cron expressions in
-.circleci/config.yml match the WINDOWS list baked into the
-"Write scan_status.json" Python heredoc.
+.github/workflows/scan.yml (the live schedule) match the SCAN_WINDOWS_UTC
+list in backend/settings.py — the single source of truth consumed by
+scan_status.json's window attribution and watchdog_check.py's staleness
+logic. Also sanity-checks the watchdog's 15-min cron window.
 
-If you add or change a scheduled scan window in either place, this
-script will fail in CI until both are updated.
+History: this guard previously validated .circleci/config.yml's `triggers:`
+block. Those triggers are inert on GitHub App projects (documented in the
+CircleCI config, removed in 1.3.3), so the guard was checking a schedule
+that never ran. It now checks the schedule that actually fires scans.
+
+If you add or change a scheduled scan window, update BOTH
+.github/workflows/scan.yml's `on.schedule` AND SCAN_WINDOWS_UTC in
+backend/settings.py in the same commit — this script fails CI until they
+agree.
 
 Usage:
     python backend/scripts/check_cron_consistency.py
@@ -14,16 +23,19 @@ import re
 import sys
 from pathlib import Path
 
-CONFIG = Path(__file__).resolve().parents[2] / ".circleci" / "config.yml"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SCAN_YML = REPO_ROOT / ".github" / "workflows" / "scan.yml"
+WATCHDOG_YML = REPO_ROOT / ".github" / "workflows" / "watchdog.yml"
 
-# MUST match the WINDOWS list inside the "Write scan_status.json" step of
-# .circleci/config.yml. Both lists are kept in sync by this guard.
-EXPECTED_WINDOWS = [(3, 30), (10, 30)]   # (hour_utc, minute_utc)
+_BACKEND_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_BACKEND_DIR))
+
+from settings import SCAN_WINDOWS_UTC  # noqa: E402
 
 
 def extract_scan_cron_entries(text: str) -> list:
     """Weekday once-an-hour scan crons: 'M H * * 1-5' (not watchdog */15)."""
-    return re.findall(r'^\s+cron:\s*"(\d+ \d+ \* \* 1-5)"', text, flags=re.MULTILINE)
+    return re.findall(r'^\s+- cron:\s*"(\d+ \d+ \* \* 1-5)"', text, flags=re.MULTILINE)
 
 
 def expected_cron_strings(windows) -> list:
@@ -31,20 +43,42 @@ def expected_cron_strings(windows) -> list:
 
 
 def main() -> int:
-    if not CONFIG.exists():
-        print(f"::error::config.yml not found at {CONFIG}")
+    failures = []
+
+    # --- scan.yml crons vs SCAN_WINDOWS_UTC (the load-bearing check) ---
+    if not SCAN_YML.exists():
+        print(f"::error::scan.yml not found at {SCAN_YML}")
         return 1
-    text = CONFIG.read_text()
+    text = SCAN_YML.read_text()
     found = extract_scan_cron_entries(text)
-    expected = expected_cron_strings(EXPECTED_WINDOWS)
+    expected = expected_cron_strings(SCAN_WINDOWS_UTC)
     if found != expected:
-        print(f"::error::Scan cron entries in {CONFIG} don't match EXPECTED_WINDOWS.")
-        print(f"  found:    {found}")
-        print(f"  expected: {expected}")
-        print(f"  Update either EXPECTED_WINDOWS in this script or the scan "
-              f"schedule crons in .circleci/config.yml so both lists agree.")
+        failures.append(
+            f"Scan cron entries in {SCAN_YML.relative_to(REPO_ROOT)} don't match "
+            f"SCAN_WINDOWS_UTC in backend/settings.py.\n"
+            f"  found:    {found}\n"
+            f"  expected: {expected}\n"
+            f"  Update both in the same commit."
+        )
+
+    # --- watchdog cron sanity: 15-min cadence, weekday hours 1-13 UTC ---
+    if WATCHDOG_YML.exists():
+        wtext = WATCHDOG_YML.read_text()
+        watchdog_crons = re.findall(r'^\s+- cron:\s*"([^"]+)"', wtext, flags=re.MULTILINE)
+        if "*/15 1-13 * * 1-5" not in watchdog_crons:
+            failures.append(
+                "watchdog.yml cron must be '*/15 1-13 * * 1-5' (15-min ticks, "
+                "06:30-19:00 IST weekdays). Found: "
+                f"{watchdog_crons or 'none'}. If you intentionally changed the "
+                "watchdog window, update this guard in the same commit."
+            )
+
+    if failures:
+        for f in failures:
+            print("::error::" + f)
         return 1
-    print(f"OK: {len(found)} scan cron entries match EXPECTED_WINDOWS.")
+
+    print(f"OK: {len(found)} scan cron entries match SCAN_WINDOWS_UTC; watchdog cron ok.")
     return 0
 
 

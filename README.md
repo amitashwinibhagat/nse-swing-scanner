@@ -278,10 +278,16 @@ but the run errored.**
 
 A redundant cron that runs every 15 minutes during market hours and:
 
-- Checks if `latest_scan.json` on `main` is older than 45 minutes.
-- If stale, fires `gh workflow run scan.yml` to kick off a recovery scan.
-- Pings its own healthchecks.io URL with `?stale=...&age_min=...` query
-  params so the alert message tells you which slot was missed.
+- Checks if `latest_scan.json` on `main` is late: only past the next
+  scheduled window plus a 30-minute grace period (weekend-aware).
+- If late AND no scan run is queued/in-flight AND the watchdog's own
+  45-minute cooldown has expired, fires `gh workflow run scan.yml` to
+  kick off a recovery scan. The dedup checks (run state + cooldown) mean
+  one drifted scan triggers at most one recovery scan — earlier versions
+  fired on every stale tick and queued duplicate runs.
+- Pings its own healthchecks.io URL with `?stale=...&age_min=...&run_state=...`
+  query params so the alert message tells you which slot was missed and
+  whether a run was already active.
 
 Setup: create a third healthchecks.io check, copy its URL into the
 `HEALTHCHECK_WATCHDOG_URL` repo secret.

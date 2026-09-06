@@ -7,10 +7,14 @@ Design decisions (see conversation for full rationale):
 - Entry-timing/quality-DEGREE criteria are a WEIGHTED SCORE (0-100), not AND-gates.
   Stacking 13 strict AND-conditions returns ~0 stocks most days. A score gives a
   usable ranking every day and degrades gracefully.
-- Only genuinely non-negotiable safety criteria are hard gates: market cap floor,
-  D/E ceiling, delivery-value floor, F-score floor, not-suspended/T-group,
-  no-pending-corporate-action, holdings-concentration, and the technical window
-  filters (drawdown, RSI).
+- Only genuinely non-negotiable safety criteria are hard gates (7, see README):
+  F-score floor, drawdown window, RSI window, liquidity adequacy (real delivery
+  OR 20d ADV), not-suspended/T-group, holdings concentration, and
+  no-pending-corporate-action. The market-cap floor and D/E ceiling from the
+  original spec were never implemented and their settings constants were
+  removed in 1.3.3 — re-add both the constant AND the gate together if the
+  spec is ever revisited (see CHANGELOG 1.3.0: no new hard gates until the
+  existing ones are validated).
 - Targets are ATR-scaled measured moves, NOT Fibonacci 61.8% (oversized for a
   15-30 day window). Targets are heuristic — see methodology.md.
 - Earnings surprise is explicitly NOT a hard gate; consensus data is not

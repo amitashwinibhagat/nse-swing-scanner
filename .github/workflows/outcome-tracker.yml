@@ -22,9 +22,9 @@ name: Outcome Tracker (forward-return attribution)
 #     and never silently dropped
 
 on:
-  # Restored 2026-08-31 with scan.yml crons. CircleCI config.yml `triggers:`
-  # never fired on this GitHub App project. Do NOT also create CircleCI UI
-  # schedule triggers while this cron is live.
+  # Live schedule (the .circleci port was removed in 1.3.3 — its `triggers:`
+  # are ignored on GitHub App projects). Do NOT also create CircleCI UI
+  # schedule triggers while this cron is live (double-run).
   schedule:
     - cron: "0 4 * * 6"
   workflow_dispatch: {}
