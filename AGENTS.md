@@ -133,7 +133,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── styles.css           # Single CSS file, ~1900 lines
 │   │   ├── utils/
 │   │   │   ├── scanPlan.js      # Entry-state, regime, RS factor, earnings chip (pure)
-│   │   │   ├── delta.js         # Snapshot diffing (new PASS / dropped / watchlist)
+││   │   ├── delta.js           # Snapshot diffing (new PASS / dropped / watchlist)
+│   │   ├── recentPicks.js     # Prior-cohort scorecard join (pure; feeds RecentPicksStrip)
 │   │   │   └── useWatchlist.js  # localStorage watchlist hook
 │   │   └── components/
 │   │       ├── Kpi.jsx          # KPI tile with delta + accent
@@ -144,6 +145,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │       ├── Rationale.jsx    # Methodology explainer
 │   │       ├── DetailDrawer.jsx # Per-stock detail panel (gate checklist, position sizer)
 │   │       ├── DeltaStrip.jsx   # "Since last scan" banner (B2)
+│       ├── RecentPicksStrip.jsx # Receipts banner (63+ evidence) + last-cohort scorecard (C2-adjacent)
 │   │       ├── PerformanceSection.jsx # Score-bucket hit-rate view (C2)
 │   │       ├── SegmentedControl.jsx, Skeleton.jsx
 │   ├── netlify/functions/
@@ -153,7 +155,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ├── plans/                        # Older planning docs (kept for context)
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.4.1)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.4.2)
 └── AGENTS.md                     # ← you are here
 ```
 

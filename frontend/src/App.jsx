@@ -7,6 +7,7 @@ import DetailDrawer from "./components/DetailDrawer.jsx";
 import { SkeletonGrid } from "./components/Skeleton.jsx";
 import Rationale from "./components/Rationale.jsx";
 import DeltaStrip from "./components/DeltaStrip.jsx";
+import RecentPicksStrip, { ReceiptsBanner } from "./components/RecentPicksStrip.jsx";
 import PerformanceSection from "./components/PerformanceSection.jsx";
 import useWatchlist from "./utils/useWatchlist.js";
 import { computeEntryState, confirmationChip, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
@@ -554,6 +555,8 @@ export default function App() {
           </div>
         </div>
 
+        <ReceiptsBanner />
+
         <div className="filter-bar">
           <label className="search-wrap">
             <IconSearch />
@@ -720,6 +723,7 @@ export default function App() {
             stocks={rows}
             watchlist={watchlist}
           />
+          <RecentPicksStrip currentGeneratedAt={data.generated_at} />
           {viewMode === "cards" ? (
         <>
           <div className="stock-grid">
