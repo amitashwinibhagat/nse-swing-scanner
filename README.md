@@ -166,6 +166,18 @@ npm install
 npm run dev   # http://localhost:5173
 ```
 
+## Analytics (privacy-first)
+
+The dashboard ships with cookieless, privacy-first analytics via Fathom.
+No cookies, no fingerprinting, no consent banner needed — and **unconfigured
+builds make zero analytics requests** (local dev and forks are untracked
+by construction).
+
+To enable it on your own deployment, set `VITE_FATHOM_SITE_ID` in Netlify
+(Site settings → Environment variables) and rebuild. The full contract —
+north-star metric, event map, and what we deliberately refuse to measure —
+lives in [`docs/analytics.md`](docs/analytics.md).
+
 ## Limitations (read this)
 
 - **NSE bhavcopy is now paywalled behind Akamai.** As of mid-2026,

@@ -135,6 +135,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   │   ├── scanPlan.js      # Entry-state, regime, RS factor, earnings chip (pure)
 ││   │   ├── delta.js           # Snapshot diffing (new PASS / dropped / watchlist)
 │   │   ├── recentPicks.js     # Prior-cohort scorecard join (pure; feeds RecentPicksStrip)
+│   │   ├── analytics.js       # Fail-silent Fathom loader + EVENTS map (off unless VITE_FATHOM_SITE_ID)
 │   │   │   └── useWatchlist.js  # localStorage watchlist hook
 │   │   └── components/
 │   │       ├── Kpi.jsx          # KPI tile with delta + accent
@@ -153,7 +154,10 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── package.json             # React 18.3, Vite 5.4
 │   └── dist/                    # Build output (gitignored, deployed by Netlify)
 ├── plans/                        # Older planning docs (kept for context)
-├── netlify.toml                  # Build config + cache-control headers
+├── docs/
+│   ├── methodology.md        # Methodology page (linked from dashboard footer)
+│   └── analytics.md          # North-star metric + instrumentation contract
+├── netlify.toml                  # Build config + cache-control + CSP (1 analytics origin)
 ├── README.md                     # User-facing docs
 ├── CHANGELOG.md                  # Versioned release notes (latest: 1.4.2)
 └── AGENTS.md                     # ← you are here
@@ -246,6 +250,7 @@ gh run watch $RUN_ID --repo amitashwinibhagat/nse-swing-scanner --exit-status
 | Variable | Used by | Purpose |
 |---|---|---|
 | `SCAN_TRIGGER_SECRET` | trigger-scan.js | Owner-only auth token for `?admin=1` POST endpoint |
+| `VITE_FATHOM_SITE_ID` | frontend build | Fathom site ID for privacy-first analytics (unset → untracked build); see docs/analytics.md |
 | `GITHUB_DISPATCH_TOKEN` | trigger-scan.js | PAT with `repo` scope to call `repos/{owner}/{repo}/dispatches` |
 
 **Note:** The `trigger-scan.js` function is the documented owner-only manual

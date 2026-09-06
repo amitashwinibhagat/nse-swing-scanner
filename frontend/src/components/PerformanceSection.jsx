@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { trackEvent, EVENTS } from "../utils/analytics.js";
 import PerSymbolAccuracy from "./PerSymbolAccuracy.jsx";
 
 const PERFORMANCE_URL = "/data/performance.json";
@@ -94,6 +95,22 @@ export default function PerformanceSection() {
         {data.meta.bucket_scheme && (
           <span>Buckets: <b>{data.meta.bucket_scheme}</b></span>
         )}
+        {data.generated_at && (() => {
+          const d = new Date(data.generated_at);
+          if (Number.isNaN(d.getTime())) return null;
+          // ISO week of the tracker payload (same math as the digest CI).
+          const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+          const day = t.getUTCDay() || 7;
+          t.setUTCDate(t.getUTCDate() + 4 - day); // Thursday of this ISO week
+          const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+          const week = Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
+          const label = `${t.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+          return (
+            <span>
+              Weekly digest: <a href={`/digests/${label}.md`} onClick={() => trackEvent(EVENTS.DIGEST_OPEN)}>{label}</a>
+            </span>
+          );
+        })()}
         <span>T+5 trackable: <b>{t5Track}</b></span>
         <span>T+5 untrackable: <b>{t5Untrack}</b></span>
         <span>T+5 not closed: <b>{t5Open}</b></span>

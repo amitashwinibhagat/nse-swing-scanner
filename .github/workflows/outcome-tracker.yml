@@ -60,11 +60,22 @@ jobs:
             --output ../frontend/public/data/performance.json \
             --cache-dir cache
 
-      - name: Commit and push performance.json
+      - name: Generate weekly digest
+        # Public accuracy digest (1.4.3): committed under frontend/public/
+        # digests/ so Netlify serves it at /digests/YYYY-Www.md with no
+        # extra routing. %G-W%V = ISO week-year + week (GNU date).
+        working-directory: backend
+        run: |
+          python scripts/generate_digest.py \
+            --performance ../frontend/public/data/performance.json \
+            --out ../frontend/public/digests/$(date -u +'%G-W%V').md \
+            --site-base https://nse-swing-scanner.netlify.app
+
+      - name: Commit and push performance.json + digest
         run: |
           git config user.name "nse-swing-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add frontend/public/data/performance.json || true
+          git add frontend/public/data/performance.json frontend/public/digests/ || true
           git diff --staged --quiet && echo "No changes to performance.json" && exit 0
           git commit -m "Performance update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           ## Resolve any rebase conflicts in favour of our new commit

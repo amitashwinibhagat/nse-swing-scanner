@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { trackEvent, EVENTS } from "../utils/analytics.js";
 
 /**
  * Per-symbol accuracy lookup — score-at-suggestion-time vs realized excess
@@ -122,7 +123,11 @@ export default function PerSymbolAccuracy({ data }) {
                 <tr
                   key={e.symbol}
                   className={selected === e.symbol ? "selected" : ""}
-                  onClick={() => setSelected(e.symbol === selected ? null : e.symbol)}
+                  onClick={() => {
+                    const next = e.symbol === selected ? null : e.symbol;
+                    setSelected(next);
+                    if (next) trackEvent(EVENTS.PER_SYMBOL_LOOKUP);
+                  }}
                   style={{ cursor: "pointer" }}
                 >
                   <td>{e.symbol}</td>
