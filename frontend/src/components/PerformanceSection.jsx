@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PerSymbolAccuracy from "./PerSymbolAccuracy.jsx";
 
 const PERFORMANCE_URL = "/data/performance.json";
 
@@ -58,7 +59,7 @@ export default function PerformanceSection() {
   const windows = Object.keys(data.windows || {});
   const buckets =
     (data.meta && data.meta.buckets) ||
-    ["60+", "55-59", "50-54", "<50"];
+    ["63+", "60-63", "55-60", "45-55", "<45"];
   const regimes = ["risk_on", "neutral", "risk_off", "unknown"];
   const regimeLabels = {
     risk_on: "Risk-on (Nifty > +2% vs 200EMA)",
@@ -126,6 +127,7 @@ export default function PerformanceSection() {
                 <th>Bucket</th>
                 <th>N</th>
                 <th>Median</th>
+                <th>Mean 95% CI</th>
                 <th>Hit rate</th>
                 <th>Q1</th>
                 <th>Q3</th>
@@ -146,6 +148,11 @@ export default function PerformanceSection() {
                       <td>{cell.n}</td>
                       <td className={_tone(cell.median)}>
                         {cell.median == null ? "—" : `${cell.median > 0 ? "+" : ""}${cell.median}%`}
+                      </td>
+                      <td className="perf-ci">
+                        {cell.ci95
+                          ? `${cell.ci95.low > 0 ? "+" : ""}${cell.ci95.low}% → ${cell.ci95.high > 0 ? "+" : ""}${cell.ci95.high}%`
+                          : "n<30"}
                       </td>
                       <td>
                         {showHit
@@ -169,7 +176,10 @@ export default function PerformanceSection() {
         Untrackable = delisted / suspended / yfinance fetch failed. Window not
         closed = forward horizon still open (not a failure). Tracked
         separately, never silently dropped. Hit rate shown only when N ≥ {HIT_RATE_N_FLOOR}.
-        Overlapping T+20 windows across consecutive scans are autocorrelated —
+        Mean 95% CI is a deterministic (seeded) bootstrap interval for the
+        cohort mean, shown when N ≥ 30 — a CI spanning 0 means the bucket's
+        edge over Nifty is not established at this sample size. Overlapping
+        T+20 windows across consecutive scans are autocorrelated —
         do not pool per-name rows.
       </p>
 
@@ -229,6 +239,8 @@ export default function PerformanceSection() {
           </p>
         </>
       )}
+
+      <PerSymbolAccuracy data={data} />
     </section>
   );
 }

@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-09-06 (1.3.3).
+> Last updated: 2026-09-06 (1.4.0).
 
 ## Project Overview
 
@@ -100,7 +100,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── holdings.py        # Screener.in shareholding scraper + cache
 │   ├── corporate_actions.py # NSE corporate-actions endpoint + cache
 │   ├── earnings.py        # yfinance earnings-date lookup (gate-passed names only)
-│   ├── performance.py     # Forward returns, pass_v2 buckets, trackable meta
+│   ├── performance.py     # Forward returns, pass_v3 buckets + bootstrap CI, trackable meta
 │   ├── yf_retry.py        # Shared 429 retry + rate-limit cache predicate
 │   ├── surveillance.py    # NSE/BSE T-group/suspension/GSM fetcher
 │   ├── bhavcopy.py        # Multi-provider delivery data (NSE/yfinance/BSE)
@@ -119,7 +119,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── compute_performance.py     # C1: outcome tracker CLI (weekly workflow)
 │   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
 │   ├── cache/             # On-disk JSON cache (gitignored, restored via actions/cache@v6)
-│   └── tests/             # 184 tests, all run in ~1s
+│   └── tests/             # 189 tests, all run in ~1s
 ├── frontend/
 │   ├── public/data/
 │   │   ├── latest_scan.json    # Committed by scan.yml after each run
@@ -153,7 +153,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ├── plans/                        # Older planning docs (kept for context)
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.3.3)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.4.0)
 └── AGENTS.md                     # ← you are here
 ```
 
@@ -165,7 +165,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pytest -q                                            # 184 tests, ~1s
+pytest -q                                            # 189 tests, ~1s
 python scanner.py --top-n 500 --workers 8 --sleep 0.3 \
     --lenient-external-gates \
     --output ../frontend/public/data/latest_scan.json
@@ -556,7 +556,7 @@ Two places, kept in sync by `backend/scripts/check_cron_consistency.py`
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 184 tests in ~1s
+.venv/bin/python -m pytest -q          # 189 tests in ~1s
 ```
 
 Coverage (manual map):
@@ -581,7 +581,7 @@ list.
 ## See also
 
 - `README.md` — user-facing docs (setup, methodology, operational risks)
-- `CHANGELOG.md` — versioned release notes (current: 1.3.3)
+- `CHANGELOG.md` — versioned release notes (current: 1.4.0)
 - `netlify.toml` — build config + cache-control headers
 - `backend/scripts/check_cron_consistency.py` — CI guard (cron windows)
 - `backend/scripts/check_workflow_scripts.py` — CI guard (script import path)

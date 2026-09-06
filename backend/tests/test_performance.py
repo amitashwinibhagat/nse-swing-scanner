@@ -1,6 +1,7 @@
 """Tests for backend/performance.py (C1 plan item + P0 integrity)."""
 import datetime
 import os
+import random
 import sys
 import unittest
 from unittest.mock import patch
@@ -53,15 +54,57 @@ class TestCohortStats(unittest.TestCase):
 
 
 class TestScoreBucket(unittest.TestCase):
-    def test_pass_v2_buckets(self):
-        self.assertEqual(performance.score_bucket(85.0), "60+")
-        self.assertEqual(performance.score_bucket(60.0), "60+")
-        self.assertEqual(performance.score_bucket(59.9), "55-59")
-        self.assertEqual(performance.score_bucket(55.0), "55-59")
-        self.assertEqual(performance.score_bucket(54.9), "50-54")
-        self.assertEqual(performance.score_bucket(50.0), "50-54")
-        self.assertEqual(performance.score_bucket(49.9), "<50")
+    def test_pass_v3_buckets(self):
+        self.assertEqual(performance.score_bucket(85.0), "63+")
+        self.assertEqual(performance.score_bucket(63.0), "63+")
+        self.assertEqual(performance.score_bucket(62.9), "60-63")
+        self.assertEqual(performance.score_bucket(60.0), "60-63")
+        self.assertEqual(performance.score_bucket(59.9), "55-60")
+        self.assertEqual(performance.score_bucket(55.0), "55-60")
+        self.assertEqual(performance.score_bucket(54.9), "45-55")
+        self.assertEqual(performance.score_bucket(45.0), "45-55")
+        self.assertEqual(performance.score_bucket(44.9), "<45")
+        self.assertEqual(performance.score_bucket(21.9), "<45")
         self.assertEqual(performance.score_bucket(None), "unknown")
+
+    def test_pass_v2_legacy_unchanged(self):
+        # pass_v2 is kept for re-bucketing historical per_name rows —
+        # its boundaries must never drift.
+        self.assertEqual(performance.score_bucket_pass_v2(85.0), "60+")
+        self.assertEqual(performance.score_bucket_pass_v2(60.0), "60+")
+        self.assertEqual(performance.score_bucket_pass_v2(59.9), "55-59")
+        self.assertEqual(performance.score_bucket_pass_v2(55.0), "55-59")
+        self.assertEqual(performance.score_bucket_pass_v2(54.9), "50-54")
+        self.assertEqual(performance.score_bucket_pass_v2(50.0), "50-54")
+        self.assertEqual(performance.score_bucket_pass_v2(49.9), "<50")
+        self.assertEqual(performance.score_bucket_pass_v2(None), "unknown")
+
+
+class TestBootstrapCI(unittest.TestCase):
+    def test_deterministic(self):
+        vals = sorted(float(i % 7) - 3 + 0.1 * (i % 3) for i in range(120))
+        a = performance.bootstrap_ci(vals)
+        b = performance.bootstrap_ci(vals)
+        self.assertEqual(a, b)
+
+    def test_below_min_n_returns_none(self):
+        self.assertIsNone(performance.bootstrap_ci([1.0, 2.0, 3.0]))
+
+    def test_at_min_n_returns_interval(self):
+        vals = sorted(float(i % 5) - 2 for i in range(performance.BOOTSTRAP_MIN_N))
+        ci = performance.bootstrap_ci(vals)
+        self.assertIsNotNone(ci)
+        self.assertLessEqual(ci["low"], ci["high"])
+
+    def test_interval_brackets_mean_and_tightens_with_n(self):
+        rng = random.Random(1234)
+        vals = sorted(rng.gauss(2.0, 1.0) for _ in range(400))
+        ci = performance.bootstrap_ci(vals)
+        mean = sum(vals) / len(vals)
+        self.assertLess(ci["low"], mean)
+        self.assertGreater(ci["high"], mean)
+        narrow = performance.bootstrap_ci(sorted(rng.gauss(2.0, 1.0) for _ in range(4000)))
+        self.assertLess(narrow["high"] - narrow["low"], ci["high"] - ci["low"])
 
 
 def _scan(symbols_with_scores, idx_pct=-1.5, confirmations=None, generated_at="2026-07-15T10:31:00+00:00"):
@@ -116,20 +159,23 @@ class TestBuildPayload(unittest.TestCase):
 
         self.assertEqual(payload["meta"]["snapshots_used"], 2)
         self.assertEqual(payload["meta"]["total_passed"], 7)
-        self.assertEqual(payload["meta"]["bucket_scheme"], "pass_v2")
+        self.assertEqual(payload["meta"]["bucket_scheme"], "pass_v3")
+        self.assertEqual(payload["meta"]["bucket_scheme_history"], ["pass_v2", "pass_v3"])
         self.assertEqual(payload["retention_days"], 90)
 
         ps20 = [c["windows"]["T+20"]["n"] for c in payload["per_scan"]]
         self.assertEqual(ps20, [3, 3])
 
         buckets = payload["windows"]["T+20"]["buckets"]
-        # A,A,E → 60+ = 3; B,B → 55-59 = 2; C → 50-54 = 1
-        self.assertEqual(buckets["60+"]["n"], 3)
-        self.assertEqual(buckets["55-59"]["n"], 2)
-        self.assertEqual(buckets["50-54"]["n"], 1)
-        self.assertEqual(buckets["<50"]["n"], 0)
-        self.assertEqual(buckets["60+"]["median"], 2.0)
-        self.assertEqual(buckets["60+"]["hit_rate"], 1.0)
+        # A(62),A(61),E(65) → 60-63 = 2, 63+ = 1; B(57),B(56) → 55-60 = 2; C(52) → 45-55
+        self.assertEqual(buckets["63+"]["n"], 1)
+        self.assertEqual(buckets["60-63"]["n"], 2)
+        self.assertEqual(buckets["55-60"]["n"], 2)
+        self.assertEqual(buckets["45-55"]["n"], 1)
+        self.assertEqual(buckets["<45"]["n"], 0)
+        self.assertEqual(buckets["63+"]["median"], 2.0)
+        self.assertEqual(buckets["63+"]["hit_rate"], 1.0)
+        self.assertEqual(buckets["63+"]["ci95"], None)  # n=1 < BOOTSTRAP_MIN_N
 
         self.assertEqual(payload["windows"]["T+20"]["untrackable_count"], 1)
         self.assertEqual(payload["windows"]["T+5"]["untrackable_count"], 1)
@@ -165,7 +211,7 @@ class TestBuildPayload(unittest.TestCase):
         self.assertEqual(payload["per_scan"], [])
         for w_label in ("T+5", "T+10", "T+20"):
             self.assertIn(w_label, payload["windows"])
-            for b in ("60+", "55-59", "50-54", "<50", "unknown"):
+            for b in ("63+", "60-63", "55-60", "45-55", "<45", "unknown"):
                 self.assertEqual(payload["windows"][w_label]["buckets"][b]["n"], 0)
 
 
@@ -195,7 +241,7 @@ class TestRegimeAndPerName(unittest.TestCase):
         by_sym = {r["symbol"]: r for r in per_name}
         self.assertEqual(by_sym["A"]["regime"], "risk_off")
         self.assertEqual(by_sym["A"]["confirmation"], "confirmed")
-        self.assertEqual(by_sym["A"]["bucket"], "60+")
+        self.assertEqual(by_sym["A"]["bucket"], "60-63")
         self.assertEqual(by_sym["B"]["confirmation"], "anticipatory")
         self.assertEqual(by_sym["B"]["windows"]["T+20"]["excess_return_pct"], -1.0)
         self.assertEqual(payload["per_scan"][0]["regime"], "risk_off")
