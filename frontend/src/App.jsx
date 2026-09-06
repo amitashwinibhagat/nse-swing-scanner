@@ -10,7 +10,6 @@ import DeltaStrip from "./components/DeltaStrip.jsx";
 import RecentPicksStrip, { ReceiptsBanner } from "./components/RecentPicksStrip.jsx";
 import PerformanceSection from "./components/PerformanceSection.jsx";
 import useWatchlist from "./utils/useWatchlist.js";
-import { trackEvent, EVENTS } from "./utils/analytics.js";
 import { computeEntryState, confirmationChip, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
 
 function IconSearch() {
@@ -354,9 +353,7 @@ export default function App() {
   }
 
   function toggleDrawer(symbol) {
-    const next = expanded === symbol ? null : symbol;
-    setExpanded(next);
-    if (next) trackEvent(EVENTS.DRAWER_OPEN);
+    setExpanded(expanded === symbol ? null : symbol);
   }
 
   function onRowKey(e, symbol) {
@@ -628,10 +625,7 @@ export default function App() {
           </div>
           <button
             className="export-pill"
-            onClick={() => {
-              exportCsv(rows);
-              trackEvent(EVENTS.CSV_EXPORT);
-            }}
+            onClick={() => exportCsv(rows)}
             title="Export current view as CSV"
           >
             <IconDownload />

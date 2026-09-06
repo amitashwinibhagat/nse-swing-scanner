@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.1 — Remove analytics (owner decision)
+
+### Removed
+
+- Fathom analytics integration (loader, event wiring, CSP origin,
+  `VITE_FATHOM_SITE_ID` plumbing) — skipped by owner decision before it
+  was ever activated. No data was ever collected; the CSP is back to
+  `script-src 'self'`.
+- `docs/analytics.md` retained as the north-star metric definition
+  (weekly engaged sessions) plus a decision log, so re-adding a
+  privacy-first provider later is a documented, single-commit path.
+
 ## 1.5.0 — Continuous feedback loop (report-only)
 
 ### Why
