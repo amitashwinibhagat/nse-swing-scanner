@@ -1,5 +1,61 @@
 # Changelog
 
+## 1.4.0 — Analytics: bootstrap CIs, pass_v3 buckets, per-symbol accuracy lookup
+
+### Why
+
+The forward-return attribution view answered "did the scanner's picks beat
+Nifty?" but not "how sure are we?" — bare medians from small cohorts invite
+over-reading. Separately, the fine-band review of per_name rows (69
+snapshots, n=1454, 2026-09-06) showed the pass_v2 5-point bands were hiding
+the top-end inflection: 60-64 behaved materially differently from 63+, while
+55-59 was the worst cohort at every horizon.
+
+### Added
+
+- **Bootstrap 95% CI for cohort means** (`performance.py: bootstrap_ci`):
+  percentile method, 500 resamples, deterministic via a fixed seed
+  (BOOTSTRAP_SEED=20260906) so weekly tracker output stays reproducible and
+  diffable. Reported as `ci95` on every cohort_stats cell; None below
+  BOOTSTRAP_MIN_N=30 rather than a misleadingly precise interval. CI is for
+  the MEAN (smooth bootstrap distribution), not the median.
+- **Per-symbol accuracy lookup** (`PerSymbolAccuracy.jsx`): search any
+  suggested symbol and see score-at-suggestion-time vs realized excess
+  returns per snapshot and window. Grouped client-side from per_name rows;
+  open/untrackable windows are shown as their reason, never dropped;
+  per-symbol hit rate shown only at >= 3 trackable T+5 outcomes.
+- Dashboard: new "Mean 95% CI" column in the bucket table; the fineprint
+  explains that a CI spanning 0 means the bucket's edge is not established
+  at this sample size.
+
+### Changed
+
+- **Score buckets pass_v2 -> pass_v3**: `63+` / `60-63` / `55-60` / `45-55`
+  / `<45`. Finer cut at the top (where the edge concentrates), the weak
+  band kept visible instead of merged away, mid-range left coarse where the
+  fine-band signal is a coin flip. Cut points come from the fine-band
+  review, not an optimisation pass. `score_bucket_pass_v2` is retained
+  (boundary-frozen, unit-tested) for old-scheme views; regeneration
+  re-buckets history losslessly from stored per-name scores.
+- `performance.json` regenerated offline with pass_v3 + CIs so the new view
+  is live immediately (T+5 trackable rose 1053 -> 1064: fresher prices
+  resolved the 11 previously untrackable rows).
+
+### What the CIs show (as of 2026-09-05 data)
+
+- `63+` is the only bucket with a CI entirely above zero at every window
+  (T+5 mean +3.76% [+2.56, +4.95]; T+10 +5.29% [+3.77, +6.85]; T+20
+  +6.04% [+2.89, +9.16]).
+- `55-60` is significantly BELOW the index at T+5 (mean -0.55%
+  [-0.97, -0.16]) — the scanner's mid-upper band is actively worse than
+  its low band at the short horizon.
+- Mid/low buckets straddle zero at most windows — no established edge.
+
+### Validation
+
+- 189 pytest passes (+5: bucket scheme, legacy freeze, bootstrap CI);
+- frontend build green.
+
 ## 1.3.3 — Ops: watchdog dedup, single CI pipeline, schedule source of truth
 
 ### Why

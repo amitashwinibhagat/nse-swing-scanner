@@ -16,6 +16,9 @@ Statistical rules (per the strategic review §6 — non-negotiable):
   - Compute excess return per-name vs ^NSEI over the same window — pooled
     stock returns without subtracting the index overstate hit rate in
     bull regimes and understate it in bear regimes.
+  - Report a deterministic bootstrap 95% CI for the cohort mean (seeded;
+    None below BOOTSTRAP_MIN_N) so interval width is visible — cohorts
+    are small and skewed, and a bare median invites over-reading.
 
 Cohorts: T+5, T+10, T+20 trading sessions from the snapshot date.
 Trailing window: matches snapshot retention (90 days).
@@ -28,6 +31,7 @@ from __future__ import annotations
 import datetime
 import json
 import os
+import random
 import statistics
 import time
 from collections import Counter
@@ -37,10 +41,33 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple
 # windows; widen cautiously — small-sample noise grows fast.
 WINDOWS = [5, 10, 20]
 
-# Bucket scheme pass_v2 — cut points match observed PASS score mass
-# (almost all live PASSes cluster 45–62; aspirational 70/80 bands stayed empty).
-BUCKET_SCHEME = "pass_v2"
-BUCKET_ORDER = ["60+", "55-59", "50-54", "<50", "unknown"]
+# Bucket scheme history:
+#   pass_v2 — 60+/55-59/50-54/<50. Fine bands showed 60-64 behaving
+#             differently from 63+ while 55-59 was the worst cohort, so the
+#             5-point bands hid the top-end inflection (1.4.0 review).
+#   pass_v3 — current. Finer cut at the top (63+), weak band kept visible
+#             (55-60) rather than merged away, mid-range left coarse
+#             (45-55) where the fine-band signal is a coin flip. Cut points
+#             come from the 2026-09-06 fine-band review of per_name rows
+#             (69 snapshots, n=1454); not from an optimisation pass.
+# BUCKET_BANDS pairs each label with its INCLUSIVE lower bound, descending.
+# Anything below the last lower bound falls into "<45". Keep BUCKET_ORDER
+# (display order, consumed by meta.buckets and the empty bucket maps) in sync.
+BUCKET_SCHEME = "pass_v3"
+BUCKET_BANDS = [("63+", 63), ("60-63", 60), ("55-60", 55), ("45-55", 45)]
+BUCKET_ORDER = [label for label, _ in BUCKET_BANDS] + ["<45", "unknown"]
+
+# Deterministic bootstrap CI for cohort means.
+# BOOTSTRAP_SEED pins the resampling RNG so identical input always yields
+# identical intervals — the weekly tracker output stays diffable/reproducible.
+# BOOTSTRAP_ITERS=500 keeps the 2.5/97.5 percentile endpoints stable enough
+# for display without a visible runtime cost in the weekly CLI.
+# BOOTSTRAP_MIN_N: below ~30 the percentile bootstrap for a mean is mostly
+# noise (and wide open); report None instead of a misleadingly precise
+#-looking interval.
+BOOTSTRAP_SEED = 20260906
+BOOTSTRAP_ITERS = 500
+BOOTSTRAP_MIN_N = 30
 
 # Reasons that mean "not yet measurable" rather than fetch failure.
 WINDOW_NOT_CLOSED = "window_not_closed"
@@ -63,8 +90,10 @@ def _percentile(sorted_vals: List[float], p: float) -> Optional[float]:
 
 def cohort_stats(returns_pct: List[float]) -> dict:
     """
-    Median + IQR + N + hit_rate for one cohort.
+    Median + IQR + N + mean + hit_rate + bootstrap CI for one cohort.
     hit_rate = fraction with excess_return_pct > 0 (None when empty).
+    ci95 = deterministic bootstrap 95% CI for the mean (None when n <
+    BOOTSTRAP_MIN_N — see bootstrap_ci).
     """
     if not returns_pct:
         return {
@@ -74,6 +103,7 @@ def cohort_stats(returns_pct: List[float]) -> dict:
             "q3": None,
             "mean": None,
             "hit_rate": None,
+            "ci95": None,
         }
     s = sorted(returns_pct)
     median = statistics.median(s)
@@ -88,11 +118,37 @@ def cohort_stats(returns_pct: List[float]) -> dict:
         "q3": round(q3, 2) if q3 is not None else None,
         "mean": round(mean, 2),
         "hit_rate": round(hits / len(s), 3),
+        "ci95": bootstrap_ci(s),
     }
 
 
-def score_bucket(score: Optional[float]) -> str:
-    """pass_v2 buckets aligned to live PASS score distribution."""
+def bootstrap_ci(sorted_vals: List[float]) -> Optional[dict]:
+    """
+    Deterministic bootstrap 95% CI for the cohort MEAN (percentile method).
+
+    Mean, not median: with BOOTSTRAP_ITERS resamples the mean's bootstrap
+    distribution is smooth, while a median CI from an ordered sample is
+    dominated by the middle order statistics (granular and sticky).
+    Fixed BOOTSTRAP_SEED means repeated weekly runs produce identical
+    output for identical input. Returns None below BOOTSTRAP_MIN_N.
+    """
+    n = len(sorted_vals)
+    if n < BOOTSTRAP_MIN_N:
+        return None
+    rng = random.Random(BOOTSTRAP_SEED)
+    means: List[float] = []
+    for _ in range(BOOTSTRAP_ITERS):
+        counts = Counter(rng.choices(range(n), k=n))
+        means.append(sum(v * counts.get(i, 0) for i, v in enumerate(sorted_vals)) / n)
+    means.sort()
+    return {
+        "low": round(_percentile(means, 2.5), 2),
+        "high": round(_percentile(means, 97.5), 2),
+    }
+
+
+def score_bucket_pass_v2(score: Optional[float]) -> str:
+    """Legacy 1.3.x bucketing, kept for re-bucketing historical per_name rows."""
     if not isinstance(score, (int, float)):
         return "unknown"
     if score >= 60:
@@ -102,6 +158,16 @@ def score_bucket(score: Optional[float]) -> str:
     if score >= 50:
         return "50-54"
     return "<50"
+
+
+def score_bucket(score: Optional[float]) -> str:
+    """pass_v3 buckets — see BUCKET_BANDS / BUCKET_ORDER above."""
+    if not isinstance(score, (int, float)):
+        return "unknown"
+    for label, lower in BUCKET_BANDS:
+        if score >= lower:
+            return label
+    return "<45"
 
 
 # Regime tag thresholds — mirror the frontend regime chip (scanPlan.js).
@@ -288,6 +354,12 @@ def build_performance_payload(
             "windows": WINDOWS,
             "regimes": ["risk_on", "neutral", "risk_off", "unknown"],
             "bucket_scheme": BUCKET_SCHEME,
+            # Schemes that ever produced a committed performance.json.
+            # per_name bucket labels are computed at build time with the
+            # CURRENT scheme — regeneration re-buckets history from the
+            # stored scores (lossless: score is the immutable source of
+            # truth; score_bucket_pass_v2 is retained for old-scheme views).
+            "bucket_scheme_history": ["pass_v2", "pass_v3"],
             "buckets": [b for b in BUCKET_ORDER if b != "unknown"],
             "trackable_count": { _window_label(w): per_window_trackable[w] for w in WINDOWS },
             "untrackable_count": { _window_label(w): per_window_untrackable[w] for w in WINDOWS },

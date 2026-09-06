@@ -1357,6 +1357,35 @@ body {
   margin: var(--sp-4) 0 var(--sp-2);
 }
 
+/* Per-symbol accuracy lookup (1.4.0) */
+.per-symbol-accuracy {
+  margin-top: var(--sp-4);
+}
+.per-symbol-search {
+  width: 100%;
+  max-width: 320px;
+  padding: 8px 12px;
+  margin-bottom: var(--sp-3);
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+.per-symbol-search:focus {
+  outline: none;
+  border-color: var(--accent, #6366f1);
+}
+.per-symbol-accuracy .perf-table tr[style] td {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.perf-ci {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
 /* =========================================================================
    View toggle (icon-only segmented control)
    ========================================================================= */
