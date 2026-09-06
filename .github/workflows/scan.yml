@@ -198,10 +198,12 @@ jobs:
           # truth alongside SCAN_WINDOWS_UTC in settings.py. The CI guard
           # check_cron_consistency.py fails if the crons in `on.schedule`
           # above drift from that list.
-          sys.path.insert(0, os.getcwd())   # ensure backend/ is importable
-          from scan_schedule import WINDOWS, attribute_window, next_scheduled_window, scheduled_cron_string
-
           try:
+              # Import INSIDE the try: this step is best-effort metadata, so an
+              # import error (e.g. scan_schedule.py renamed without updating
+              # this heredoc) must warn, not fail the whole scan job.
+              sys.path.insert(0, os.getcwd())   # ensure backend/ is importable
+              from scan_schedule import WINDOWS, attribute_window, next_scheduled_window, scheduled_cron_string
               event = os.environ["GH_EVENT_NAME"]
               scan = json.load(open("../frontend/public/data/latest_scan.json"))
               now = datetime.datetime.now(datetime.timezone.utc)
