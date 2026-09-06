@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { trackEvent, EVENTS } from "../utils/analytics.js";
 import PerSymbolAccuracy from "./PerSymbolAccuracy.jsx";
 
 const PERFORMANCE_URL = "/data/performance.json";
@@ -107,7 +106,7 @@ export default function PerformanceSection() {
           const label = `${t.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
           return (
             <span>
-              Weekly digest: <a href={`/digests/${label}.md`} onClick={() => trackEvent(EVENTS.DIGEST_OPEN)}>{label}</a>
+              Weekly digest: <a href={`/digests/${label}.md`}>{label}</a>
             </span>
           );
         })()}
