@@ -76,7 +76,12 @@ def main(argv=None) -> int:
     )
     args = p.parse_args(argv)
 
-    cache_dir = args.cache_dir or os.path.join(os.path.dirname(args.snapshots), "..", "..", "backend", "cache")
+    # Default anchors to this script's backend dir, NOT the snapshots path:
+    # snapshots may live anywhere (e.g. ../frontend/public/data/snapshots),
+    # and a snapshots-relative default once resolved to frontend/backend/cache,
+    # which a `git add -A` then swept into the repo (1.4.0). Production always
+    # passes --cache-dir explicitly; this default only guards local runs.
+    cache_dir = args.cache_dir or os.path.join(_BACKEND_DIR, "cache")
     cache_dir = os.path.abspath(cache_dir)
 
     snapshots = load_snapshots(args.snapshots)
