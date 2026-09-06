@@ -1,0 +1,269 @@
+{
+ "confirmation_ab": {
+  "T+10": {
+   "anticipatory": {
+    "ci95": {
+     "high": 1.34,
+     "low": 0.63
+    },
+    "hit_rate": 0.469,
+    "mean": 0.97,
+    "median": -0.23,
+    "n": 721,
+    "q1": -2.1,
+    "q3": 2.97
+   },
+   "confirmed": {
+    "ci95": {
+     "high": 2.52,
+     "low": 0.73
+    },
+    "hit_rate": 0.549,
+    "mean": 1.6,
+    "median": 0.12,
+    "n": 113,
+    "q1": -1.41,
+    "q3": 3.12
+   }
+  },
+  "T+20": {
+   "anticipatory": {
+    "ci95": {
+     "high": 2.68,
+     "low": 1.1
+    },
+    "hit_rate": 0.528,
+    "mean": 1.85,
+    "median": 0.32,
+    "n": 335,
+    "q1": -3.29,
+    "q3": 4.85
+   },
+   "confirmed": {
+    "ci95": {
+     "high": 2.85,
+     "low": -0.08
+    },
+    "hit_rate": 0.427,
+    "mean": 1.43,
+    "median": -0.93,
+    "n": 89,
+    "q1": -3.52,
+    "q3": 5.97
+   }
+  },
+  "T+5": {
+   "anticipatory": {
+    "ci95": {
+     "high": 0.86,
+     "low": 0.38
+    },
+    "hit_rate": 0.5,
+    "mean": 0.63,
+    "median": -0.01,
+    "n": 916,
+    "q1": -1.57,
+    "q3": 1.83
+   },
+   "confirmed": {
+    "ci95": {
+     "high": 1.62,
+     "low": 0.51
+    },
+    "hit_rate": 0.574,
+    "mean": 1.0,
+    "median": 0.5,
+    "n": 148,
+    "q1": -0.95,
+    "q3": 2.11
+   }
+  }
+ },
+ "generated_at": "2026-09-06T15:53:09.611392+00:00",
+ "meta": {
+  "baseline_weights": {
+   "conviction_holding": 0.1,
+   "drawdown_sweetspot": 0.1,
+   "oversold_positioning": 0.15,
+   "quality_composite": 0.2,
+   "support_proximity": 0.15,
+   "valuation_compression": 0.2,
+   "volume_capitulation": 0.1
+  },
+  "bootstrap_resamples": 300,
+  "bootstrap_seed": 42,
+  "ic_min_n": 30,
+  "in_sample": true,
+  "rows_closed_any_window": 1064,
+  "rows_total": 1454
+ },
+ "promotion_checklist": [
+  "Out-of-sample: the candidate weights beat baseline on the tracker's top-band mean excess for 4 consecutive weekly runs (not just this in-sample report).",
+  "The candidate's top-band (63+) T+5 mean CI sits above the baseline's, with n >= 20 in both.",
+  "No band's hit rate regresses by more than 5 points without a documented trade-off rationale.",
+  "The weight change is a single commit touching only backend/settings.py WEIGHTS + CHANGELOG.md, so the tracker can attribute the regime change to score_version."
+ ],
+ "shadow": {
+  "baseline_score_mismatch_gt5": 0,
+  "rows_used": 0,
+  "windows": {
+   "T+10": {
+    "baseline": {},
+    "ic_proportional": {}
+   },
+   "T+20": {
+    "baseline": {},
+    "ic_proportional": {}
+   },
+   "T+5": {
+    "baseline": {},
+    "ic_proportional": {}
+   }
+  }
+ },
+ "subscore_ic": {
+  "T+10": {
+   "conviction_holding": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "drawdown_sweetspot": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "oversold_positioning": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "quality_composite": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "support_proximity": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "valuation_compression": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "volume_capitulation": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   }
+  },
+  "T+20": {
+   "conviction_holding": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "drawdown_sweetspot": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "oversold_positioning": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "quality_composite": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "support_proximity": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "valuation_compression": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "volume_capitulation": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   }
+  },
+  "T+5": {
+   "conviction_holding": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "drawdown_sweetspot": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "oversold_positioning": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "quality_composite": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "support_proximity": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "valuation_compression": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   },
+   "volume_capitulation": {
+    "ci95": null,
+    "ic": null,
+    "n": 0,
+    "usable": false
+   }
+  }
+ },
+ "top_band_lift": {
+  "T+10": {
+   "ic_proportional": null
+  },
+  "T+20": {
+   "ic_proportional": null
+  },
+  "T+5": {
+   "ic_proportional": null
+  }
+ }
+}

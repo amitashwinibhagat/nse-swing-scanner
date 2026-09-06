@@ -269,6 +269,11 @@ def build_performance_payload(
                 "bucket": bucket,
                 "regime": scan_regime,
                 "confirmation": confirmation,
+                # 1.5.0 feedback loop: raw component scores + the weights
+                # regime that produced them, so evaluate_feedback.py can
+                # re-score history under candidate weight sets.
+                "sub_scores": s.get("sub_scores") if isinstance(s.get("sub_scores"), dict) else None,
+                "score_version": s.get("score_version"),
                 "windows": {},
             }
             for w in WINDOWS:

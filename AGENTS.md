@@ -117,6 +117,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── watchdog_check.py          # Watchdog trigger decision (dedup logic)
 │   │   ├── snapshot_writer.py         # B1: dated snapshots + history_index + 90d prune
 │   │   ├── compute_performance.py     # C1: outcome tracker CLI (weekly workflow)
+│   │   ├── evaluate_feedback.py       # 1.5.0: sub-score ICs + shadow re-scoring (report-only)
+│   │   ├── generate_digest.py         # 1.4.3: public weekly accuracy digest (markdown)
 │   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
 │   ├── cache/             # On-disk JSON cache (gitignored, restored via actions/cache@v6)
 │   └── tests/             # 189 tests, all run in ~1s
@@ -159,7 +161,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   └── analytics.md          # North-star metric + instrumentation contract
 ├── netlify.toml                  # Build config + cache-control + CSP (1 analytics origin)
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.4.2)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.5.0)
 └── AGENTS.md                     # ← you are here
 ```
 

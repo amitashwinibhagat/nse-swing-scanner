@@ -63,6 +63,7 @@ from settings import (
     UNIVERSE_DEFAULT_TOP_N,
     UNIVERSE_DEFAULT_WORKERS,
     WEIGHTS,
+    SCORE_VERSION,
 )
 
 
@@ -925,6 +926,8 @@ def to_json_records(df: pd.DataFrame) -> list:
             ),
             "swing_score": _json_safe(r.get("swing_score")),
             "sub_scores": _json_safe(r.get("sub_scores")) if isinstance(r.get("sub_scores"), dict) else None,
+            # 1.5.0 feedback loop: which weight regime produced this score.
+            "score_version": SCORE_VERSION,
             # B3: earnings proximity (gate-passed names only)
             "earnings_date": (
                 _json_safe(r.get("earnings_data", {}).get("earnings_date"))

@@ -60,6 +60,17 @@ jobs:
             --output ../frontend/public/data/performance.json \
             --cache-dir cache
 
+      - name: Evaluate feedback loop
+        # 1.5.0: close the loop — sub-score ICs + shadow re-scoring evidence
+        # from the labelled rows. Report-only; weight promotion stays a
+        # human decision gated by the checklist in the report.
+        working-directory: backend
+        run: |
+          python scripts/evaluate_feedback.py \
+            --performance ../frontend/public/data/performance.json \
+            --out ../docs/feedback/feedback-latest.json \
+            --report ../docs/feedback/feedback-report.md
+
       - name: Generate weekly digest
         # Public accuracy digest (1.4.3): committed under frontend/public/
         # digests/ so Netlify serves it at /digests/YYYY-Www.md with no
@@ -71,11 +82,11 @@ jobs:
             --out ../frontend/public/digests/$(date -u +'%G-W%V').md \
             --site-base https://nse-swing-scanner.netlify.app
 
-      - name: Commit and push performance.json + digest
+      - name: Commit and push performance.json + feedback + digest
         run: |
           git config user.name "nse-swing-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add frontend/public/data/performance.json frontend/public/digests/ || true
+          git add frontend/public/data/performance.json frontend/public/digests/ docs/feedback/ || true
           git diff --staged --quiet && echo "No changes to performance.json" && exit 0
           git commit -m "Performance update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           ## Resolve any rebase conflicts in favour of our new commit

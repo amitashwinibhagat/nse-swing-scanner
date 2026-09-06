@@ -1,5 +1,67 @@
 # Changelog
 
+## 1.5.0 — Continuous feedback loop (report-only)
+
+### Why
+
+The outcome tracker measures what happened to every suggestion, but nothing
+flowed back into the scoring weights — tuning was vibes. This closes the
+loop: attribution data now produces direct evidence about which score
+components predict outcomes, and shadows candidate weight sets against the
+baseline on the same labelled rows.
+
+### Added
+
+- **`backend/scripts/evaluate_feedback.py`** (weekly workflow, stdlib-only,
+  deterministic seed): sub-score rank ICs per window with bootstrap CIs,
+  regime-split ICs, confirmation A/B cohorts, and **shadow re-scoring** —
+  every closed row re-scored from its stored `sub_scores` under candidate
+  weight sets (same renormalised blend as `scanner.py`), re-bucketed with
+  pass_v3 bands, compared vs baseline.
+- **`sub_scores` + `score_version` in `per_name` rows** (performance.py) —
+  the labelled data the ICs need; older rows carry nulls and are skipped,
+  so IC cohorts fill in as new snapshots land.
+- **`SCORE_VERSION` stamp** (settings.py, emitted per row by
+  scanner.to_json_records): every score now carries the identity of the
+  weight regime that produced it, so a weight change is attributable in
+  tracker data. Promotion protocol: bump it in the same commit as WEIGHTS.
+- **`docs/feedback/feedback-report.md` + `feedback-latest.json`** —
+  committed weekly by outcome-tracker.yml alongside performance.json.
+- **Promotion checklist** embedded in every report: out-of-sample
+  confirmation (4 consecutive weekly runs), CI comparison, no unexplained
+  hit-rate regression, single-purpose commit. REPORT-ONLY by design — no
+  auto-optimizer; a single-regime sample would make auto-fitting a
+  overfitting machine.
+
+### Notes
+
+- First report's sub-score ICs are n=0: snapshots predating 1.5.0 store no
+  `sub_scores` in per_name. Cohorts accrue automatically from the next
+  scan onward. The confirmation A/B already has signal (n=148/916).
+
+## 1.4.3 — Privacy-first analytics + public weekly digest + mobile fixes
+
+### Added
+
+- **Fathom analytics** (`frontend/src/utils/analytics.js`): cookieless,
+  fail-silent, no-op unless `VITE_FATHOM_SITE_ID` is set at build time.
+  Four fixed-name events (`drawer_open`, `per_symbol_lookup`,
+  `csv_export`, `digest_open`); CSP scoped to the single analytics
+  origin in netlify.toml. `docs/analytics.md` is the contract: north-star
+  metric = weekly engaged sessions (visitors who open a drawer), plus the
+  event map and what we deliberately refuse to measure.
+- **Public weekly digest** (`backend/scripts/generate_digest.py` →
+  `frontend/public/digests/YYYY-Www.md`): deterministic markdown scoreboard
+  of the tracker's measured accuracy, committed weekly by
+  outcome-tracker.yml, linked from the performance section (`digest_open`
+  tracked). First digest: `2026-W36.md`.
+- **Mobile fixes (≤600px)**: receipts banner stacks; pick chips wrap.
+
+### Notes
+
+- Unconfigured builds make zero analytics requests (local dev and forks
+  are untracked by construction).
+
 ## 1.4.2 — Trust surface: receipts banner + recent-picks scorecard
 
 ### Why
