@@ -1781,6 +1781,21 @@ body {
 }
 
 @media (max-width: 600px) {
+  .receipts-banner {
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+  }
+
+  .recent-picks-chips .recent-pick {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .recent-picks-chips {
+    gap: var(--sp-1);
+  }
+
   .stock-grid {
     grid-template-columns: 1fr;
   }

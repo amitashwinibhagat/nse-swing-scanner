@@ -10,6 +10,7 @@ import DeltaStrip from "./components/DeltaStrip.jsx";
 import RecentPicksStrip, { ReceiptsBanner } from "./components/RecentPicksStrip.jsx";
 import PerformanceSection from "./components/PerformanceSection.jsx";
 import useWatchlist from "./utils/useWatchlist.js";
+import { trackEvent, EVENTS } from "./utils/analytics.js";
 import { computeEntryState, confirmationChip, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
 
 function IconSearch() {
@@ -352,10 +353,16 @@ export default function App() {
     }
   }
 
+  function toggleDrawer(symbol) {
+    const next = expanded === symbol ? null : symbol;
+    setExpanded(next);
+    if (next) trackEvent(EVENTS.DRAWER_OPEN);
+  }
+
   function onRowKey(e, symbol) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      setExpanded(expanded === symbol ? null : symbol);
+      toggleDrawer(symbol);
     }
   }
 
@@ -621,7 +628,10 @@ export default function App() {
           </div>
           <button
             className="export-pill"
-            onClick={() => exportCsv(rows)}
+            onClick={() => {
+              exportCsv(rows);
+              trackEvent(EVENTS.CSV_EXPORT);
+            }}
             title="Export current view as CSV"
           >
             <IconDownload />
@@ -732,7 +742,7 @@ export default function App() {
                 key={s.symbol}
                 stock={s}
                 expanded={expanded === s.symbol}
-                onToggle={() => setExpanded(expanded === s.symbol ? null : s.symbol)}
+                onToggle={() => toggleDrawer(s.symbol)}
                 watchlist={watchlist}
               />
             ))}
@@ -775,7 +785,7 @@ export default function App() {
             {rows.map((s) => (
               <Fragment key={s.symbol}>
                 <tr
-                  onClick={() => setExpanded(expanded === s.symbol ? null : s.symbol)}
+                  onClick={() => toggleDrawer(s.symbol)}
                   onKeyDown={(e) => onRowKey(e, s.symbol)}
                   tabIndex={0}
                   role="button"

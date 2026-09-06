@@ -23,7 +23,11 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; script-src 'self'; frame-ancestors 'none'"
+    # cdn.usefathom.com is the single third-party origin allowed: the
+    # privacy-first, cookieless analytics script (see docs/analytics.md).
+    # connect-src stays 'self' — Fathom's beacon posts back to its script
+    # origin, which script-src already covers.
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; script-src 'self' https://cdn.usefathom.com; frame-ancestors 'none'"
 
 [[headers]]
   for = "/data/*"
