@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-07T05:51:59.862349+00:00",
+  "generated_at": "2026-09-07T08:34:54.044577+00:00",
   "universe_size": 501,
   "gate_pass_count": 49,
   "coverage": {
@@ -45586,115 +45586,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "LICHSGFIN",
-      "company_name": "LIC Housing Finance Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "LICHSGFIN.NS",
-      "current_price": 561.4,
-      "fifty_two_wk_high": 581.77,
-      "pct_off_52wk_high": -3.5,
-      "pct_from_ema200": 6.22,
-      "rsi14": 72.74,
-      "atr14": 13.01,
-      "entry_zone_low": 554.9,
-      "entry_zone_high": 561.4,
-      "stop_loss": 545.14,
-      "target_1": 577.66,
-      "target_2": 590.67,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.46,
-      "adtv_value_inr_approx": 1546927288.0,
-      "f_score": 4.0,
-      "f_score_components_available": 7.0,
-      "avg_pe_5y": 5.7,
-      "trailing_pe": 5.38,
-      "delivery_value_inr": 417829683.88848877,
-      "delivery_qty": 744529.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-07",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 1695982347.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": 6.84,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 1.41,
-      "swing_high_63d": 579.4,
-      "atr_expansion_ratio": 1.22,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -2.55,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; pct_off_high -3.5 outside [-40.0,-15.0]; rsi 72.74 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -3.5 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 72.74 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 15.6,
-      "sub_scores": {
-        "valuation_compression": 0.14035087719298256,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.22999999999999998,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "LTFOODS",
       "company_name": "LT Foods Ltd.",
       "industry": "Fast Moving Consumer Goods",
@@ -45796,6 +45687,115 @@
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.07499999999999996,
         "quality_composite": 0.6666666666666666,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "LICHSGFIN",
+      "company_name": "LIC Housing Finance Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "LICHSGFIN.NS",
+      "current_price": 561.4,
+      "fifty_two_wk_high": 581.77,
+      "pct_off_52wk_high": -3.5,
+      "pct_from_ema200": 6.22,
+      "rsi14": 72.74,
+      "atr14": 13.01,
+      "entry_zone_low": 554.9,
+      "entry_zone_high": 561.4,
+      "stop_loss": 545.14,
+      "target_1": 577.66,
+      "target_2": 590.67,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.46,
+      "adtv_value_inr_approx": 1546927288.0,
+      "f_score": 4.0,
+      "f_score_components_available": 7.0,
+      "avg_pe_5y": 5.7,
+      "trailing_pe": 5.38,
+      "delivery_value_inr": 417829683.88848877,
+      "delivery_qty": 744529.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-07",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 1695982347.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": 6.84,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 1.41,
+      "swing_high_63d": 579.4,
+      "atr_expansion_ratio": 1.22,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -2.55,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; pct_off_high -3.5 outside [-40.0,-15.0]; rsi 72.74 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -3.5 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 72.74 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 15.6,
+      "sub_scores": {
+        "valuation_compression": 0.14035087719298256,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.22999999999999998,
+        "quality_composite": 0.4444444444444444,
         "conviction_holding": null
       },
       "score_version": "weights-2026-06-v1",
@@ -50709,115 +50709,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "PNBHOUSING",
-      "company_name": "PNB Housing Finance Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "PNBHOUSING.NS",
-      "current_price": 1173.6,
-      "fifty_two_wk_high": 1185.0,
-      "pct_off_52wk_high": -0.96,
-      "pct_from_ema200": 17.99,
-      "rsi14": 60.04,
-      "atr14": 28.83,
-      "entry_zone_low": 1159.18,
-      "entry_zone_high": 1173.6,
-      "stop_loss": 1137.56,
-      "target_1": 1209.64,
-      "target_2": 1238.47,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.63,
-      "adtv_value_inr_approx": 1202126827.0,
-      "f_score": 4.0,
-      "f_score_components_available": 7.0,
-      "avg_pe_5y": 9.71,
-      "trailing_pe": 13.23,
-      "delivery_value_inr": 243321998.93041992,
-      "delivery_qty": 207471.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-07",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 867954957.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 9.5,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.69,
-      "swing_high_63d": 1211.5,
-      "atr_expansion_ratio": 0.8,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -2.55,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; pct_off_high -0.96 outside [-40.0,-15.0]; rsi 60.04 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -0.96 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 60.04 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 9.9,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "PTCIL",
       "company_name": "PTC Industries Ltd.",
       "industry": "Capital Goods",
@@ -50889,6 +50780,115 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 77.24 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 9.9,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.4444444444444444,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "PNBHOUSING",
+      "company_name": "PNB Housing Finance Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "PNBHOUSING.NS",
+      "current_price": 1173.6,
+      "fifty_two_wk_high": 1185.0,
+      "pct_off_52wk_high": -0.96,
+      "pct_from_ema200": 17.99,
+      "rsi14": 60.04,
+      "atr14": 28.83,
+      "entry_zone_low": 1159.18,
+      "entry_zone_high": 1173.6,
+      "stop_loss": 1137.56,
+      "target_1": 1209.64,
+      "target_2": 1238.47,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.63,
+      "adtv_value_inr_approx": 1202126827.0,
+      "f_score": 4.0,
+      "f_score_components_available": 7.0,
+      "avg_pe_5y": 9.71,
+      "trailing_pe": 13.23,
+      "delivery_value_inr": 243321998.93041992,
+      "delivery_qty": 207471.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-07",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 867954957.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 9.5,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.69,
+      "swing_high_63d": 1211.5,
+      "atr_expansion_ratio": 0.8,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -2.55,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; pct_off_high -0.96 outside [-40.0,-15.0]; rsi 60.04 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -0.96 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 60.04 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
