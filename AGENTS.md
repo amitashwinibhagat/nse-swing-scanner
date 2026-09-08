@@ -130,16 +130,22 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── snapshots/          # Dated minified scans + history_index.json (90d window)
 │   │   └── .gitkeep
 │   ├── src/
-│   │   ├── App.jsx              # Top-level dashboard
+│   │   ├── App.jsx              # Top-level dashboard (shortlist-first default)
 │   │   ├── main.jsx             # React root
 │   │   ├── styles.css           # Single CSS file, ~1900 lines
 │   │   ├── utils/
 │   │   │   ├── scanPlan.js      # Entry-state, regime, RS factor, earnings chip (pure)
+│   │   │   ├── picks.js        # 63+ shortlist tiering, reasons, band mirror (pure)
+│   │   │   ├── sizing.js       # Position sizing + risk math (card & drawer)
+│   │   │   ├── trades.js       # Trade-journal status/aggregate math (pure)
 ││   │   ├── delta.js           # Snapshot diffing (new PASS / dropped / watchlist)
 │   │   ├── recentPicks.js     # Prior-cohort scorecard join (pure; feeds RecentPicksStrip)
 │   │   │   └── useWatchlist.js  # localStorage watchlist hook
+│   │   │   └── useTradeJournal.js # localStorage trade journal hook
 │   │   └── components/
 │   │       ├── Kpi.jsx          # KPI tile with delta + accent
+│   │       ├── TopPickCard.jsx  # Shortlist card (plan + evidence + reasons)
+│   │       ├── MyTrades.jsx     # Local-only trade journal panel
 │   │       ├── StockCard.jsx    # Card view (entry-state + earnings chips, watch star)
 │   │       ├── ScoreRing.jsx    # Soft score donut
 │   │       ├── SubscoreBars.jsx # Sub-score breakdown (+ RS adjustment line)

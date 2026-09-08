@@ -87,6 +87,56 @@ export function computeEntryState(stock) {
 }
 
 /**
+ * Customer-facing action for a pick, derived from where price sits relative
+ * to the stored plan. Turns the mechanical entry-state label into a verb the
+ * customer can act on tonight. Levels themselves live in the plan grid.
+ */
+export function entryAction(stock) {
+  const es = computeEntryState(stock);
+  if (!es) return null;
+  switch (es.state) {
+    case ENTRY_STATES.IN_ZONE:
+      return {
+        tone: "success",
+        label: "In the buy zone",
+        detail: "Consider entering now — levels are below.",
+      };
+    case ENTRY_STATES.BELOW_ZONE:
+      return {
+        tone: "warning",
+        label: "Below the buy zone",
+        detail: "Wait for a close back above the zone before entering.",
+      };
+    case ENTRY_STATES.EXTENDED:
+      return {
+        tone: "warning",
+        label: "Above the buy zone",
+        detail: "Do not chase — wait for a pullback into the zone.",
+      };
+    case ENTRY_STATES.AT_T1:
+      return {
+        tone: "accent",
+        label: "At target 1",
+        detail: "Book part of the position or trail the stop.",
+      };
+    case ENTRY_STATES.AT_T2:
+      return {
+        tone: "accent",
+        label: "At target 2",
+        detail: "The plan has largely played out — book or trail.",
+      };
+    case ENTRY_STATES.STOPPED:
+      return {
+        tone: "danger",
+        label: "Stop breached",
+        detail: "The setup is invalidated — stand aside.",
+      };
+    default:
+      return null;
+  }
+}
+
+/**
  * Market-regime chip from Nifty's distance to its 200-EMA (percent).
  * Replicates backend relative_strength_factor thresholds client-side to keep
  * Phase A contract-neutral; see scanner.py::relative_strength_factor.

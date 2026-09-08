@@ -3,14 +3,18 @@ import Kpi from "./components/Kpi.jsx";
 import SegmentedControl from "./components/SegmentedControl.jsx";
 import SubscoreBars from "./components/SubscoreBars.jsx";
 import StockCard from "./components/StockCard.jsx";
+import TopPickCard from "./components/TopPickCard.jsx";
 import DetailDrawer from "./components/DetailDrawer.jsx";
 import { SkeletonGrid } from "./components/Skeleton.jsx";
 import Rationale from "./components/Rationale.jsx";
 import DeltaStrip from "./components/DeltaStrip.jsx";
 import RecentPicksStrip, { ReceiptsBanner } from "./components/RecentPicksStrip.jsx";
+import MyTrades from "./components/MyTrades.jsx";
 import PerformanceSection from "./components/PerformanceSection.jsx";
 import useWatchlist from "./utils/useWatchlist.js";
+import useTradeJournal from "./utils/useTradeJournal.js";
 import { computeEntryState, confirmationChip, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
+import { splitShortlist, regimeKeyOf, TOP_PICK_MIN_SCORE } from "./utils/picks.js";
 
 function IconSearch() {
   return (
@@ -72,7 +76,8 @@ const THEME_LS_KEY = "nseSwingTheme";
 const VIEW_LS_KEY = "nseSwingViewMode";
 const FILTER_LS_KEY = "nseSwingFilter";
 const SCAN_STATUS_URL = "/data/scan_status.json";
-const VALID_FILTERS = ["all", "passed", "watchlist"];
+const VALID_FILTERS = ["picks", "passed", "watchlist", "all"];
+const DEFAULT_FILTER = "picks";
 
 const COLUMNS = [
   { key: "symbol", label: "Stock" },
@@ -207,14 +212,14 @@ export default function App() {
   const [scanStatus, setScanStatus] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState(() => {
-    if (typeof window === "undefined") return "all";
+    if (typeof window === "undefined") return DEFAULT_FILTER;
     try {
       const v = localStorage.getItem(FILTER_LS_KEY);
-      return VALID_FILTERS.includes(v) ? v : "all";
+      return VALID_FILTERS.includes(v) ? v : DEFAULT_FILTER;
     } catch {
-      return "all";
+      return DEFAULT_FILTER;
     }
-  }); // all | passed | watchlist
+  }); // picks | passed | watchlist | all
   const [sortKey, setSortKey] = useState("swing_score");
   const [sortDir, setSortDir] = useState("desc");
   const [expanded, setExpanded] = useState(null);
@@ -302,20 +307,38 @@ export default function App() {
   }, [filter]);
 
   const watchlist = useWatchlist();
+  const journal = useTradeJournal();
 
-  const regime = useMemo(() => {
+  const priceBySymbol = useMemo(() => {
+    if (!data) return {};
+    const out = {};
+    for (const s of data.stocks) out[s.symbol] = s.current_price;
+    return out;
+  }, [data]);
+
+  const marketIdx = useMemo(() => {
     if (!data) return null;
     for (const s of data.stocks) {
       if (typeof s.market_index_pct_from_ema200 === "number") {
-        return regimeFromMarketIndex(s.market_index_pct_from_ema200);
+        return s.market_index_pct_from_ema200;
       }
     }
     return null;
   }, [data]);
 
+  const regime = useMemo(() => regimeFromMarketIndex(marketIdx), [marketIdx]);
+  const regimeKey = useMemo(() => regimeKeyOf(marketIdx), [marketIdx]);
+
+  // Computed from the full scan, independent of the search box, so the
+  // header counts never lie about what the scan actually found.
+  const shortlist = useMemo(() => splitShortlist(data?.stocks), [data]);
+
   const rows = useMemo(() => {
     if (!data) return [];
     let r = data.stocks;
+    if (filter === "picks") {
+      r = r.filter((s) => s.gate_pass && (s.swing_score || 0) >= TOP_PICK_MIN_SCORE);
+    }
     if (filter === "passed") r = r.filter((s) => s.gate_pass);
     if (filter === "watchlist") r = r.filter((s) => watchlist.has(s.symbol));
     if (search.trim()) {
@@ -511,36 +534,17 @@ export default function App() {
           <div className="hero-title">
             <h1>NSE Swing Scanner</h1>
             <p className="hero-sub">
-              {data.universe_size}-stock universe · 7 hard gates · Free data, transparent scoring
+              {shortlist.counts.universe} screened · {shortlist.counts.passed} passed gates
+              {data.coverage ? ` · ${data.coverage.priced} priced` : ""}
             </p>
           </div>
-          <div className="kpi-row">
-            <Kpi label="Universe" value={data.universe_size} />
+          <div className="kpi-row kpi-row--compact">
             <Kpi
-              label="Gate-passed"
-              value={data.gate_pass_count}
-              delta={`${((data.gate_pass_count / data.universe_size) * 100).toFixed(1)}% of universe`}
-              accent="success"
+              label="Top picks"
+              value={shortlist.counts.topPicks}
+              delta={`score ${TOP_PICK_MIN_SCORE}+ · only evidenced band`}
+              accent={shortlist.counts.topPicks > 0 ? "success" : "warning"}
             />
-            {data.coverage && (
-              <Kpi
-                label="Priced"
-                value={`${data.coverage.priced}/${data.coverage.universe}`}
-                delta={
-                  data.coverage.rate_limited
-                    ? `${(data.coverage.pct * 100).toFixed(0)}% · ${data.coverage.rate_limited} rate-limited`
-                    : `${(data.coverage.pct * 100).toFixed(0)}% of universe`
-                }
-                accent={
-                  data.coverage.pct >= 0.95
-                    ? "success"
-                    : data.coverage.pct >= 0.85
-                      ? "warning"
-                      : "danger"
-                }
-                title="Stocks with a usable yfinance price this scan. Below 85% the scanner refuses to publish."
-              />
-            )}
             {regime && (
               <Kpi
                 label="Regime"
@@ -587,9 +591,10 @@ export default function App() {
             onChange={setFilter}
             ariaLabel="Stock filter"
             options={[
-              { value: "all", label: `All · ${data.stocks.length}` },
-              { value: "passed", label: `Passed · ${data.gate_pass_count}` },
+              { value: "picks", label: `Top picks · ${shortlist.counts.topPicks}` },
+              { value: "passed", label: `All passes · ${shortlist.counts.passed}` },
               { value: "watchlist", label: `Watchlist · ${watchlist.symbols.length}` },
+              { value: "all", label: `Screened · ${shortlist.counts.universe}` },
             ]}
           />
           <div className="icon-group">
@@ -602,26 +607,28 @@ export default function App() {
             >
               {theme === "dark" ? <IconSun /> : <IconMoon />}
             </button>
-            <div className="view-toggle" role="group" aria-label="View mode">
-              <button
-                type="button"
-                aria-pressed={viewMode === "cards"}
-                onClick={() => setViewMode("cards")}
-                title="Card view"
-                aria-label="Card view"
-              >
-                <IconGrid />
-              </button>
-              <button
-                type="button"
-                aria-pressed={viewMode === "table"}
-                onClick={() => setViewMode("table")}
-                title="Table view"
-                aria-label="Table view"
-              >
-                <IconTable />
-              </button>
-            </div>
+            {filter !== "picks" && (
+              <div className="view-toggle" role="group" aria-label="View mode">
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "cards"}
+                  onClick={() => setViewMode("cards")}
+                  title="Card view"
+                  aria-label="Card view"
+                >
+                  <IconGrid />
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "table"}
+                  onClick={() => setViewMode("table")}
+                  title="Table view"
+                  aria-label="Table view"
+                >
+                  <IconTable />
+                </button>
+              </div>
+            )}
           </div>
           <button
             className="export-pill"
@@ -715,19 +722,106 @@ export default function App() {
         </div>
       )}
 
-      {rows.length === 0 ? (
-        <div className="empty-state">
-          <h2>No stocks match</h2>
-          <p>Try clearing the filter or search term.</p>
-        </div>
-      ) : (
-        <>
+      <MyTrades
+        trades={journal.trades}
+        priceBySymbol={priceBySymbol}
+        onRemove={journal.remove}
+        onUpdate={journal.update}
+      />
+
+      <details className="more-panel">
+        <summary>What changed since the last scan</summary>
+        <div className="more-panel-body">
           <DeltaStrip
             currentGeneratedAt={data.generated_at}
-            stocks={rows}
+            stocks={data.stocks}
             watchlist={watchlist}
           />
           <RecentPicksStrip currentGeneratedAt={data.generated_at} />
+        </div>
+      </details>
+
+      {rows.length === 0 ? (
+        filter === "picks" && shortlist.counts.topPicks === 0 && !search.trim() ? (
+          <div className="empty-state">
+            <h2>No top picks today</h2>
+            <p>
+              Nothing in the {TOP_PICK_MIN_SCORE}+ band passed all seven gates.
+              That is a valid signal — patience beats forcing a trade.
+              {scanStatus && scanStatus.next_expected_utc && (
+                <>
+                  {" "}The next scan is due{" "}
+                  {new Date(scanStatus.next_expected_utc).toLocaleString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    timeZone: "Asia/Kolkata",
+                  })}{" "}
+                  IST.
+                </>
+              )}{" "}
+              The closest candidates are under{" "}
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => setFilter("passed")}
+              >
+                all passes
+              </button>.
+            </p>
+          </div>
+        ) : (
+          <div className="empty-state">
+            <h2>No stocks match</h2>
+            <p>Try clearing the filter or search term.</p>
+          </div>
+        )
+      ) : filter === "picks" ? (
+        <>
+          <div className="pick-section-head">
+            <h2>
+              Top picks
+              <span className="pick-count">{rows.length}</span>
+            </h2>
+            <p className="pick-section-sub">
+              Gate-passed names scoring {TOP_PICK_MIN_SCORE}+ — the only band with
+              a measured edge vs the Nifty. Click a card for the full plan and
+              the gate checklist.
+              {regimeKey === "risk_off" && (
+                <span className="pick-regime-warn">
+                  {" "}Risk-off tape: the tracker&apos;s risk-off cohorts
+                  underperform, so treat these as watch-first and size smaller.
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="pick-grid">
+            {rows.map((s) => (
+              <TopPickCard
+                key={s.symbol}
+                stock={s}
+                onOpen={() => toggleDrawer(s.symbol)}
+                watchlist={watchlist}
+                journal={journal}
+                scanDate={data.generated_at}
+              />
+            ))}
+          </div>
+          {expanded && (() => {
+            const s = rows.find((r) => r.symbol === expanded);
+            return s ? (
+              <DetailDrawer
+                stock={s}
+                onClose={() => setExpanded(null)}
+                watchlist={watchlist}
+                scanDate={data.generated_at}
+              />
+            ) : null;
+          })()}
+        </>
+      ) : (
+        <>
           {viewMode === "cards" ? (
         <>
           <div className="stock-grid">
@@ -936,9 +1030,13 @@ export default function App() {
         </>
       )}
 
-      <Rationale />
-
-      <PerformanceSection />
+      <details className="more-panel" id="track-record">
+        <summary>Methodology &amp; track record</summary>
+        <div className="more-panel-body">
+          <Rationale />
+          <PerformanceSection />
+        </div>
+      </details>
 
       <div className="footer-note">
         Screening layer only — not investment advice, not a buy/sell signal.

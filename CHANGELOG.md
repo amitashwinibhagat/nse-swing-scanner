@@ -1,5 +1,88 @@
 # Changelog
 
+## 1.6.0 — Shortlist-first dashboard
+
+### Why
+
+The dashboard was a 501-row data console: five KPI tiles, two banner
+strips, all names shown by default, and a detail drawer with eight
+sections. The scanner's own outcome tracker says only one cohort has a
+measured edge — the pass_v3 **63+ score band** (mean excess vs Nifty
++3.76% at T+5, 60.4% hit rate, 95% CI +2.56%..+4.95%, n=96; the 55-60
+band is *negative* at T+5). The signal was buried in the noise.
+
+### Changed
+
+- **Default view is now a Top Picks shortlist**: gate-passed names in the
+  63+ band only. Each card leads with the trade plan (buy zone, stop, T1
+  and upside), the entry state, and the two-to-four reasons the name
+  cleared (confirmation, F-Score, conviction, RSI, 200EMA, capitulation).
+- **KPI row cut from five tiles to three** (Top picks / Regime / Last
+  scan). Universe, gate-pass count, and price coverage moved into the
+  header subtitle.
+- **Secondary surfaces collapsed**: "What changed since the last scan"
+  (delta + recent-picks strips) and "Methodology & track record"
+  (rationale + full performance tables) are now `<details>` panels,
+  closed by default.
+- **Filter tabs are picks-first**: `Top picks · N`, `All passes · N`,
+  `Watchlist · N`, `Screened · N`. The card/table toggle is hidden on the
+  picks tab (cards are the only sensible layout for a shortlist).
+- **Regime caution** on the shortlist when the tape is risk-off, matching
+  the tracker's negative risk-off cohort.
+
+### Added
+
+- `frontend/src/utils/picks.js` — pure shortlist logic mirroring
+  `performance.py` pass_v3 bands and `regime_tag` thresholds.
+- `frontend/src/components/TopPickCard.jsx` — the shortlist card.
+- `frontend/src/utils/sizing.js` — shared position-sizing / risk math.
+
+### Customer-centric decision layer
+
+The card now answers the four questions a customer actually has, not just
+"what is this stock":
+
+- **What do I do now?** An action banner derived from price vs the plan
+  (`entryAction`): "In the buy zone — consider entering now", "Above the
+  buy zone — don't chase", "Stop breached — stand aside", etc.
+- **Where do I buy and exit?** Buy zone, stop and target stay in one
+  scannable grid.
+- **What do I risk?** Per-share risk and reward in rupees and percent,
+  measured at the **top of the buy zone** (the conservative fill). This
+  replaces the misleading "R:R 1.5" headline: 1.5 only holds at the
+  mid-zone fill, while the position sizer already assumes zone-top. The
+  drawer labels the 1.5 as "mid-fill" and explains the difference.
+- **How much do I buy?** A share-count preview from the customer's saved
+  capital and risk-per-trade, using the same math as the drawer sizer
+  (extracted to `sizing.js` so card and drawer can never disagree).
+
+Also: the zero-picks empty state now tells the customer when the next
+scan is due instead of leaving a dead end.
+
+### Personal trade journal (local-only)
+
+- **"I took this"** on a shortlist card logs the trade (fill, shares,
+  stop, target) to `localStorage`. Nothing is uploaded; there is no auth,
+  no account, and no server.
+- A **"My trades"** panel shows each open position against the latest
+  scan close: P&L %, rupee P&L, and R-multiple, plus a portfolio total.
+  Entry and share count are editable inline; a trade can be removed when
+  the customer is done with it.
+- Status is descriptive ("Open", "Target reached", "Stop hit"), never a
+  recommendation to exit. Unpriced symbols are counted, not hidden.
+- New: `utils/trades.js` (pure status/aggregate math),
+  `utils/useTradeJournal.js` (localStorage hook), `components/MyTrades.jsx`.
+- **Non-goals:** broker integration, order placement, auto-exit
+  detection, P&L history/charts, notifications, multi-device sync.
+
+### Notes
+
+- No JSON contract change; the backend is untouched. Everything renders
+  from the existing `latest_scan.json` / `performance.json`.
+- The 63+ threshold is not a new hard gate — it is the tracker's top
+  band. If the band loses its edge in future cohorts, the shortlist
+  should be redefined, not defended.
+
 ## 1.5.1 — Remove analytics (owner decision)
 
 ### Removed
