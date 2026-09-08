@@ -1944,3 +1944,554 @@ body {
   color: var(--text-dim);
   border-color: var(--border-subtle);
 }
+
+/* =========================================================================
+   Shortlist — the simplified default view
+   A top pick is a gate-passed name in the 63+ band (the only band the
+   forward-return tracker shows with a CI above zero). The card leads with
+   the tracker evidence and the trade plan; everything else is one click away.
+   ========================================================================= */
+.kpi-row--compact {
+  flex: 0 1 auto;
+  max-width: 520px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.pick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--sp-4);
+}
+
+.pick-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--success);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.pick-card:hover,
+.pick-card:focus-visible {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+
+.pick-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.pick-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pick-symbol-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pick-symbol {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--t-h);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.pick-company {
+  font-size: var(--t-meta);
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.pick-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pick-score-label {
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+.pick-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 var(--sp-4);
+}
+
+.pick-section-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  letter-spacing: -0.01em;
+}
+
+.pick-count {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  color: var(--success);
+  background: var(--success-dim);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: var(--r-pill);
+  padding: 1px 10px;
+}
+
+.pick-section-sub {
+  margin: 0;
+  font-size: var(--t-meta);
+  color: var(--text-dim);
+  max-width: 70ch;
+}
+
+.pick-section-sub b {
+  color: var(--success);
+  font-family: var(--font-mono);
+}
+
+.pick-regime-warn {
+  color: var(--warning);
+}
+
+.pick-plan {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.pick-plan > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pick-plan dt {
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+.pick-plan dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  color: var(--text);
+}
+
+.pick-upside {
+  display: block;
+  font-size: var(--t-micro);
+  color: var(--success);
+}
+
+.pick-action {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.pick-action-label {
+  font-size: var(--t-meta);
+  font-weight: 600;
+}
+
+.pick-action-detail {
+  font-size: var(--t-micro);
+  color: var(--text-dim);
+}
+
+.pick-action--success {
+  background: var(--success-dim);
+  border-color: rgba(74, 222, 128, 0.3);
+}
+.pick-action--success .pick-action-label { color: var(--success); }
+
+.pick-action--warning {
+  background: var(--warning-dim);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+.pick-action--warning .pick-action-label { color: var(--warning); }
+
+.pick-action--danger {
+  background: var(--danger-dim);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+.pick-action--danger .pick-action-label { color: var(--danger); }
+
+.pick-action--accent {
+  background: var(--accent-dim);
+  border-color: rgba(167, 139, 250, 0.3);
+}
+.pick-action--accent .pick-action-label { color: var(--accent-bright); }
+
+.pick-risk {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--text-dim);
+}
+
+.pick-risk-item { white-space: nowrap; }
+.pick-risk-size { color: var(--accent-bright); }
+
+.pick-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.pick-price {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  color: var(--text-dim);
+}
+
+.pick-reasons {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+}
+
+.pick-reason {
+  font-size: var(--t-micro);
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.pick-reason--success {
+  color: var(--success);
+  border-color: rgba(74, 222, 128, 0.35);
+  background: var(--success-dim);
+}
+
+.pick-reason--warning {
+  color: var(--warning);
+  border-color: rgba(251, 191, 36, 0.35);
+  background: var(--warning-dim);
+}
+
+.pick-reason--accent {
+  color: var(--accent-bright);
+  border-color: rgba(167, 139, 250, 0.3);
+  background: var(--accent-dim);
+}
+
+.pick-open {
+  font-size: var(--t-micro);
+  color: var(--accent-bright);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* =========================================================================
+   Collapsible secondary panels — keep the default view quiet
+   ========================================================================= */
+.more-panel {
+  margin: var(--sp-4) 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+}
+
+.more-panel > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.more-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-panel > summary::before {
+  content: "+";
+  font-family: var(--font-mono);
+  color: var(--accent-bright);
+}
+
+.more-panel[open] > summary::before {
+  content: "\2212";
+}
+
+.more-panel > summary:hover {
+  color: var(--text);
+}
+
+.more-panel-body {
+  padding: 0 var(--sp-4) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent-bright);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .pick-plan {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================================================
+   My trades — private, browser-local journal
+   ========================================================================= */
+.my-trades {
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-lg);
+}
+
+.my-trades-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.my-trades-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.my-trades-count {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent-bright);
+  background: var(--accent-dim);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: var(--r-pill);
+  padding: 1px 8px;
+}
+
+.my-trades-total {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.my-trades-total-pct {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.my-trades-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.my-trade-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1.2fr) 96px 80px 92px minmax(120px, 1fr) 28px;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface-0);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+}
+
+.my-trade-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.my-trade-id b {
+  font-family: var(--font-display);
+  font-size: var(--t-h);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.my-trade-badge {
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.my-trade-badge--success { color: var(--success); }
+.my-trade-badge--warning { color: var(--warning); }
+.my-trade-badge--danger  { color: var(--danger); }
+.my-trade-badge--muted   { color: var(--text-faint); }
+
+.my-trade-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.my-trade-field > span,
+.my-trade-now-label {
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.my-trade-field input {
+  width: 100%;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  padding: 4px 6px;
+}
+
+.my-trade-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.my-trade-now {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.my-trade-now span:last-child {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+}
+
+.my-trade-pnl {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  text-align: right;
+}
+
+.my-trade-pnl-abs { font-size: var(--t-micro); }
+.my-trade-r { font-size: var(--t-micro); color: var(--text-faint); }
+
+.my-trade-remove {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.my-trade-remove:hover { color: var(--danger); }
+
+.my-trades-note {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--t-micro);
+  color: var(--text-faint);
+}
+
+/* Pick card footer + "I took this" */
+.pick-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.pick-take {
+  background: var(--accent-dim);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  color: var(--accent-bright);
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.pick-take:hover { background: rgba(167, 139, 250, 0.22); }
+
+.pick-taken {
+  font-size: var(--t-micro);
+  color: var(--success);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 720px) {
+  .my-trade-row {
+    grid-template-columns: 1fr 1fr 1fr;
+    row-gap: var(--sp-2);
+  }
+  .my-trade-now,
+  .my-trade-pnl {
+    text-align: left;
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ScoreRing from "./ScoreRing.jsx";
 import DonutHoldings from "./DonutHoldings.jsx";
 import SubscoreBars from "./SubscoreBars.jsx";
+import { readSizing, saveSizing, computePositionSize } from "../utils/sizing.js";
 import {
   computeEntryState,
   confirmationChip,
@@ -21,58 +22,14 @@ const fmtCr = (v) => (v == null ? "—" : (v / 1_00_00_000).toFixed(1));
 const fmtNum = (v, d = 1, suffix = "") =>
   v == null ? "—" : `${v.toFixed(d)}${suffix}`;
 
-const SIZING_KEY = "nseSwingSizing";
-
-function readSizing() {
-  if (typeof window === "undefined") return { capital: 500000, riskPct: 1.0 };
-  try {
-    const raw = localStorage.getItem(SIZING_KEY);
-    if (!raw) return { capital: 500000, riskPct: 1.0 };
-    const v = JSON.parse(raw);
-    const capital = Number.isFinite(+v.capital) && +v.capital > 0 ? +v.capital : 500000;
-    const riskPct = Number.isFinite(+v.riskPct) && +v.riskPct > 0 ? +v.riskPct : 1.0;
-    return { capital, riskPct };
-  } catch {
-    return { capital: 500000, riskPct: 1.0 };
-  }
-}
-
 function PositionSizer({ stock }) {
   const [sizing, setSizing] = useState(readSizing);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(SIZING_KEY, JSON.stringify(sizing));
-    } catch {
-      /* ignore */
-    }
+    saveSizing(sizing);
   }, [sizing]);
 
-  const calc = useMemo(() => {
-    const { capital, riskPct } = sizing;
-    const zh = stock.entry_zone_high;
-    const stop = stock.stop_loss;
-    if (
-      !(
-        typeof capital === "number" &&
-        capital > 0 &&
-        typeof riskPct === "number" &&
-        riskPct > 0 &&
-        typeof zh === "number" &&
-        typeof stop === "number" &&
-        stop < zh
-      )
-    ) {
-      return null;
-    }
-    // Size off the TOP of the zone (worst-case fill) so risk is never
-    // understated; stop distance from zone-high fill = 1.25·ATR.
-    const distance = zh - stop;
-    const riskAmount = capital * (riskPct / 100);
-    const shares = Math.floor(riskAmount / distance);
-    const notional = shares * zh;
-    return { shares, notional, riskAmount, distance };
-  }, [sizing, stock]);
+  const calc = useMemo(() => computePositionSize(stock, sizing), [sizing, stock]);
 
   return (
     <section className="drawer-section">
@@ -131,7 +88,7 @@ function PositionSizer({ stock }) {
                 zone-high
               </span>
             </span>
-            <b>{fmtINR(calc.distance)}</b>
+            <b>{fmtINR(calc.riskPerShare)}</b>
           </li>
         </ul>
       ) : (
@@ -419,9 +376,9 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
                     Target 1 (R:R){" "}
                     <span
                       className="gate-path"
-                      title="R:R to T1 is a fixed 1.5×ATR multiple from entry mid; does not discriminate between candidates."
+                      title="R:R is computed at the entry-zone midpoint (a fixed 1.5x by construction). If you fill at the top of the zone, your actual reward-to-risk is closer to 1.0 — the position sizer below assumes that conservative case."
                     >
-                      fixed
+                      mid-fill
                     </span>
                   </span>
                   <b>
@@ -434,9 +391,9 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
                     Target 2 (R:R){" "}
                     <span
                       className="gate-path"
-                      title="R:R to T2 is a fixed 2.5×ATR multiple from entry mid."
+                      title="R:R at the entry-zone midpoint (a fixed 2.5x by construction). At a zone-top fill it is lower."
                     >
-                      fixed
+                      mid-fill
                     </span>
                   </span>
                   <b>

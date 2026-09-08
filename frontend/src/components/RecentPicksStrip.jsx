@@ -50,7 +50,15 @@ export function ReceiptsBanner() {
         <b>{pct(t5.mean)}</b> on average within 5 sessions{" "}
         <span className="receipts-ci">(95% CI {pct(t5.ci95.low)} to {pct(t5.ci95.high)}, n={t5.n})</span>.
         Every pick is scored against what actually happened —{" "}
-        <a href="#perf-heading">see the full track record</a>.
+        <a
+          href="#track-record"
+          onClick={() => {
+            const el = document.getElementById("track-record");
+            if (el && el.tagName === "DETAILS") el.open = true;
+          }}
+        >
+          see the full track record
+        </a>.
       </p>
     </section>
   );
