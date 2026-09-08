@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-08T14:38:42.103320+00:00",
+  "generated_at": "2026-09-08T14:45:49.588267+00:00",
   "universe_size": 501,
   "gate_pass_count": 52,
   "coverage": {
@@ -48529,115 +48529,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "CARBORUNIV",
-      "company_name": "Carborundum Universal Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "CARBORUNIV.NS",
-      "current_price": 1115.9,
-      "fifty_two_wk_high": 1238.75,
-      "pct_off_52wk_high": -9.92,
-      "pct_from_ema200": 10.93,
-      "rsi14": 51.45,
-      "atr14": 42.89,
-      "entry_zone_low": 1094.45,
-      "entry_zone_high": 1115.9,
-      "stop_loss": 1062.28,
-      "target_1": 1169.52,
-      "target_2": 1212.41,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.08,
-      "adtv_value_inr_approx": 245256487.0,
-      "f_score": 5.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 59.13,
-      "trailing_pe": 103.13,
-      "delivery_value_inr": 40380234.0,
-      "delivery_qty": 36086.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-08",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 258641584.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 7.06,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.89,
-      "swing_high_63d": 1303.79,
-      "atr_expansion_ratio": 1.02,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -2.88,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; pct_off_high -9.92 outside [-40.0,-15.0]; rsi 51.45 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -9.92 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 51.45 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 12.8,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.040000000000000036,
-        "quality_composite": 0.5555555555555556,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "CGCL",
       "company_name": "Capri Global Capital Ltd.",
       "industry": "Financial Services",
@@ -48739,6 +48630,115 @@
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.010000000000000009,
         "quality_composite": 0.4444444444444444,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "CARBORUNIV",
+      "company_name": "Carborundum Universal Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "CARBORUNIV.NS",
+      "current_price": 1115.9,
+      "fifty_two_wk_high": 1238.75,
+      "pct_off_52wk_high": -9.92,
+      "pct_from_ema200": 10.93,
+      "rsi14": 51.45,
+      "atr14": 42.89,
+      "entry_zone_low": 1094.45,
+      "entry_zone_high": 1115.9,
+      "stop_loss": 1062.28,
+      "target_1": 1169.52,
+      "target_2": 1212.41,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.08,
+      "adtv_value_inr_approx": 245256487.0,
+      "f_score": 5.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 59.13,
+      "trailing_pe": 103.13,
+      "delivery_value_inr": 40380234.0,
+      "delivery_qty": 36086.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-08",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 258641584.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 7.06,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.89,
+      "swing_high_63d": 1303.79,
+      "atr_expansion_ratio": 1.02,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -2.88,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 5 < 6; pct_off_high -9.92 outside [-40.0,-15.0]; rsi 51.45 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 5 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -9.92 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 51.45 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 12.8,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.040000000000000036,
+        "quality_composite": 0.5555555555555556,
         "conviction_holding": null
       },
       "score_version": "weights-2026-06-v1",
