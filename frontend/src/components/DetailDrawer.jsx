@@ -97,7 +97,7 @@ function PositionSizer({ stock }) {
       <p className="sizer-note">
         Sized off entry-zone <em>high</em> − stop (worst-case fill). When price
         is already extended above the zone, the realistic fill is worse than
-        this calculation — reduce shares or wait for a pullback.
+        this calculation. Reduce shares or wait for a pullback.
       </p>
     </section>
   );
@@ -376,7 +376,7 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
                     Target 1 (R:R){" "}
                     <span
                       className="gate-path"
-                      title="R:R is computed at the entry-zone midpoint (a fixed 1.5x by construction). If you fill at the top of the zone, your actual reward-to-risk is closer to 1.0 — the position sizer below assumes that conservative case."
+                      title="R:R is computed at the entry-zone midpoint (a fixed 1.5x by construction). If you fill at the top of the zone, your actual reward-to-risk is closer to 1.0. The position sizer below assumes that conservative case."
                     >
                       mid-fill
                     </span>
@@ -487,7 +487,7 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
                 ))}
               </ul>
               <p className="sizer-note">
-                Expectancy warnings — not predictions. These flag structural
+                Expectancy warnings, not predictions. These flag structural
                 R:R asymmetry (T1 capped by nearby resistance, or stop too
                 tight given expanding volatility) so you can adjust size or
                 skip the trade.
@@ -501,7 +501,7 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
               {n < SCORE_KEY_TOTAL && (
                 <span
                   className="plan-asof"
-                  title={`Composite score was computed over ${n} of ${SCORE_KEY_TOTAL} weighted components; missing components renormalise the weight — score not directly comparable to a 7-component score.`}
+                  title={`Composite score was computed over ${n} of ${SCORE_KEY_TOTAL} weighted components; missing components renormalise the weight; the score is not directly comparable to a 7-component score.`}
                 >
                   scored on {n}/{SCORE_KEY_TOTAL}
                 </span>
@@ -518,7 +518,7 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
             <p className="plan-asof">
               Mean excess return vs Nifty 50 with 95% bootstrap CI, from the
               forward-return tracker (T+5). n per cell; cells with n &lt; 5
-              are suppressed. Single 90-day window — directional only.
+              are suppressed. Single 90-day window. Directional only.
             </p>
             <div className="perf-table-wrap">
               <table className="perf-table">

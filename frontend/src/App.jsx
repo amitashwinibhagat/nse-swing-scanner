@@ -571,6 +571,7 @@ export default function App() {
             <input
               id="search"
               type="text"
+              aria-label="Filter stocks"
               placeholder="Filter by symbol, company, sector…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -651,8 +652,8 @@ export default function App() {
           {data.coverage.rate_limited
             ? ` (${data.coverage.rate_limited} rate-limited by yfinance)`
             : ""}
-          . PASS list may understate the true opportunity set — treat rankings
-          as partial until coverage recovers.
+          . PASS list may understate the true opportunity set. Treat
+          rankings as partial until coverage recovers.
         </div>
       )}
 
@@ -663,7 +664,7 @@ export default function App() {
               No fresh scan since {fmtRelativeAge(data.generated_at)}. The
               next scheduled scan was due{" "}
               {fmtRelativeAge(scanStatus.next_expected_utc)} and did not
-              arrive — check the{" "}
+              arrive. Check the{" "}
               <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
                 Actions tab
               </a>
@@ -672,7 +673,7 @@ export default function App() {
           ) : (
             <>
               Scan data is older than {STALE_HOURS} hours. The scheduled
-              GitHub Action may have failed — check the{" "}
+              GitHub Action may have failed. Check the{" "}
               <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
                 Actions tab
               </a>
@@ -747,7 +748,7 @@ export default function App() {
             <h2>No top picks today</h2>
             <p>
               Nothing in the {TOP_PICK_MIN_SCORE}+ band passed all seven gates.
-              That is a valid signal — patience beats forcing a trade.
+              That is a valid signal. Patience beats forcing a trade.
               {scanStatus && scanStatus.next_expected_utc && (
                 <>
                   {" "}The next scan is due{" "}
@@ -780,14 +781,14 @@ export default function App() {
       ) : filter === "picks" ? (
         <>
           <div className="pick-section-head">
-            <h2>
+            <h2 aria-label={`Top picks, ${rows.length}`}>
               Top picks
-              <span className="pick-count">{rows.length}</span>
+              <span className="pick-count" aria-hidden="true">{rows.length}</span>
             </h2>
             <p className="pick-section-sub">
-              Gate-passed names scoring {TOP_PICK_MIN_SCORE}+ — the only band with
-              a measured edge vs the Nifty. Click a card for the full plan and
-              the gate checklist.
+              Gate-passed names scoring {TOP_PICK_MIN_SCORE}+. The only band
+              with a measured edge vs the Nifty. Click a card for the full plan
+              and the gate checklist.
               {regimeKey === "risk_off" && (
                 <span className="pick-regime-warn">
                   {" "}Risk-off tape: the tracker&apos;s risk-off cohorts
@@ -1039,7 +1040,7 @@ export default function App() {
       </details>
 
       <div className="footer-note">
-        Screening layer only — not investment advice, not a buy/sell signal.
+        Screening layer only. Not investment advice, not a buy/sell signal.
         Not SEBI-registered research. Free data sources: yfinance (price),
         NSE bhavcopy (delivery), Screener.in (holdings), NSE corporate filings.
         Spot-check any candidate against the source provider before acting.

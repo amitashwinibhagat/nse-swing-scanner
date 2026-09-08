@@ -1,6 +1,6 @@
 const RATIONALE = [
-  "Twice a day, the GitHub Actions scan runs the universe through seven hard gates and a 0–100 soft score, then commits the result as frontend/public/data/latest_scan.json. This dashboard renders that JSON — it never calls a live API, never touches your data, and never blocks on a backend.",
-  "Two free data sources feed every always-on signal: yfinance (price, volume, ADV, F-Score, 5y P/E) and Screener.in (promoter/FII/DII holdings). NSE bhavcopy for real delivery and NSE corporate filings for pending-actions remain best-effort and only ever tighten the gate — they cannot, by themselves, inflate PASSes. When any source changes its URL or rate-limits, the affected gate fails closed and the source-status pill surfaces it row by row.",
+  "Twice a day, the GitHub Actions scan runs the universe through seven hard gates and a 0–100 soft score, then commits the result as frontend/public/data/latest_scan.json. This dashboard renders that JSON. It never calls a live API, never touches your data, and never blocks on a backend.",
+  "Two free data sources feed every always-on signal: yfinance (price, volume, ADV, F-Score, 5y P/E) and Screener.in (promoter/FII/DII holdings). NSE bhavcopy for real delivery and NSE corporate filings for pending-actions remain best-effort and only ever tighten the gate; they cannot, by themselves, inflate PASSes. When any source changes its URL or rate-limits, the affected gate fails closed and the source-status pill surfaces it row by row.",
   "The CSV export captures every field the scanner emits, including sub-scores, ATR(14), entry zone, both R-multiples, holdings breakdown, source status, and the gate-fail reason. Useful for re-scoring in a notebook without re-running the scan.",
 ];
 
@@ -8,12 +8,12 @@ const TERMS = [
   {
     term: "GATE",
     body:
-      "PASS / FAIL on the seven hard gates (F-Score ≥ 6, drawdown in [-40%, -15%], 25 ≤ RSI ≤ 40, liquidity adequacy ≥ ₹10 cr ADV OR actual delivery ≥ ₹5 cr, no T-group / suspension / GSM flag, holdings conviction > 50%, no pending corporate action in the next 30 days). Hard gates fail closed — if a source is unreachable, that gate fails rather than silently passing. The detail drawer reveals which gate blocked a FAIL.",
+      "PASS / FAIL on the seven hard gates (F-Score ≥ 6, drawdown in [-40%, -15%], 25 ≤ RSI ≤ 40, liquidity adequacy ≥ ₹10 cr ADV OR actual delivery ≥ ₹5 cr, no T-group / suspension / GSM flag, holdings conviction > 50%, no pending corporate action in the next 30 days). Hard gates fail closed. If a source is unreachable, that gate fails rather than silently passing. The detail drawer reveals which gate blocked a FAIL.",
   },
   {
     term: "SCORE",
     body:
-      "0–100 soft ranking: weighted blend of valuation compression (current P/E vs 5Y mean), RSI positioning, 200-EMA proximity, drawdown sweet-spot, volume capitulation, F-Score, and holdings conviction — multiplied by the Nifty 50's distance from its 200-EMA as a regime filter. Weights are hand-tuned, not backtested; treat the score as a degree-of-match ranking, not an edge.",
+      "0–100 soft ranking: weighted blend of valuation compression (current P/E vs 5Y mean), RSI positioning, 200-EMA proximity, drawdown sweet-spot, volume capitulation, F-Score, and holdings conviction, multiplied by the Nifty 50's distance from its 200-EMA as a regime filter. Weights are hand-tuned, not backtested; treat the score as a degree-of-match ranking, not an edge.",
   },
   {
     term: "PRICE",
@@ -23,7 +23,7 @@ const TERMS = [
   {
     term: "% OFF 52W",
     body:
-      "Distance from the 52-week high: (price / 52w_high − 1) × 100. The gate window is −40% to −15% — far enough below the high that the swing has had time to consolidate, not so far that the thesis is broken.",
+      "Distance from the 52-week high: (price / 52w_high − 1) × 100. The gate window is −40% to −15%, far enough below the high that the swing has had time to consolidate, not so far that the thesis is broken.",
   },
   {
     term: "RSI-14",
@@ -33,7 +33,7 @@ const TERMS = [
   {
     term: "T1",
     body:
-      "First profit target at +1.5R above the entry zone, derived from ATR(14). T2 is at +2.5R. If the stock doesn't reach T1, the trade is a scratch; if it does, a trailing stop is not signalled — that's deliberate for v1.",
+      "First profit target at +1.5R above the entry zone, derived from ATR(14). T2 is at +2.5R. If the stock doesn't reach T1, the trade is a scratch; if it does, a trailing stop is not signalled; that's deliberate for v1.",
   },
   {
     term: "STOP",
@@ -53,12 +53,12 @@ const TERMS = [
   {
     term: "F-SCORE",
     body:
-      "Joseph Piotroski's 9-point financial-strength score across profitability, leverage / liquidity, and operating efficiency. Gate threshold is 6 — the original 2000 paper uses 8–9 for strict value screens; 6 widens the swing-trade universe.",
+      "Joseph Piotroski's 9-point financial-strength score across profitability, leverage / liquidity, and operating efficiency. Gate threshold is 6; the original 2000 paper uses 8–9 for strict value screens; 6 widens the swing-trade universe.",
   },
   {
     term: "P/E (T / 5Y)",
     body:
-      "Trailing P/E (current) compared to the 5-year average P/E. ADR / GDR-listed names (INFY, WIPRO, IBN, HDB, RDY) have a known yfinance bug where diluted EPS is returned in USD while price is in INR; fscore.py explicitly refuses to return a value when the two diverge by more than 3×. Those rows show a blank — that's the system working, not a missing data feed.",
+      "Trailing P/E (current) compared to the 5-year average P/E. ADR / GDR-listed names (INFY, WIPRO, IBN, HDB, RDY) have a known yfinance bug where diluted EPS is returned in USD while price is in INR; fscore.py explicitly refuses to return a value when the two diverge by more than 3×. Those rows show a blank. That's the system working, not a missing data feed.",
   },
 ];
 

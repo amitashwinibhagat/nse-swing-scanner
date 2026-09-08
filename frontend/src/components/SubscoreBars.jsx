@@ -60,7 +60,7 @@ export default function SubscoreBars({ subScores, marketCorrectionFactor }) {
             <Fragment key={key}>
               <div className="subscore-label">{LABELS[key]}</div>
               <div className="subscore-track">
-                <div className="subscore-fill" style={{ width: `${pct}%` }} />
+                <div className="subscore-fill" style={{ transform: `scaleX(${pct / 100})` }} />
               </div>
               <div className="subscore-value">{v == null ? "n/a" : pct}</div>
             </Fragment>
