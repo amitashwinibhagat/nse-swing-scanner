@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T05:48:34.082210+00:00",
+  "generated_at": "2026-09-10T08:20:25.902669+00:00",
   "universe_size": 501,
   "gate_pass_count": 52,
   "coverage": {
@@ -22260,115 +22260,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "VIJAYA",
-      "company_name": "Vijaya Diagnostic Centre Ltd.",
-      "industry": "Healthcare",
-      "yf_ticker": "VIJAYA.NS",
-      "current_price": 1507.3,
-      "fifty_two_wk_high": 1518.4,
-      "pct_off_52wk_high": -0.73,
-      "pct_from_ema200": 22.04,
-      "rsi14": 59.21,
-      "atr14": 46.57,
-      "entry_zone_low": 1484.01,
-      "entry_zone_high": 1507.3,
-      "stop_loss": 1449.08,
-      "target_1": 1565.52,
-      "target_2": 1612.09,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 2.67,
-      "adtv_value_inr_approx": 321096060.0,
-      "f_score": 8.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 65098747.7109375,
-      "delivery_qty": 43232.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-10",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 199754958.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 1.45,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 1.72,
-      "swing_high_63d": 1578.0,
-      "atr_expansion_ratio": 0.78,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -3.91,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -0.73 outside [-40.0,-15.0]; rsi 59.21 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -0.73 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 59.21 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 37.3,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.835,
-        "quality_composite": 0.8888888888888888,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "DABUR",
       "company_name": "Dabur India Ltd.",
       "industry": "Fast Moving Consumer Goods",
@@ -26620,6 +26511,115 @@
       "earnings_source_status": "not_applicable"
     },
     {
+      "symbol": "VMM",
+      "company_name": "Vishal Mega Mart Ltd.",
+      "industry": "Consumer Services",
+      "yf_ticker": "VMM.NS",
+      "current_price": 102.95,
+      "fifty_two_wk_high": 152.59,
+      "pct_off_52wk_high": -32.53,
+      "pct_from_ema200": -14.06,
+      "rsi14": 39.86,
+      "atr14": 3.03,
+      "entry_zone_low": 101.43,
+      "entry_zone_high": 102.95,
+      "stop_loss": 99.16,
+      "target_1": 106.74,
+      "target_2": 109.77,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.33,
+      "adtv_value_inr_approx": 1495675510.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 67.74,
+      "trailing_pe": 54.29,
+      "delivery_value_inr": 148173100.80358887,
+      "delivery_qty": 1440812.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-10",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 1899106860.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -1.78,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.32,
+      "swing_high_63d": 123.69,
+      "atr_expansion_ratio": 1.03,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -3.91,
+      "market_correction_factor": 0.7,
+      "gate_pass": true,
+      "gate_fail_reason": null,
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 33.8,
+      "sub_scores": {
+        "valuation_compression": 0.49638322999704737,
+        "oversold_positioning": 0.7342857142857143,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.7469999999999999,
+        "volume_capitulation": 0.16500000000000004,
+        "quality_composite": 0.6666666666666666,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "missing"
+    },
+    {
       "symbol": "CDSL",
       "company_name": "Central Depository Services (India) Ltd.",
       "industry": "Financial Services",
@@ -26945,115 +26945,6 @@
       "earnings_date": null,
       "earnings_within_days": null,
       "earnings_source_status": "not_applicable"
-    },
-    {
-      "symbol": "VMM",
-      "company_name": "Vishal Mega Mart Ltd.",
-      "industry": "Consumer Services",
-      "yf_ticker": "VMM.NS",
-      "current_price": 102.95,
-      "fifty_two_wk_high": 152.59,
-      "pct_off_52wk_high": -32.53,
-      "pct_from_ema200": -14.06,
-      "rsi14": 39.86,
-      "atr14": 3.03,
-      "entry_zone_low": 101.43,
-      "entry_zone_high": 102.95,
-      "stop_loss": 99.16,
-      "target_1": 106.74,
-      "target_2": 109.77,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.33,
-      "adtv_value_inr_approx": 1495675510.0,
-      "f_score": 6.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 148173100.80358887,
-      "delivery_qty": 1440812.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-10",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 1899106860.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -1.78,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.32,
-      "swing_high_63d": 123.69,
-      "atr_expansion_ratio": 1.03,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -3.91,
-      "market_correction_factor": 0.7,
-      "gate_pass": true,
-      "gate_fail_reason": null,
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 33.5,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.7342857142857143,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.7469999999999999,
-        "volume_capitulation": 0.16500000000000004,
-        "quality_composite": 0.6666666666666666,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
     },
     {
       "symbol": "EIDPARRY",
@@ -32171,6 +32062,115 @@
         "drawdown_sweetspot": 1.0,
         "volume_capitulation": 0.06999999999999995,
         "quality_composite": 0.7777777777777778,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "VIJAYA",
+      "company_name": "Vijaya Diagnostic Centre Ltd.",
+      "industry": "Healthcare",
+      "yf_ticker": "VIJAYA.NS",
+      "current_price": 1507.3,
+      "fifty_two_wk_high": 1518.4,
+      "pct_off_52wk_high": -0.73,
+      "pct_from_ema200": 22.04,
+      "rsi14": 59.21,
+      "atr14": 46.57,
+      "entry_zone_low": 1484.01,
+      "entry_zone_high": 1507.3,
+      "stop_loss": 1449.08,
+      "target_1": 1565.52,
+      "target_2": 1612.09,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 2.67,
+      "adtv_value_inr_approx": 321096060.0,
+      "f_score": 8.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 56.28,
+      "trailing_pe": 82.81,
+      "delivery_value_inr": 65098747.7109375,
+      "delivery_qty": 43232.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-10",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 199754958.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 1.45,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 1.72,
+      "swing_high_63d": 1578.0,
+      "atr_expansion_ratio": 0.78,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -3.91,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -0.73 outside [-40.0,-15.0]; rsi 59.21 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -0.73 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 59.21 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 29.0,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.835,
+        "quality_composite": 0.8888888888888888,
         "conviction_holding": null
       },
       "score_version": "weights-2026-06-v1",
@@ -51581,115 +51581,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "PTCIL",
-      "company_name": "PTC Industries Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "PTCIL.NS",
-      "current_price": 22485.0,
-      "fifty_two_wk_high": 23830.0,
-      "pct_off_52wk_high": -5.64,
-      "pct_from_ema200": 25.67,
-      "rsi14": 61.6,
-      "atr14": 822.61,
-      "entry_zone_low": 22073.69,
-      "entry_zone_high": 22485.0,
-      "stop_loss": 21456.74,
-      "target_1": 23513.26,
-      "target_2": 24335.88,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.73,
-      "adtv_value_inr_approx": 967897554.0,
-      "f_score": 4.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 274.82,
-      "trailing_pe": 282.01,
-      "delivery_value_inr": 177646850.0,
-      "delivery_qty": 7913.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-10",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 1189156495.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -15.5,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.38,
-      "swing_high_63d": 24125.0,
-      "atr_expansion_ratio": 1.68,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -3.91,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; pct_off_high -5.64 outside [-40.0,-15.0]; rsi 61.6 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -5.64 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 61.6 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 9.9,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "PNBHOUSING",
       "company_name": "PNB Housing Finance Ltd.",
       "industry": "Financial Services",
@@ -51761,6 +51652,115 @@
           "gate": "rsi",
           "passed": false,
           "reason": "rsi 53.62 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 9.9,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.4444444444444444,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "PTCIL",
+      "company_name": "PTC Industries Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "PTCIL.NS",
+      "current_price": 22485.0,
+      "fifty_two_wk_high": 23830.0,
+      "pct_off_52wk_high": -5.64,
+      "pct_from_ema200": 25.67,
+      "rsi14": 61.6,
+      "atr14": 822.61,
+      "entry_zone_low": 22073.69,
+      "entry_zone_high": 22485.0,
+      "stop_loss": 21456.74,
+      "target_1": 23513.26,
+      "target_2": 24335.88,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.73,
+      "adtv_value_inr_approx": 967897554.0,
+      "f_score": 4.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 274.82,
+      "trailing_pe": 282.01,
+      "delivery_value_inr": 177646850.0,
+      "delivery_qty": 7913.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-10",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 1189156495.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -15.5,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.38,
+      "swing_high_63d": 24125.0,
+      "atr_expansion_ratio": 1.68,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -3.91,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; pct_off_high -5.64 outside [-40.0,-15.0]; rsi 61.6 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -5.64 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 61.6 outside [25,40]"
         },
         {
           "gate": "liquidity_adequacy",
