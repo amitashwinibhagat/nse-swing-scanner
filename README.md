@@ -442,9 +442,9 @@ to run. If it saves you time, you can support its continued development:
 
 <div align="center">
 
-### [Buy me a coffee](https://buymeacoffee.com/amitash)
-
-**[https://buymeacoffee.com/amitash](https://buymeacoffee.com/amitash)**
+<a href="https://www.buymeacoffee.com/amitash" target="_blank" rel="noopener">
+  <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=%E2%98%95&slug=amitash&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" alt="Buy me a coffee" height="50">
+</a>
 
 Every contribution goes toward keeping the data fresh, the tests green, and the
 project free for everyone.
