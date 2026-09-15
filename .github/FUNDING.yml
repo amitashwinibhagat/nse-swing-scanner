@@ -1,3 +1,4 @@
-# Renders the "Sponsor" button in the repository sidebar.
-# Dodo Payments — free and open source, funded by its users.
-custom: ["https://dodo.pe/amitash"]
+# Buy Me a Coffee — free and open source, funded by its users.
+# `buy_me_a_coffee` is a funding platform GitHub recognizes natively, so the
+# repository sidebar gets a branded button instead of a generic custom link.
+buy_me_a_coffee: amitash

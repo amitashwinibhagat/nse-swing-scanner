@@ -13,7 +13,7 @@ that grades the system's own past picks.
 [![Vite 8](https://img.shields.io/badge/Vite-8-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Deployed on Netlify](https://img.shields.io/badge/Netlify-live-00C7B7.svg?logo=netlify&logoColor=white)](https://nse-swing-scanner.netlify.app)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Sponsor](https://img.shields.io/badge/Sponsor-this_project-ea4aaa.svg?logo=githubsponsors&logoColor=white)](https://dodo.pe/amitash)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-support_this_project-FFDD00.svg?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/amitash)
 
 [![Not investment advice](https://img.shields.io/badge/not_investment_advice-red.svg)](#disclaimer)
 [![Not SEBI-registered](https://img.shields.io/badge/not_SEBI--registered_research-red.svg)](#disclaimer)
@@ -442,9 +442,9 @@ to run. If it saves you time, you can support its continued development:
 
 <div align="center">
 
-### [Sponsor / donate via Dodo Payments](https://dodo.pe/amitash)
+### [Buy me a coffee](https://buymeacoffee.com/amitash)
 
-**[https://dodo.pe/amitash](https://dodo.pe/amitash)**
+**[https://buymeacoffee.com/amitash](https://buymeacoffee.com/amitash)**
 
 Every contribution goes toward keeping the data fresh, the tests green, and the
 project free for everyone.
