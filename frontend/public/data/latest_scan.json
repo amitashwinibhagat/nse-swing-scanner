@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-17T05:58:48.387588+00:00",
+  "generated_at": "2026-09-17T08:52:47.179193+00:00",
   "universe_size": 501,
   "gate_pass_count": 74,
   "coverage": {
@@ -10488,115 +10488,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "ULTRACEMCO",
-      "company_name": "UltraTech Cement Ltd.",
-      "industry": "Construction Materials",
-      "yf_ticker": "ULTRACEMCO.NS",
-      "current_price": 10751.0,
-      "fifty_two_wk_high": 12790.92,
-      "pct_off_52wk_high": -15.95,
-      "pct_from_ema200": -7.05,
-      "rsi14": 30.46,
-      "atr14": 182.72,
-      "entry_zone_low": 10659.64,
-      "entry_zone_high": 10751.0,
-      "stop_loss": 10522.6,
-      "target_1": 10979.4,
-      "target_2": 11162.13,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.47,
-      "adtv_value_inr_approx": 2470235768.0,
-      "f_score": 8.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 526636374.0,
-      "delivery_qty": 48953.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-17",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 2652231693.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -4.28,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.55,
-      "swing_high_63d": 12239.0,
-      "atr_expansion_ratio": 0.91,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -4.54,
-      "market_correction_factor": 1.0,
-      "gate_pass": true,
-      "gate_fail_reason": null,
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 48.2,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.7800000000000001,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.18999999999999986,
-        "volume_capitulation": 0.235,
-        "quality_composite": 0.8888888888888888,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "missing"
-    },
-    {
       "symbol": "HOMEFIRST",
       "company_name": "Home First Finance Company India Ltd.",
       "industry": "Financial Services",
@@ -13974,6 +13865,115 @@
       "earnings_date": null,
       "earnings_within_days": null,
       "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "ULTRACEMCO",
+      "company_name": "UltraTech Cement Ltd.",
+      "industry": "Construction Materials",
+      "yf_ticker": "ULTRACEMCO.NS",
+      "current_price": 10751.0,
+      "fifty_two_wk_high": 12790.92,
+      "pct_off_52wk_high": -15.95,
+      "pct_from_ema200": -7.05,
+      "rsi14": 30.46,
+      "atr14": 182.72,
+      "entry_zone_low": 10659.64,
+      "entry_zone_high": 10751.0,
+      "stop_loss": 10522.6,
+      "target_1": 10979.4,
+      "target_2": 11162.13,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.47,
+      "adtv_value_inr_approx": 2470235768.0,
+      "f_score": 8.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 43.32,
+      "trailing_pe": 37.3,
+      "delivery_value_inr": 526636374.0,
+      "delivery_qty": 48953.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-17",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 2652231693.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -4.28,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.55,
+      "swing_high_63d": 12239.0,
+      "atr_expansion_ratio": 0.91,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -4.54,
+      "market_correction_factor": 1.0,
+      "gate_pass": true,
+      "gate_fail_reason": null,
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 45.2,
+      "sub_scores": {
+        "valuation_compression": 0.3474145891043399,
+        "oversold_positioning": 0.7800000000000001,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.18999999999999986,
+        "volume_capitulation": 0.235,
+        "quality_composite": 0.8888888888888888,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "missing"
     },
     {
       "symbol": "ENDURANCE",
@@ -40354,115 +40354,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "UTIAMC",
-      "company_name": "UTI Asset Management Company Ltd.",
-      "industry": "Financial Services",
-      "yf_ticker": "UTIAMC.NS",
-      "current_price": 895.35,
-      "fifty_two_wk_high": 1347.26,
-      "pct_off_52wk_high": -33.54,
-      "pct_from_ema200": -8.1,
-      "rsi14": 47.86,
-      "atr14": 15.48,
-      "entry_zone_low": 887.61,
-      "entry_zone_high": 895.35,
-      "stop_loss": 876.0,
-      "target_1": 914.7,
-      "target_2": 930.19,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.08,
-      "adtv_value_inr_approx": 92759541.0,
-      "f_score": 5.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 7916275.0,
-      "delivery_qty": 8845.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-17",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 100285725.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -7.99,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.68,
-      "swing_high_63d": 995.59,
-      "atr_expansion_ratio": 0.95,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": null,
-      "holdings_fii_pct": null,
-      "holdings_dii_pct": null,
-      "holdings_conviction_pct": null,
-      "holdings_source_status": "source_failed",
-      "holdings_source": "screener.in",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -4.54,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 5 < 6; rsi 47.86 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 5 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 47.86 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 25.7,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.6460000000000001,
-        "volume_capitulation": 0.040000000000000036,
-        "quality_composite": 0.5555555555555556,
-        "conviction_holding": null
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "BAJAJ-AUTO",
       "company_name": "Bajaj Auto Ltd.",
       "industry": "Automobile and Auto Components",
@@ -46559,6 +46450,115 @@
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.09499999999999997,
         "quality_composite": 0.6666666666666666,
+        "conviction_holding": null
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "UTIAMC",
+      "company_name": "UTI Asset Management Company Ltd.",
+      "industry": "Financial Services",
+      "yf_ticker": "UTIAMC.NS",
+      "current_price": 895.35,
+      "fifty_two_wk_high": 1347.26,
+      "pct_off_52wk_high": -33.54,
+      "pct_from_ema200": -8.1,
+      "rsi14": 47.86,
+      "atr14": 15.48,
+      "entry_zone_low": 887.61,
+      "entry_zone_high": 895.35,
+      "stop_loss": 876.0,
+      "target_1": 914.7,
+      "target_2": 930.19,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.08,
+      "adtv_value_inr_approx": 92759541.0,
+      "f_score": 5.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 18.51,
+      "trailing_pe": 25.49,
+      "delivery_value_inr": 7916275.0,
+      "delivery_qty": 8845.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-17",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 100285725.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -7.99,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.68,
+      "swing_high_63d": 995.59,
+      "atr_expansion_ratio": 0.95,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": null,
+      "holdings_fii_pct": null,
+      "holdings_dii_pct": null,
+      "holdings_conviction_pct": null,
+      "holdings_source_status": "source_failed",
+      "holdings_source": "screener.in",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -4.54,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 5 < 6; rsi 47.86 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 5 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 47.86 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 20.0,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.6460000000000001,
+        "volume_capitulation": 0.040000000000000036,
+        "quality_composite": 0.5555555555555556,
         "conviction_holding": null
       },
       "score_version": "weights-2026-06-v1",
