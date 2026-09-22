@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-22T08:46:23.567054+00:00",
+  "generated_at": "2026-09-22T11:11:25.868086+00:00",
   "universe_size": 501,
   "gate_pass_count": 34,
   "coverage": {
@@ -39482,115 +39482,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "ACE",
-      "company_name": "Action Construction Equipment Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "ACE.NS",
-      "current_price": 1240.3,
-      "fifty_two_wk_high": 1240.3,
-      "pct_off_52wk_high": 0.0,
-      "pct_from_ema200": 22.4,
-      "rsi14": 71.64,
-      "atr14": 40.33,
-      "entry_zone_low": 1220.13,
-      "entry_zone_high": 1240.3,
-      "stop_loss": 1189.89,
-      "target_1": 1290.71,
-      "target_2": 1331.04,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.93,
-      "adtv_value_inr_approx": 444985591.0,
-      "f_score": 6.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 34.35,
-      "trailing_pe": 33.75,
-      "delivery_value_inr": 177851856.60058594,
-      "delivery_qty": 143348.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-22",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 360409967.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 13.57,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 1.83,
-      "swing_high_63d": 1263.1,
-      "atr_expansion_ratio": 1.02,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 65.42,
-      "holdings_fii_pct": 9.58,
-      "holdings_dii_pct": 1.84,
-      "holdings_conviction_pct": 76.84,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -3.8,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high 0.0 outside [-40.0,-15.0]; rsi 71.64 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high 0.0 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 71.64 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 24.2,
-      "sub_scores": {
-        "valuation_compression": 0.04366812227074246,
-        "oversold_positioning": 0.0,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.6666666666666666,
-        "conviction_holding": 1.0
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "ACUTAAS",
       "company_name": "Acutaas Chemicals Ltd.",
       "industry": "Healthcare",
@@ -39691,6 +39582,115 @@
         "support_proximity": 0.0,
         "drawdown_sweetspot": 0.0,
         "volume_capitulation": 0.08999999999999997,
+        "quality_composite": 0.6666666666666666,
+        "conviction_holding": 1.0
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "ACE",
+      "company_name": "Action Construction Equipment Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "ACE.NS",
+      "current_price": 1240.3,
+      "fifty_two_wk_high": 1240.3,
+      "pct_off_52wk_high": 0.0,
+      "pct_from_ema200": 22.4,
+      "rsi14": 71.64,
+      "atr14": 40.33,
+      "entry_zone_low": 1220.13,
+      "entry_zone_high": 1240.3,
+      "stop_loss": 1189.89,
+      "target_1": 1290.71,
+      "target_2": 1331.04,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.93,
+      "adtv_value_inr_approx": 444985591.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 34.35,
+      "trailing_pe": 33.75,
+      "delivery_value_inr": 177851856.60058594,
+      "delivery_qty": 143348.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-22",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 360409967.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 13.57,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 1.83,
+      "swing_high_63d": 1263.1,
+      "atr_expansion_ratio": 1.02,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 65.42,
+      "holdings_fii_pct": 9.58,
+      "holdings_dii_pct": 1.84,
+      "holdings_conviction_pct": 76.84,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -3.8,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high 0.0 outside [-40.0,-15.0]; rsi 71.64 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high 0.0 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 71.64 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 24.2,
+      "sub_scores": {
+        "valuation_compression": 0.04366812227074246,
+        "oversold_positioning": 0.0,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.0,
         "quality_composite": 0.6666666666666666,
         "conviction_holding": 1.0
       },
