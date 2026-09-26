@@ -3,83 +3,83 @@
   "T+10": {
    "anticipatory": {
     "ci95": {
-     "high": 1.27,
-     "low": 0.71
+     "high": 1.12,
+     "low": 0.67
     },
-    "hit_rate": 0.475,
-    "mean": 0.99,
-    "median": -0.22,
-    "n": 1147,
-    "q1": -2.02,
-    "q3": 2.96
+    "hit_rate": 0.492,
+    "mean": 0.88,
+    "median": -0.1,
+    "n": 1671,
+    "q1": -2.03,
+    "q3": 2.8
    },
    "confirmed": {
     "ci95": {
-     "high": 2.49,
-     "low": 1.03
+     "high": 2.19,
+     "low": 1.05
     },
-    "hit_rate": 0.593,
-    "mean": 1.73,
-    "median": 0.59,
-    "n": 177,
-    "q1": -1.36,
-    "q3": 3.89
+    "hit_rate": 0.584,
+    "mean": 1.59,
+    "median": 0.93,
+    "n": 238,
+    "q1": -1.47,
+    "q3": 3.88
    }
   },
   "T+20": {
    "anticipatory": {
     "ci95": {
-     "high": 2.39,
-     "low": 1.3
+     "high": 2.28,
+     "low": 1.48
     },
-    "hit_rate": 0.539,
-    "mean": 1.81,
-    "median": 0.65,
-    "n": 651,
-    "q1": -3.09,
+    "hit_rate": 0.556,
+    "mean": 1.85,
+    "median": 0.84,
+    "n": 891,
+    "q1": -2.6,
     "q3": 5.02
    },
    "confirmed": {
     "ci95": {
-     "high": 3.06,
-     "low": 0.37
+     "high": 2.67,
+     "low": 0.5
     },
-    "hit_rate": 0.432,
-    "mean": 1.65,
-    "median": -0.87,
-    "n": 111,
-    "q1": -3.21,
+    "hit_rate": 0.418,
+    "mean": 1.54,
+    "median": -0.83,
+    "n": 146,
+    "q1": -3.27,
     "q3": 5.97
    }
   },
   "T+5": {
    "anticipatory": {
     "ci95": {
-     "high": 0.71,
-     "low": 0.38
+     "high": 0.8,
+     "low": 0.54
     },
-    "hit_rate": 0.515,
-    "mean": 0.55,
-    "median": 0.09,
-    "n": 1619,
-    "q1": -1.38,
-    "q3": 1.88
+    "hit_rate": 0.548,
+    "mean": 0.68,
+    "median": 0.34,
+    "n": 2316,
+    "q1": -1.31,
+    "q3": 2.1
    },
    "confirmed": {
     "ci95": {
-     "high": 1.15,
-     "low": 0.38
+     "high": 1.0,
+     "low": 0.4
     },
-    "hit_rate": 0.555,
-    "mean": 0.75,
-    "median": 0.47,
-    "n": 236,
-    "q1": -1.35,
-    "q3": 2.27
+    "hit_rate": 0.522,
+    "mean": 0.69,
+    "median": 0.24,
+    "n": 358,
+    "q1": -1.37,
+    "q3": 2.4
    }
   }
  },
- "generated_at": "2026-09-19T08:39:13.210391+00:00",
+ "generated_at": "2026-09-26T09:13:32.813652+00:00",
  "meta": {
   "baseline_weights": {
    "conviction_holding": 0.1,
@@ -94,8 +94,8 @@
   "bootstrap_seed": 42,
   "ic_min_n": 30,
   "in_sample": true,
-  "rows_closed_any_window": 1855,
-  "rows_total": 2674
+  "rows_closed_any_window": 2674,
+  "rows_total": 3046
  },
  "promotion_checklist": [
   "Out-of-sample: the candidate weights beat baseline on the tracker's top-band mean excess for 4 consecutive weekly runs (not just this in-sample report).",
@@ -104,174 +104,174 @@
   "The weight change is a single commit touching only backend/settings.py WEIGHTS + CHANGELOG.md, so the tracker can attribute the regime change to score_version."
  ],
  "shadow": {
-  "baseline_score_mismatch_gt5": 1412,
-  "rows_used": 2674,
+  "baseline_score_mismatch_gt5": 1604,
+  "rows_used": 3046,
   "windows": {
    "T+10": {
     "baseline": {
      "45-55": {
-      "hit_rate": 0.513,
-      "mean": 0.98,
-      "n": 472
+      "hit_rate": 0.519,
+      "mean": 0.87,
+      "n": 686
      },
      "55-60": {
-      "hit_rate": 0.516,
-      "mean": 1.65,
-      "n": 188
+      "hit_rate": 0.578,
+      "mean": 2.0,
+      "n": 268
      },
      "60-63": {
-      "hit_rate": 0.41,
-      "mean": 0.38,
-      "n": 117
+      "hit_rate": 0.412,
+      "mean": 0.23,
+      "n": 148
      },
      "63+": {
-      "hit_rate": 0.447,
-      "mean": 0.88,
-      "n": 356
+      "hit_rate": 0.477,
+      "mean": 0.82,
+      "n": 522
      },
      "<45": {
-      "hit_rate": 0.545,
-      "mean": 1.64,
-      "n": 191
+      "hit_rate": 0.491,
+      "mean": 0.88,
+      "n": 285
      }
     },
     "ic_proportional": {
      "45-55": {
-      "hit_rate": 0.574,
-      "mean": 2.19,
-      "n": 162
+      "hit_rate": 0.548,
+      "mean": 0.9,
+      "n": 281
      },
      "55-60": {
-      "hit_rate": 0.725,
-      "mean": 2.48,
-      "n": 51
+      "hit_rate": 0.565,
+      "mean": 1.9,
+      "n": 138
      },
      "60-63": {
-      "hit_rate": 0.444,
-      "mean": -0.21,
-      "n": 63
+      "hit_rate": 0.692,
+      "mean": 3.15,
+      "n": 78
      },
      "63+": {
-      "hit_rate": 0.572,
-      "mean": 2.01,
-      "n": 339
+      "hit_rate": 0.596,
+      "mean": 1.83,
+      "n": 329
      },
      "<45": {
-      "hit_rate": 0.42,
-      "mean": 0.42,
-      "n": 709
+      "hit_rate": 0.442,
+      "mean": 0.44,
+      "n": 1083
      }
     }
    },
    "T+20": {
     "baseline": {
      "45-55": {
-      "hit_rate": 0.59,
-      "mean": 2.13,
-      "n": 261
+      "hit_rate": 0.612,
+      "mean": 2.02,
+      "n": 363
      },
      "55-60": {
-      "hit_rate": 0.481,
-      "mean": 0.55,
-      "n": 106
+      "hit_rate": 0.555,
+      "mean": 1.63,
+      "n": 146
      },
      "60-63": {
-      "hit_rate": 0.569,
-      "mean": 1.17,
-      "n": 58
+      "hit_rate": 0.558,
+      "mean": 0.94,
+      "n": 86
      },
      "63+": {
-      "hit_rate": 0.429,
-      "mean": 1.5,
-      "n": 226
+      "hit_rate": 0.434,
+      "mean": 1.41,
+      "n": 290
      },
      "<45": {
-      "hit_rate": 0.577,
-      "mean": 3.09,
-      "n": 111
+      "hit_rate": 0.52,
+      "mean": 2.72,
+      "n": 152
      }
     },
     "ic_proportional": {
      "45-55": {
-      "hit_rate": 0.641,
-      "mean": 5.12,
-      "n": 92
+      "hit_rate": 0.704,
+      "mean": 3.51,
+      "n": 142
      },
      "55-60": {
-      "hit_rate": 0.962,
-      "mean": 6.2,
-      "n": 26
+      "hit_rate": 0.607,
+      "mean": 4.05,
+      "n": 107
      },
      "60-63": {
-      "hit_rate": 0.931,
-      "mean": 6.31,
-      "n": 29
+      "hit_rate": 0.836,
+      "mean": 4.22,
+      "n": 61
      },
      "63+": {
-      "hit_rate": 0.502,
-      "mean": 1.01,
-      "n": 261
+      "hit_rate": 0.522,
+      "mean": 1.52,
+      "n": 209
      },
      "<45": {
-      "hit_rate": 0.444,
-      "mean": 0.8,
-      "n": 354
+      "hit_rate": 0.446,
+      "mean": 0.71,
+      "n": 518
      }
     }
    },
    "T+5": {
     "baseline": {
      "45-55": {
-      "hit_rate": 0.526,
-      "mean": 0.56,
-      "n": 664
+      "hit_rate": 0.555,
+      "mean": 0.73,
+      "n": 947
      },
      "55-60": {
-      "hit_rate": 0.538,
-      "mean": 0.64,
-      "n": 262
+      "hit_rate": 0.547,
+      "mean": 0.65,
+      "n": 382
      },
      "60-63": {
-      "hit_rate": 0.453,
-      "mean": -0.36,
-      "n": 148
+      "hit_rate": 0.436,
+      "mean": -0.29,
+      "n": 204
      },
      "63+": {
-      "hit_rate": 0.522,
-      "mean": 0.81,
-      "n": 504
+      "hit_rate": 0.545,
+      "mean": 0.84,
+      "n": 697
      },
      "<45": {
-      "hit_rate": 0.523,
-      "mean": 0.62,
-      "n": 277
+      "hit_rate": 0.568,
+      "mean": 0.8,
+      "n": 444
      }
     },
     "ic_proportional": {
      "45-55": {
-      "hit_rate": 0.515,
-      "mean": 0.79,
-      "n": 237
+      "hit_rate": 0.485,
+      "mean": 0.32,
+      "n": 369
      },
      "55-60": {
-      "hit_rate": 0.467,
-      "mean": 0.35,
-      "n": 92
+      "hit_rate": 0.592,
+      "mean": 1.44,
+      "n": 169
      },
      "60-63": {
-      "hit_rate": 0.551,
-      "mean": 0.4,
-      "n": 69
+      "hit_rate": 0.696,
+      "mean": 2.02,
+      "n": 102
      },
      "63+": {
-      "hit_rate": 0.552,
-      "mean": 1.06,
-      "n": 422
+      "hit_rate": 0.551,
+      "mean": 0.99,
+      "n": 403
      },
      "<45": {
-      "hit_rate": 0.511,
-      "mean": 0.36,
-      "n": 1035
+      "hit_rate": 0.542,
+      "mean": 0.53,
+      "n": 1631
      }
     }
    }
@@ -281,208 +281,208 @@
   "T+10": {
    "conviction_holding": {
     "ci95": [
-     -0.226,
-     -0.097
+     -0.194,
+     -0.071
     ],
-    "ic": -0.158,
-    "n": 318,
+    "ic": -0.137,
+    "n": 524,
     "usable": true
    },
    "drawdown_sweetspot": {
     "ci95": [
-     -0.136,
-     -0.022
+     -0.095,
+     -0.001
     ],
-    "ic": -0.075,
-    "n": 1324,
+    "ic": -0.05,
+    "n": 1909,
     "usable": true
    },
    "oversold_positioning": {
     "ci95": [
-     -0.14,
-     -0.039
+     -0.121,
+     -0.037
     ],
-    "ic": -0.086,
-    "n": 1324,
+    "ic": -0.077,
+    "n": 1909,
     "usable": true
    },
    "quality_composite": {
     "ci95": [
-     0.014,
-     0.134
+     0.043,
+     0.131
     ],
-    "ic": 0.072,
-    "n": 1324,
+    "ic": 0.084,
+    "n": 1909,
     "usable": true
    },
    "support_proximity": {
     "ci95": [
-     0.037,
-     0.157
+     -0.007,
+     0.103
     ],
-    "ic": 0.095,
-    "n": 1324,
+    "ic": 0.05,
+    "n": 1909,
     "usable": true
    },
    "valuation_compression": {
     "ci95": [
-     -0.286,
-     -0.179
+     -0.163,
+     -0.071
     ],
-    "ic": -0.233,
-    "n": 1224,
+    "ic": -0.121,
+    "n": 1749,
     "usable": true
    },
    "volume_capitulation": {
     "ci95": [
-     0.129,
-     0.234
+     0.136,
+     0.221
     ],
-    "ic": 0.185,
-    "n": 1324,
+    "ic": 0.177,
+    "n": 1909,
     "usable": true
    }
   },
   "T+20": {
    "conviction_holding": {
     "ci95": [
-     -0.111,
-     0.266
+     -0.09,
+     0.256
     ],
-    "ic": 0.098,
-    "n": 180,
+    "ic": 0.099,
+    "n": 230,
     "usable": true
    },
    "drawdown_sweetspot": {
     "ci95": [
-     -0.183,
-     -0.044
+     -0.159,
+     -0.027
     ],
-    "ic": -0.118,
-    "n": 762,
+    "ic": -0.087,
+    "n": 1037,
     "usable": true
    },
    "oversold_positioning": {
     "ci95": [
-     -0.066,
-     0.078
+     -0.068,
+     0.044
     ],
-    "ic": 0.013,
-    "n": 762,
+    "ic": -0.011,
+    "n": 1037,
     "usable": true
    },
    "quality_composite": {
     "ci95": [
-     0.068,
-     0.209
+     0.05,
+     0.177
     ],
-    "ic": 0.145,
-    "n": 762,
+    "ic": 0.114,
+    "n": 1037,
     "usable": true
    },
    "support_proximity": {
     "ci95": [
      0.183,
-     0.316
+     0.293
     ],
-    "ic": 0.25,
-    "n": 762,
+    "ic": 0.234,
+    "n": 1037,
     "usable": true
    },
    "valuation_compression": {
     "ci95": [
-     -0.467,
-     -0.33
+     -0.431,
+     -0.323
     ],
-    "ic": -0.4,
-    "n": 698,
+    "ic": -0.38,
+    "n": 960,
     "usable": true
    },
    "volume_capitulation": {
     "ci95": [
-     -0.027,
-     0.122
+     0.025,
+     0.154
     ],
-    "ic": 0.051,
-    "n": 762,
+    "ic": 0.092,
+    "n": 1037,
     "usable": true
    }
   },
   "T+5": {
    "conviction_holding": {
     "ci95": [
-     -0.129,
-     -0.021
+     -0.103,
+     -0.007
     ],
-    "ic": -0.075,
-    "n": 500,
+    "ic": -0.054,
+    "n": 801,
     "usable": true
    },
    "drawdown_sweetspot": {
     "ci95": [
-     -0.099,
-     -0.008
+     -0.111,
+     -0.032
     ],
-    "ic": -0.049,
-    "n": 1855,
+    "ic": -0.074,
+    "n": 2674,
     "usable": true
    },
    "oversold_positioning": {
     "ci95": [
-     -0.052,
-     0.035
+     -0.038,
+     0.037
     ],
-    "ic": -0.01,
-    "n": 1855,
+    "ic": 0.001,
+    "n": 2674,
     "usable": true
    },
    "quality_composite": {
     "ci95": [
-     -0.026,
-     0.071
+     0.002,
+     0.083
     ],
-    "ic": 0.025,
-    "n": 1855,
+    "ic": 0.044,
+    "n": 2674,
     "usable": true
    },
    "support_proximity": {
     "ci95": [
-     -0.04,
-     0.068
+     0.004,
+     0.091
     ],
-    "ic": 0.015,
-    "n": 1855,
+    "ic": 0.047,
+    "n": 2674,
     "usable": true
    },
    "valuation_compression": {
     "ci95": [
-     -0.113,
-     -0.012
+     -0.09,
+     -0.007
     ],
-    "ic": -0.065,
-    "n": 1701,
+    "ic": -0.052,
+    "n": 2433,
     "usable": true
    },
    "volume_capitulation": {
     "ci95": [
-     0.039,
-     0.128
+     0.035,
+     0.109
     ],
-    "ic": 0.086,
-    "n": 1855,
+    "ic": 0.073,
+    "n": 2674,
     "usable": true
    }
   }
  },
  "top_band_lift": {
   "T+10": {
-   "ic_proportional": 1.13
+   "ic_proportional": 1.01
   },
   "T+20": {
-   "ic_proportional": -0.49
+   "ic_proportional": 0.11
   },
   "T+5": {
-   "ic_proportional": 0.25
+   "ic_proportional": 0.15
   }
  }
 }
