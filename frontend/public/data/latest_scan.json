@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-29T13:25:18.934895+00:00",
+  "generated_at": "2026-09-29T16:39:40.014373+00:00",
   "universe_size": 501,
   "gate_pass_count": 72,
   "coverage": {
@@ -40572,115 +40572,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "ABFRL",
-      "company_name": "Aditya Birla Fashion and Retail Ltd.",
-      "industry": "Consumer Services",
-      "yf_ticker": "ABFRL.NS",
-      "current_price": 46.48,
-      "fifty_two_wk_high": 87.99,
-      "pct_off_52wk_high": -47.18,
-      "pct_from_ema200": -25.23,
-      "rsi14": 28.42,
-      "atr14": 1.45,
-      "entry_zone_low": 45.75,
-      "entry_zone_high": 46.48,
-      "stop_loss": 44.67,
-      "target_1": 48.29,
-      "target_2": 49.74,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.27,
-      "adtv_value_inr_approx": 185913211.0,
-      "f_score": 6.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 157232770.32300568,
-      "delivery_qty": 3377718.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-09-29",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 213890354.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "anticipatory",
-      "rsi_delta_3d": -0.76,
-      "close_up_1d": false,
-      "vol_ratio_3v20": 0.91,
-      "swing_high_63d": 64.1,
-      "atr_expansion_ratio": 0.88,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 46.61,
-      "holdings_fii_pct": 15.53,
-      "holdings_dii_pct": 6.62,
-      "holdings_conviction_pct": 68.76,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -6.04,
-      "market_correction_factor": 0.7,
-      "gate_pass": false,
-      "gate_fail_reason": "pct_off_high -47.18 outside [-40.0,-15.0]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": false,
-          "reason": "pct_off_high -47.18 outside [-40.0,-15.0]"
-        },
-        {
-          "gate": "rsi",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 27.7,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.4885714285714288,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0,
-        "volume_capitulation": 0.135,
-        "quality_composite": 0.6666666666666666,
-        "conviction_holding": 0.9690000000000001
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "ABLBL",
       "company_name": "Aditya Birla Lifestyle Brands Ltd.",
       "industry": "Consumer Services",
@@ -40783,6 +40674,115 @@
         "volume_capitulation": 0.39,
         "quality_composite": 0.8888888888888888,
         "conviction_holding": 1.0
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "ABFRL",
+      "company_name": "Aditya Birla Fashion and Retail Ltd.",
+      "industry": "Consumer Services",
+      "yf_ticker": "ABFRL.NS",
+      "current_price": 46.48,
+      "fifty_two_wk_high": 87.99,
+      "pct_off_52wk_high": -47.18,
+      "pct_from_ema200": -25.23,
+      "rsi14": 28.42,
+      "atr14": 1.45,
+      "entry_zone_low": 45.75,
+      "entry_zone_high": 46.48,
+      "stop_loss": 44.67,
+      "target_1": 48.29,
+      "target_2": 49.74,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.27,
+      "adtv_value_inr_approx": 185913211.0,
+      "f_score": 6.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": null,
+      "trailing_pe": null,
+      "delivery_value_inr": 157232770.32300568,
+      "delivery_qty": 3377718.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-09-29",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 213890354.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "anticipatory",
+      "rsi_delta_3d": -0.76,
+      "close_up_1d": false,
+      "vol_ratio_3v20": 0.91,
+      "swing_high_63d": 64.1,
+      "atr_expansion_ratio": 0.88,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 46.61,
+      "holdings_fii_pct": 15.53,
+      "holdings_dii_pct": 6.62,
+      "holdings_conviction_pct": 68.76,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -6.04,
+      "market_correction_factor": 0.7,
+      "gate_pass": false,
+      "gate_fail_reason": "pct_off_high -47.18 outside [-40.0,-15.0]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": false,
+          "reason": "pct_off_high -47.18 outside [-40.0,-15.0]"
+        },
+        {
+          "gate": "rsi",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 27.7,
+      "sub_scores": {
+        "valuation_compression": null,
+        "oversold_positioning": 0.4885714285714288,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0,
+        "volume_capitulation": 0.135,
+        "quality_composite": 0.6666666666666666,
+        "conviction_holding": 0.9690000000000001
       },
       "score_version": "weights-2026-06-v1",
       "earnings_date": null,
