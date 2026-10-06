@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T10:43:51.193978+00:00",
+  "generated_at": "2026-10-06T16:57:48.388130+00:00",
   "universe_size": 501,
   "gate_pass_count": 46,
   "coverage": {
@@ -458,115 +458,6 @@
       "earnings_date": "2026-11-05",
       "earnings_within_days": 30,
       "earnings_source_status": "ok"
-    },
-    {
-      "symbol": "TATATECH",
-      "company_name": "Tata Technologies Ltd.",
-      "industry": "Information Technology",
-      "yf_ticker": "TATATECH.NS",
-      "current_price": 703.1,
-      "fifty_two_wk_high": 879.15,
-      "pct_off_52wk_high": -20.03,
-      "pct_from_ema200": -0.56,
-      "rsi14": 36.74,
-      "atr14": 21.91,
-      "entry_zone_low": 692.14,
-      "entry_zone_high": 703.1,
-      "stop_loss": 675.71,
-      "target_1": 730.49,
-      "target_2": 752.41,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 0.74,
-      "adtv_value_inr_approx": 624170957.0,
-      "f_score": 4.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 215972625.7006836,
-      "delivery_qty": 307172.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-10-06",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 552815130.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 2.39,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.41,
-      "swing_high_63d": 891.0,
-      "atr_expansion_ratio": 0.78,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 55.17,
-      "holdings_fii_pct": 6.3,
-      "holdings_dii_pct": 4.48,
-      "holdings_conviction_pct": 65.95,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -5.82,
-      "market_correction_factor": 1.05,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 73.8,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 1.0,
-        "support_proximity": 0.888,
-        "drawdown_sweetspot": 1.0,
-        "volume_capitulation": 0.0,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": 0.89875
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
     },
     {
       "symbol": "YESBANK",
@@ -2422,6 +2313,115 @@
       "earnings_source_status": "not_applicable"
     },
     {
+      "symbol": "TATASTEEL",
+      "company_name": "Tata Steel Ltd.",
+      "industry": "Metals & Mining",
+      "yf_ticker": "TATASTEEL.NS",
+      "current_price": 178.69,
+      "fifty_two_wk_high": 216.66,
+      "pct_off_52wk_high": -17.53,
+      "pct_from_ema200": -4.8,
+      "rsi14": 39.42,
+      "atr14": 4.33,
+      "entry_zone_low": 176.53,
+      "entry_zone_high": 178.69,
+      "stop_loss": 173.28,
+      "target_1": 184.1,
+      "target_2": 188.43,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 1.79,
+      "adtv_value_inr_approx": 4769897318.0,
+      "f_score": 7.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 29.63,
+      "trailing_pe": 20.19,
+      "delivery_value_inr": 3080864021.1932373,
+      "delivery_qty": 17241390.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-10-06",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 4426975376.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 1.53,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.52,
+      "swing_high_63d": 193.65,
+      "atr_expansion_ratio": 1.0,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 32.94,
+      "holdings_fii_pct": 18.9,
+      "holdings_dii_pct": 26.44,
+      "holdings_conviction_pct": 78.28,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -5.82,
+      "market_correction_factor": 1.05,
+      "gate_pass": true,
+      "gate_fail_reason": null,
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 66.2,
+      "sub_scores": {
+        "valuation_compression": 0.7964900438744513,
+        "oversold_positioning": 0.7971428571428569,
+        "support_proximity": 0.040000000000000036,
+        "drawdown_sweetspot": 0.5060000000000002,
+        "volume_capitulation": 0.395,
+        "quality_composite": 0.7777777777777778,
+        "conviction_holding": 1.0
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": "2026-11-11",
+      "earnings_within_days": 36,
+      "earnings_source_status": "ok"
+    },
+    {
       "symbol": "FIVESTAR",
       "company_name": "Five-Star Business Finance Ltd.",
       "industry": "Financial Services",
@@ -4166,115 +4166,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "TATASTEEL",
-      "company_name": "Tata Steel Ltd.",
-      "industry": "Metals & Mining",
-      "yf_ticker": "TATASTEEL.NS",
-      "current_price": 178.69,
-      "fifty_two_wk_high": 216.66,
-      "pct_off_52wk_high": -17.53,
-      "pct_from_ema200": -4.8,
-      "rsi14": 39.42,
-      "atr14": 4.33,
-      "entry_zone_low": 176.53,
-      "entry_zone_high": 178.69,
-      "stop_loss": 173.28,
-      "target_1": 184.1,
-      "target_2": 188.43,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 1.79,
-      "adtv_value_inr_approx": 4769897318.0,
-      "f_score": 7.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": null,
-      "trailing_pe": null,
-      "delivery_value_inr": 3080864021.1932373,
-      "delivery_qty": 17241390.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-10-06",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 4426975376.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 1.53,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.52,
-      "swing_high_63d": 193.65,
-      "atr_expansion_ratio": 1.0,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 32.94,
-      "holdings_fii_pct": 18.9,
-      "holdings_dii_pct": 26.44,
-      "holdings_conviction_pct": 78.28,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -5.82,
-      "market_correction_factor": 1.05,
-      "gate_pass": true,
-      "gate_fail_reason": null,
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 61.8,
-      "sub_scores": {
-        "valuation_compression": null,
-        "oversold_positioning": 0.7971428571428569,
-        "support_proximity": 0.040000000000000036,
-        "drawdown_sweetspot": 0.5060000000000002,
-        "volume_capitulation": 0.395,
-        "quality_composite": 0.7777777777777778,
-        "conviction_holding": 1.0
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": "2026-11-11",
-      "earnings_within_days": 36,
-      "earnings_source_status": "ok"
-    },
-    {
       "symbol": "HINDZINC",
       "company_name": "Hindustan Zinc Ltd.",
       "industry": "Metals & Mining",
@@ -5903,6 +5794,115 @@
         "volume_capitulation": 0.11499999999999999,
         "quality_composite": 0.4444444444444444,
         "conviction_holding": 1.0
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "TATATECH",
+      "company_name": "Tata Technologies Ltd.",
+      "industry": "Information Technology",
+      "yf_ticker": "TATATECH.NS",
+      "current_price": 703.1,
+      "fifty_two_wk_high": 879.15,
+      "pct_off_52wk_high": -20.03,
+      "pct_from_ema200": -0.56,
+      "rsi14": 36.74,
+      "atr14": 21.91,
+      "entry_zone_low": 692.14,
+      "entry_zone_high": 703.1,
+      "stop_loss": 675.71,
+      "target_1": 730.49,
+      "target_2": 752.41,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 0.74,
+      "adtv_value_inr_approx": 624170957.0,
+      "f_score": 4.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 45.14,
+      "trailing_pe": 51.25,
+      "delivery_value_inr": 215972625.7006836,
+      "delivery_qty": 307172.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-10-06",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 552815130.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 2.39,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.41,
+      "swing_high_63d": 891.0,
+      "atr_expansion_ratio": 0.78,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 55.17,
+      "holdings_fii_pct": 6.3,
+      "holdings_dii_pct": 4.48,
+      "holdings_conviction_pct": 65.95,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -5.82,
+      "market_correction_factor": 1.05,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 59.0,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 1.0,
+        "support_proximity": 0.888,
+        "drawdown_sweetspot": 1.0,
+        "volume_capitulation": 0.0,
+        "quality_composite": 0.4444444444444444,
+        "conviction_holding": 0.89875
       },
       "score_version": "weights-2026-06-v1",
       "earnings_date": null,
