@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-07T07:01:29.109995+00:00",
+  "generated_at": "2026-10-07T10:32:32.996748+00:00",
   "universe_size": 501,
   "gate_pass_count": 62,
   "coverage": {
@@ -17573,115 +17573,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "OFSS",
-      "company_name": "Oracle Financial Services Software Ltd.",
-      "industry": "Information Technology",
-      "yf_ticker": "OFSS.NS",
-      "current_price": 10620.0,
-      "fifty_two_wk_high": 12540.0,
-      "pct_off_52wk_high": -15.31,
-      "pct_from_ema200": 6.62,
-      "rsi14": 38.96,
-      "atr14": 351.61,
-      "entry_zone_low": 10444.2,
-      "entry_zone_high": 10620.0,
-      "stop_loss": 10180.49,
-      "target_1": 11059.51,
-      "target_2": 11411.11,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 2.47,
-      "adtv_value_inr_approx": 2341108554.0,
-      "f_score": 7.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 23.15,
-      "trailing_pe": 27.14,
-      "delivery_value_inr": 1049369032.0,
-      "delivery_qty": 98662.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-10-07",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 2268570115.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 5.58,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.42,
-      "swing_high_63d": 12540.0,
-      "atr_expansion_ratio": 1.03,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 72.41,
-      "holdings_fii_pct": 9.7,
-      "holdings_dii_pct": 8.79,
-      "holdings_conviction_pct": 90.9,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -6.24,
-      "market_correction_factor": 1.05,
-      "gate_pass": true,
-      "gate_fail_reason": null,
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 48.8,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.8628571428571428,
-        "support_proximity": 0.0,
-        "drawdown_sweetspot": 0.0620000000000001,
-        "volume_capitulation": 0.7350000000000001,
-        "quality_composite": 0.7777777777777778,
-        "conviction_holding": 1.0
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": "2026-10-16",
-      "earnings_within_days": 9,
-      "earnings_source_status": "ok"
-    },
-    {
       "symbol": "ONESOURCE",
       "company_name": "Onesource Specialty Pharma Ltd.",
       "industry": "Healthcare",
@@ -17789,6 +17680,115 @@
       "earnings_date": null,
       "earnings_within_days": null,
       "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "OFSS",
+      "company_name": "Oracle Financial Services Software Ltd.",
+      "industry": "Information Technology",
+      "yf_ticker": "OFSS.NS",
+      "current_price": 10620.0,
+      "fifty_two_wk_high": 12540.0,
+      "pct_off_52wk_high": -15.31,
+      "pct_from_ema200": 6.62,
+      "rsi14": 38.96,
+      "atr14": 351.61,
+      "entry_zone_low": 10444.2,
+      "entry_zone_high": 10620.0,
+      "stop_loss": 10180.49,
+      "target_1": 11059.51,
+      "target_2": 11411.11,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 2.47,
+      "adtv_value_inr_approx": 2341108554.0,
+      "f_score": 7.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 23.15,
+      "trailing_pe": 27.14,
+      "delivery_value_inr": 1049369032.0,
+      "delivery_qty": 98662.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-10-07",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 2268570115.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 5.58,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.42,
+      "swing_high_63d": 12540.0,
+      "atr_expansion_ratio": 1.03,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 72.41,
+      "holdings_fii_pct": 9.7,
+      "holdings_dii_pct": 8.79,
+      "holdings_conviction_pct": 90.9,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -6.24,
+      "market_correction_factor": 1.05,
+      "gate_pass": true,
+      "gate_fail_reason": null,
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 48.8,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.8628571428571428,
+        "support_proximity": 0.0,
+        "drawdown_sweetspot": 0.0620000000000001,
+        "volume_capitulation": 0.7350000000000001,
+        "quality_composite": 0.7777777777777778,
+        "conviction_holding": 1.0
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": "2026-10-16",
+      "earnings_within_days": 9,
+      "earnings_source_status": "ok"
     },
     {
       "symbol": "HDFCLIFE",
