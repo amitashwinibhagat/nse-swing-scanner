@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T08:32:59.805378+00:00",
+  "generated_at": "2026-10-15T15:18:31.910572+00:00",
   "universe_size": 501,
   "gate_pass_count": 45,
   "coverage": {
@@ -20843,115 +20843,6 @@
       "earnings_source_status": "not_applicable"
     },
     {
-      "symbol": "KIRLOSBROS",
-      "company_name": "Kirloskar Brothers Ltd.",
-      "industry": "Capital Goods",
-      "yf_ticker": "KIRLOSBROS.NS",
-      "current_price": 1714.0,
-      "fifty_two_wk_high": 2065.44,
-      "pct_off_52wk_high": -17.02,
-      "pct_from_ema200": -3.8,
-      "rsi14": 42.1,
-      "atr14": 53.21,
-      "entry_zone_low": 1687.4,
-      "entry_zone_high": 1714.0,
-      "stop_loss": 1647.49,
-      "target_1": 1780.51,
-      "target_2": 1833.72,
-      "risk_reward_target_1": 1.5,
-      "risk_reward_target_2": 2.5,
-      "volume_surge_factor": 5.64,
-      "adtv_value_inr_approx": 97847004.0,
-      "f_score": 4.0,
-      "f_score_components_available": 9.0,
-      "avg_pe_5y": 24.81,
-      "trailing_pe": 36.42,
-      "delivery_value_inr": 8169876.967285156,
-      "delivery_qty": 4766.0,
-      "delivery_pct": null,
-      "delivery_kind": "traded_value_proxy",
-      "delivery_fallback_from": null,
-      "delivery_as_of": "2026-10-15",
-      "delivery_source_status": "ok",
-      "delivery_source": "yfinance:traded_value_proxy",
-      "adv_value_inr": 124158199.0,
-      "adv_sessions": 20.0,
-      "liquidity_gate_path": "adv",
-      "confirmation_state": "confirmed",
-      "rsi_delta_3d": 3.5,
-      "close_up_1d": true,
-      "vol_ratio_3v20": 0.28,
-      "swing_high_63d": 1993.0,
-      "atr_expansion_ratio": 1.07,
-      "surveillance_is_restricted": false,
-      "surveillance_restriction_type": null,
-      "surveillance_source_status": "flag_only",
-      "surveillance_source": "none",
-      "holdings_promoter_pct": 65.95,
-      "holdings_fii_pct": 6.41,
-      "holdings_dii_pct": 10.23,
-      "holdings_conviction_pct": 82.59,
-      "holdings_source_status": "ok",
-      "holdings_source": "screener.in(consolidated)",
-      "pending_corporate_action": false,
-      "corporate_actions_status": "source_failed",
-      "market_index_pct_from_ema200": -4.86,
-      "market_correction_factor": 1.0,
-      "gate_pass": false,
-      "gate_fail_reason": "f_score 4 < 6; rsi 42.1 outside [25,40]",
-      "gate_results": [
-        {
-          "gate": "f_score",
-          "passed": false,
-          "reason": "f_score 4 < 6"
-        },
-        {
-          "gate": "drawdown",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "rsi",
-          "passed": false,
-          "reason": "rsi 42.1 outside [25,40]"
-        },
-        {
-          "gate": "liquidity_adequacy",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "surveillance",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "holdings_conviction",
-          "passed": true,
-          "reason": null
-        },
-        {
-          "gate": "corporate_actions",
-          "passed": true,
-          "reason": null
-        }
-      ],
-      "swing_score": 42.7,
-      "sub_scores": {
-        "valuation_compression": 0.0,
-        "oversold_positioning": 0.4142857142857141,
-        "support_proximity": 0.24,
-        "drawdown_sweetspot": 0.4039999999999999,
-        "volume_capitulation": 1.0,
-        "quality_composite": 0.4444444444444444,
-        "conviction_holding": 1.0
-      },
-      "score_version": "weights-2026-06-v1",
-      "earnings_date": null,
-      "earnings_within_days": null,
-      "earnings_source_status": "not_applicable"
-    },
-    {
       "symbol": "KIRLOSENG",
       "company_name": "Kirloskar Oil Eng Ltd.",
       "industry": "Capital Goods",
@@ -21053,6 +20944,115 @@
         "drawdown_sweetspot": 0.7439999999999998,
         "volume_capitulation": 0.06999999999999995,
         "quality_composite": 0.8888888888888888,
+        "conviction_holding": 1.0
+      },
+      "score_version": "weights-2026-06-v1",
+      "earnings_date": null,
+      "earnings_within_days": null,
+      "earnings_source_status": "not_applicable"
+    },
+    {
+      "symbol": "KIRLOSBROS",
+      "company_name": "Kirloskar Brothers Ltd.",
+      "industry": "Capital Goods",
+      "yf_ticker": "KIRLOSBROS.NS",
+      "current_price": 1714.0,
+      "fifty_two_wk_high": 2065.44,
+      "pct_off_52wk_high": -17.02,
+      "pct_from_ema200": -3.8,
+      "rsi14": 42.1,
+      "atr14": 53.21,
+      "entry_zone_low": 1687.4,
+      "entry_zone_high": 1714.0,
+      "stop_loss": 1647.49,
+      "target_1": 1780.51,
+      "target_2": 1833.72,
+      "risk_reward_target_1": 1.5,
+      "risk_reward_target_2": 2.5,
+      "volume_surge_factor": 5.64,
+      "adtv_value_inr_approx": 97847004.0,
+      "f_score": 4.0,
+      "f_score_components_available": 9.0,
+      "avg_pe_5y": 24.81,
+      "trailing_pe": 36.42,
+      "delivery_value_inr": 8169876.967285156,
+      "delivery_qty": 4766.0,
+      "delivery_pct": null,
+      "delivery_kind": "traded_value_proxy",
+      "delivery_fallback_from": null,
+      "delivery_as_of": "2026-10-15",
+      "delivery_source_status": "ok",
+      "delivery_source": "yfinance:traded_value_proxy",
+      "adv_value_inr": 124158199.0,
+      "adv_sessions": 20.0,
+      "liquidity_gate_path": "adv",
+      "confirmation_state": "confirmed",
+      "rsi_delta_3d": 3.5,
+      "close_up_1d": true,
+      "vol_ratio_3v20": 0.28,
+      "swing_high_63d": 1993.0,
+      "atr_expansion_ratio": 1.07,
+      "surveillance_is_restricted": false,
+      "surveillance_restriction_type": null,
+      "surveillance_source_status": "flag_only",
+      "surveillance_source": "none",
+      "holdings_promoter_pct": 65.95,
+      "holdings_fii_pct": 6.41,
+      "holdings_dii_pct": 10.23,
+      "holdings_conviction_pct": 82.59,
+      "holdings_source_status": "ok",
+      "holdings_source": "screener.in(consolidated)",
+      "pending_corporate_action": false,
+      "corporate_actions_status": "source_failed",
+      "market_index_pct_from_ema200": -4.86,
+      "market_correction_factor": 1.0,
+      "gate_pass": false,
+      "gate_fail_reason": "f_score 4 < 6; rsi 42.1 outside [25,40]",
+      "gate_results": [
+        {
+          "gate": "f_score",
+          "passed": false,
+          "reason": "f_score 4 < 6"
+        },
+        {
+          "gate": "drawdown",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "rsi",
+          "passed": false,
+          "reason": "rsi 42.1 outside [25,40]"
+        },
+        {
+          "gate": "liquidity_adequacy",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "surveillance",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "holdings_conviction",
+          "passed": true,
+          "reason": null
+        },
+        {
+          "gate": "corporate_actions",
+          "passed": true,
+          "reason": null
+        }
+      ],
+      "swing_score": 42.7,
+      "sub_scores": {
+        "valuation_compression": 0.0,
+        "oversold_positioning": 0.4142857142857141,
+        "support_proximity": 0.24,
+        "drawdown_sweetspot": 0.4039999999999999,
+        "volume_capitulation": 1.0,
+        "quality_composite": 0.4444444444444444,
         "conviction_holding": 1.0
       },
       "score_version": "weights-2026-06-v1",
