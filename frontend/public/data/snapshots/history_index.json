@@ -1,29 +1,5 @@
 [
   {
-    "date": "2026-07-18",
-    "slot": "pm",
-    "file": "2026-07-18-pm.json",
-    "generated_at": "2026-07-18T17:33:27.138564+00:00",
-    "universe_size": 500,
-    "gate_pass_count": 24
-  },
-  {
-    "date": "2026-07-20",
-    "slot": "am",
-    "file": "2026-07-20-am.json",
-    "generated_at": "2026-07-20T07:48:36.443975+00:00",
-    "universe_size": 500,
-    "gate_pass_count": 13
-  },
-  {
-    "date": "2026-07-20",
-    "slot": "pm",
-    "file": "2026-07-20-pm.json",
-    "generated_at": "2026-07-20T15:24:16.379940+00:00",
-    "universe_size": 500,
-    "gate_pass_count": 13
-  },
-  {
     "date": "2026-07-21",
     "slot": "am",
     "file": "2026-07-21-am.json",
@@ -1038,5 +1014,13 @@
     "generated_at": "2026-10-16T15:02:30.029523+00:00",
     "universe_size": 501,
     "gate_pass_count": 45
+  },
+  {
+    "date": "2026-10-19",
+    "slot": "am",
+    "file": "2026-10-19-am.json",
+    "generated_at": "2026-10-19T06:00:14.858138+00:00",
+    "universe_size": 501,
+    "gate_pass_count": 51
   }
 ]
