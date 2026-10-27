@@ -27,10 +27,10 @@ all gates pass.
 
 | Gate | Criterion | Source | Defaults |
 |---|---|---|---|
-| `gate_f_score` | Piotroski F-Score ≥ MIN_F_SCORE | yfinance | MIN_F_SCORE=6 |
+| `gate_f_score` | Piotroski F-Score ≥ MIN_F_SCORE with all 9 components available | yfinance | MIN_F_SCORE=6 |
 | `gate_drawdown` | -40% ≤ pct off 52W high ≤ -15% | yfinance | -40, -15 |
 | `gate_rsi` | 25 ≤ RSI(14) ≤ 40 | yfinance | 25, 40 |
-| `gate_delivery_value` | latest-day delivery value ≥ ₹5cr | NSE bhavcopy | 5_00_00_000 INR |
+| `gate_liquidity_adequacy` | real delivery ≥ ₹5cr with ADV secondary floor, or 20-session ADV ≥ ₹10cr | NSE bhavcopy / yfinance | 5_00_00_000 / 10_00_00_000 INR |
 | `gate_surveillance` | not in T-group / GSM / suspension | NSE → BSE → flag-only | — |
 | `gate_holdings` | promoter + FII + DII > 50% | Screener.in | 50% |
 | `gate_corporate_actions` | no excluded action in next 30 days | NSE corporate actions | 30 days |

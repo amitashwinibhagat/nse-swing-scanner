@@ -35,7 +35,7 @@ function StarButton({ on, onToggle, symbol, stop }) {
   );
 }
 
-export default function StockCard({ stock, expanded, onToggle, watchlist }) {
+export default function StockCard({ stock, expanded, onToggle, watchlist, performance }) {
   const {
     symbol,
     company_name,
@@ -55,7 +55,7 @@ export default function StockCard({ stock, expanded, onToggle, watchlist }) {
   const entryState = computeEntryState(stock);
   const conf = confirmationChip(stock);
   const ea = earningsChip(stock);
-  const band = scoreBandChip(swing_score);
+  const band = scoreBandChip(swing_score, performance);
   const watched = watchlist?.has?.(symbol) ?? false;
 
   return (

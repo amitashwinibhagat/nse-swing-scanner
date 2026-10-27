@@ -46,6 +46,25 @@ jobs:
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
 
+      - name: Ping healthchecks.io (scan started)
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
+          EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
+        continue-on-error: true
+        run: |
+          case "${{ github.event.schedule }}" in
+            "30 3 * * 1-5") url="$MORNING_URL"; label="morning";;
+            "30 10 * * 1-5") url="$EVENING_URL"; label="evening";;
+            *) echo "::notice::unrecognized cron '${{ github.event.schedule }}'; skipping start ping."; exit 0;;
+          esac
+          if [ -z "$url" ]; then
+            echo "::notice::HEALTHCHECK_PING_URL_${label^^} secret not set; skipping start ping."
+            exit 0
+          fi
+          curl -fsS -m 10 --retry 3 "${url}/start" \
+            || echo "::warning::healthchecks.io start ping failed"
+
       - name: Run full scan
         working-directory: backend
         run: python scanner.py --top-n 500 --workers 4 --sleep 0.5 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
@@ -56,44 +75,6 @@ jobs:
         #   - Cold cache worst case can approach timeout; 45 min headroom.
         # --lenient-external-gates: holdings gate passes on source_failed
         # (Screener captcha). Liquidity uses 20d ADV when bhavcopy is down.
-
-      - name: Ping healthchecks.io (scan started)
-        if: ${{ github.event_name == 'schedule' }}
-        # Proves the GitHub cron fired. healthchecks.io resets its "last
-        # ping" timer on any successful ping — including /start — so a
-        # /start ping is informational and an additional success ping
-        # later just keeps the check green.
-        #
-        # Two secrets, one per scheduled slot, so healthchecks.io can
-        # alert independently on a missed morning vs missed evening.
-        # github.event.schedule carries the cron expression that fired
-        # (e.g. "30 3 * * 1-5"), so we branch on it to pick the URL.
-        env:
-          MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
-          EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
-        continue-on-error: true
-        run: |
-          set +e
-          case "${{ github.event.schedule }}" in
-            "30 3 * * 1-5")
-              url="$MORNING_URL"
-              label="morning"
-              ;;
-            "30 10 * * 1-5")
-              url="$EVENING_URL"
-              label="evening"
-              ;;
-            *)
-              echo "::notice::unrecognized cron '${{ github.event.schedule }}'; skipping healthchecks.io ping."
-              exit 0
-              ;;
-          esac
-          if [ -z "$url" ]; then
-            echo "::notice::HEALTHCHECK_PING_URL_${label^^} secret not set; skipping healthchecks.io ping."
-            exit 0
-          fi
-          curl -fsS -m 10 --retry 3 "${url}/start" \
-            || echo "::warning::healthchecks.io start ping failed (will rely on success/fail ping)"
 
       - name: Ping healthchecks.io (scan failed)
         # If any prior step failed, ping /fail so healthchecks.io marks
@@ -169,15 +150,26 @@ jobs:
         # Persists the current run as YYYY-MM-DD-{am|pm}.json (minified) and
         # updates frontend/public/data/snapshots/history_index.json. Rolling
         # 90-day prune runs in the same step. Cheap (~1-2 s), no network.
-        # Slot is derived from generated_at hour: <8 UTC = am (prior close),
-        # >=8 UTC = pm (same-day close).
+        # Scheduled runs pass their cron-derived slot explicitly so a delayed
+        # morning run cannot be mislabeled as an evening snapshot. Manual runs
+        # still fall back to generated_at-based derivation.
         if: success()
         working-directory: backend
+        env:
+          GH_EVENT_SCHEDULE: ${{ github.event.schedule }}
         run: |
+          slot=""
+          case "$GH_EVENT_SCHEDULE" in
+            "30 3 * * 1-5") slot="am" ;;
+            "30 10 * * 1-5") slot="pm" ;;
+          esac
+          slot_arg=""
+          if [ -n "$slot" ]; then slot_arg="--slot $slot"; fi
           python scripts/snapshot_writer.py \
             --latest ../frontend/public/data/latest_scan.json \
             --snapshots ../frontend/public/data/snapshots \
-            --retention-days 90
+            --retention-days 90 \
+            $slot_arg
 
       - name: Write scan_status.json
         # Always run after a successful scan (skip on scan failure). Internal

@@ -39,10 +39,30 @@ before trusting them.
 import numpy as np
 import pandas as pd
 import yfinance as yf
+from threading import Lock
 
 from cache import cached_call
 from settings import YF_CACHE_TTL_SECONDS, YF_FUNDAMENTAL_CACHE_TTL_SECONDS
 from yf_retry import call_with_retry, is_rate_limit_error, should_cache_yf_payload
+
+
+_TICKERS = {}
+_TICKERS_LOCK = Lock()
+
+
+def _get_ticker(yf_ticker: str):
+    """Reuse one yfinance Ticker per symbol within a scan process.
+
+    yfinance caches properties on the Ticker object. Reusing it prevents the
+    F-Score and valuation paths from creating separate objects and repeating
+    overlapping statement requests.
+    """
+    with _TICKERS_LOCK:
+        ticker = _TICKERS.get(yf_ticker)
+        if ticker is None:
+            ticker = yf.Ticker(yf_ticker)
+            _TICKERS[yf_ticker] = ticker
+        return ticker
 
 
 def _safe_get(df: pd.DataFrame, row_names, col) -> float:
@@ -59,7 +79,7 @@ def _safe_get(df: pd.DataFrame, row_names, col) -> float:
 
 def _compute_fscore_impl(yf_ticker: str) -> dict:
     """Implementation behind the cached_call wrapper. See compute_fscore."""
-    t = yf.Ticker(yf_ticker)
+    t = _get_ticker(yf_ticker)
     try:
         def _stmts():
             return t.financials, t.balance_sheet, t.cashflow
@@ -162,7 +182,7 @@ def compute_fscore(yf_ticker: str) -> dict:
 
 def _approx_5y_avg_pe_impl(yf_ticker: str) -> dict:
     """Implementation behind the cached_call wrapper. See approx_5y_avg_pe."""
-    t = yf.Ticker(yf_ticker)
+    t = _get_ticker(yf_ticker)
     try:
         def _fetch():
             return t.financials, t.history(period="6y", auto_adjust=True), t.info.get("trailingPE")

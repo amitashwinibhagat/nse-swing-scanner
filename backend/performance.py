@@ -269,6 +269,8 @@ def build_performance_payload(
                 "bucket": bucket,
                 "regime": scan_regime,
                 "confirmation": confirmation,
+                "market_correction_factor": s.get("market_correction_factor"),
+                "market_index_pct_from_ema200": s.get("market_index_pct_from_ema200"),
                 # 1.5.0 feedback loop: raw component scores + the weights
                 # regime that produced them, so evaluate_feedback.py can
                 # re-score history under candidate weight sets.
@@ -506,8 +508,11 @@ def cache_entry_usable(entry: Optional[dict], *, min_end_date: str) -> bool:
     if not closes:
         return False
     end = entry.get("end_date") or ""
-    # Usable if cached end >= needed end (extra history is fine)
-    return end >= min_end_date
+    actual_end = max(closes.keys()) if closes else ""
+    # The metadata is advisory; the returned close dates are authoritative.
+    # Older cache entries recorded the requested end date even when yfinance
+    # returned only history through the current session.
+    return end >= min_end_date and actual_end >= min_end_date
 
 
 # --- Live forward-return computation (yfinance) -----------------------------
@@ -691,8 +696,9 @@ def fetch_forward_returns(
             closes_by_ticker[tk] = closes
             # Never cache empty closes (anti-poison)
             if closes:
+                actual_end = max(closes.keys())
                 prices_cache[tk] = {
-                    "end_date": global_end.isoformat(),
+                    "end_date": actual_end,
                     "closes": closes,
                     "ok": True,
                 }

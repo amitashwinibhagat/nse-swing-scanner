@@ -103,7 +103,7 @@ function PositionSizer({ stock }) {
   );
 }
 
-export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
+export default function DetailDrawer({ stock, onClose, watchlist, scanDate, performance }) {
   const closeRef = useRef(null);
 
   // Esc to close + scroll lock
@@ -125,22 +125,8 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate }) {
 
   const entryState = computeEntryState(stock);
   const conf = confirmationChip(stock);
-  const band = scoreBandChip(stock.swing_score);
-  // Forward-return evidence for the band × regime cross-tab. Static data;
-  // fetched once per drawer mount and shared by all drawer opens.
-  const [perf, setPerf] = useState(null);
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/data/performance.json", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => {
-        if (!cancelled && j) setPerf(j);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const band = scoreBandChip(stock.swing_score, performance);
+  const perf = performance;
   const exits = exitWarnings(stock);
   const ea = earningsChip(stock);
   const watched = watchlist?.has?.(stock.symbol) ?? false;

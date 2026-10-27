@@ -32,6 +32,7 @@ import json
 import math
 import os
 import sys
+import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
@@ -46,11 +47,17 @@ from fscore import compute_fscore, approx_5y_avg_pe
 from surveillance import fetch_surveillance_list, check_symbol
 from bhavcopy import fetch_bhavcopy, lookup_delivery
 from holdings import fetch_holdings
-from corporate_actions import fetch_corporate_actions
+from corporate_actions import (
+    fetch_corporate_actions,
+    fetch_corporate_actions_list,
+    lookup_corporate_actions,
+)
 from earnings import fetch_earnings
+from yf_retry import is_rate_limit_error
 
 from settings import (
     MIN_F_SCORE,
+    MIN_F_SCORE_COMPONENTS,
     MIN_DELIVERY_VALUE_INR,
     MIN_ADV_VALUE_INR,
     MIN_ADV_SECONDARY_FLOOR_INR,
@@ -145,9 +152,13 @@ def _score_conviction(holdings_data: Optional[dict]) -> float:
 # ---------------------------------------------------------------------------
 # Hard-gate helpers (each returns (passed: bool, reason: str|None))
 # ---------------------------------------------------------------------------
-def gate_f_score(f_score) -> tuple[bool, Optional[str]]:
+def gate_f_score(f_score, components_available: Optional[int] = None) -> tuple[bool, Optional[str]]:
     if f_score is None:
         return False, "f_score_missing"
+    if components_available is None or components_available < MIN_F_SCORE_COMPONENTS:
+        return False, (
+            f"f_score_components_missing ({components_available or 0}/{MIN_F_SCORE_COMPONENTS})"
+        )
     if f_score < MIN_F_SCORE:
         return False, f"f_score {f_score} < {MIN_F_SCORE}"
     return True, None
@@ -230,6 +241,7 @@ def gate_holdings(
     holdings_data: Optional[dict],
     holdings_status: str,
     lenient: bool = False,
+    enabled: bool = True,
 ) -> tuple[bool, Optional[str]]:
     """
     Hard gate for promoter + FII + DII conviction > 50%.
@@ -241,6 +253,8 @@ def gate_holdings(
     we let the stock through with a flag. Useful when Screener is rate-
     limiting the scanner's IP (common on GitHub Actions runners).
     """
+    if not enabled:
+        return True, "gate_disabled"
     if holdings_status in ("source_failed",):
         if lenient:
             return True, None
@@ -259,9 +273,15 @@ def gate_holdings(
     return True, None
 
 
-def gate_corporate_actions(ca_data: Optional[dict]) -> tuple[bool, Optional[str]]:
-    if ca_data is None:
-        return True, None  # source_failed -> we don't claim the gap is closed
+def gate_corporate_actions(
+    ca_data: Optional[dict],
+    ca_status: str = "source_failed",
+    enabled: bool = True,
+) -> tuple[bool, Optional[str]]:
+    if not enabled:
+        return True, "gate_disabled"
+    if ca_status in ("source_failed", "missing") or ca_data is None:
+        return False, "corporate_actions_source_failed"
     if ca_data.get("has_excluded_action"):
         actions = ca_data.get("actions") or []
         names = [a.get("action", "") for a in actions[:3]]
@@ -323,20 +343,18 @@ def evaluate_stock(
     tech = compute_technicals(yf_ticker)
     time.sleep(sleep_between_calls)
     fsc = compute_fscore(yf_ticker)
-    time.sleep(sleep_between_calls)
-    pe5y = approx_5y_avg_pe(yf_ticker)
-    time.sleep(sleep_between_calls)
 
     result.update({f"tech_{k}": v for k, v in tech.items() if k != "yf_ticker"})
     result.update({f"fscore_{k}": v for k, v in fsc.items() if k not in ("yf_ticker", "f_score_detail")})
-    result.update({f"pe5y_{k}": v for k, v in pe5y.items() if k != "yf_ticker"})
 
     # External sources (Screener holdings — may be slow; should be pre-fetched
     # in batch via holdings.fetch_holdings in run_scan, not here)
     holdings_status = result.get("holdings_status", "missing")
     holdings_data = result.get("holdings_data") or None
+    holdings_gate_enabled = result.get("holdings_gate_enabled", True)
     ca_status = result.get("corporate_actions_status", "source_failed")
     ca_data = result.get("corporate_actions_data") or None
+    ca_gate_enabled = result.get("corporate_actions_gate_enabled", True)
 
     # Surveillance
     if surveillance_payload is None:
@@ -381,7 +399,7 @@ def evaluate_stock(
     gate_results = []
     f_score = fsc.get("f_score")
 
-    ok, why = gate_f_score(f_score)
+    ok, why = gate_f_score(f_score, fsc.get("f_score_components_available"))
     gate_results.append({"gate": "f_score", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
@@ -434,12 +452,21 @@ def evaluate_stock(
     if not ok:
         fail_reasons.append(why)
 
-    ok, why = gate_holdings(holdings_data, holdings_status, lenient=lenient_external_gates)
+    ok, why = gate_holdings(
+        holdings_data,
+        holdings_status,
+        lenient=lenient_external_gates,
+        enabled=holdings_gate_enabled,
+    )
     gate_results.append({"gate": "holdings_conviction", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
 
-    ok, why = gate_corporate_actions(ca_data)
+    ok, why = gate_corporate_actions(
+        ca_data,
+        ca_status=ca_status,
+        enabled=ca_gate_enabled,
+    )
     gate_results.append({"gate": "corporate_actions", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
@@ -465,6 +492,11 @@ def evaluate_stock(
             result["earnings_error"] = str(e)
     result["earnings_status"] = earnings_status
     result["earnings_data"] = earnings_data
+
+    # Valuation is score-only, not a hard gate. Defer the expensive 6-year
+    # history/info fetch until after all safety gates pass.
+    pe5y = approx_5y_avg_pe(yf_ticker)
+    result.update({f"pe5y_{k}": v for k, v in pe5y.items() if k != "yf_ticker"})
 
     # --- soft score ---
     pe_now = pe5y.get("trailing_pe_check")
@@ -511,6 +543,7 @@ def _evaluate_one_stock(
     skip_holdings: bool,
     skip_corporate_actions: bool,
     lenient_external_gates: bool = False,
+    corporate_actions_payload: Optional[dict] = None,
 ) -> dict:
     """
     Per-stock worker: fetches holdings + corp-actions for this symbol, then
@@ -526,7 +559,7 @@ def _evaluate_one_stock(
             h = fetch_holdings(symbol)
             rdict["holdings_status"] = h.get("status")
             rdict["holdings_source"] = h.get("source")
-            rdict["holdings_data"] = h.get("data") or {}
+            rdict["holdings_data"] = h.get("data")
         except Exception as e:
             rdict["holdings_status"] = "source_failed"
             rdict["holdings_source"] = "screener.in"
@@ -534,20 +567,26 @@ def _evaluate_one_stock(
             rdict["holdings_error"] = str(e)
     else:
         rdict["holdings_status"] = "missing"
-        rdict["holdings_data"] = {}
+        rdict["holdings_data"] = None
+        rdict["holdings_gate_enabled"] = False
 
     if not skip_corporate_actions:
         try:
-            ca = fetch_corporate_actions(symbol)
+            ca = (
+                lookup_corporate_actions(corporate_actions_payload, symbol)
+                if corporate_actions_payload is not None
+                else fetch_corporate_actions(symbol)
+            )
             rdict["corporate_actions_status"] = ca.get("status")
-            rdict["corporate_actions_data"] = ca.get("data") or {}
+            rdict["corporate_actions_data"] = ca.get("data")
         except Exception as e:
             rdict["corporate_actions_status"] = "source_failed"
             rdict["corporate_actions_data"] = {}
             rdict["corporate_actions_error"] = str(e)
     else:
         rdict["corporate_actions_status"] = "missing"
-        rdict["corporate_actions_data"] = {}
+        rdict["corporate_actions_data"] = None
+        rdict["corporate_actions_gate_enabled"] = False
 
     try:
         return evaluate_stock(
@@ -603,7 +642,7 @@ def run_scan(
 
     # Shared external data: fetched once for the whole scan (these don't depend
     # on the worker pool — they're not per-stock).
-    print(f"Fetching shared data: surveillance, bhavcopy, nifty50…")
+    print(f"Fetching shared data: surveillance, bhavcopy, corporate actions, nifty50…")
     surveillance_payload = fetch_surveillance_list()
     print(f"  surveillance: status={surveillance_payload['status']}")
     universe_symbols = universe["symbol"].tolist()
@@ -613,6 +652,10 @@ def run_scan(
         universe_yf_tickers=universe_yf_tickers,
     )
     print(f"  bhavcopy: status={bhavcopy_payload['status']} source={bhavcopy_payload.get('source')} as_of={bhavcopy_payload.get('as_of')}")
+    corporate_actions_payload = None
+    if not skip_corporate_actions:
+        corporate_actions_payload = fetch_corporate_actions_list()
+        print(f"  corporate actions: status={corporate_actions_payload['status']}")
     nifty = compute_nifty50_context()
     print(f"  nifty50: {nifty.get('index_pct_from_ema200')}% from 200EMA")
 
@@ -640,6 +683,7 @@ def run_scan(
                 skip_holdings,
                 skip_corporate_actions,
                 lenient_external_gates,
+                corporate_actions_payload,
             ): rdict["symbol"]
             for rdict in inputs
         }
@@ -681,6 +725,7 @@ def run_scan(
         sleep_between_calls=max(sleep_between_calls, 0.6),
         surveillance_payload=surveillance_payload,
         bhavcopy_payload=bhavcopy_payload,
+        corporate_actions_payload=corporate_actions_payload,
         skip_holdings=skip_holdings,
         skip_corporate_actions=skip_corporate_actions,
         lenient_external_gates=lenient_external_gates,
@@ -694,7 +739,7 @@ def _row_price(row: dict):
     """Price on a raw evaluate_stock row (tech_*) or JSON record (current_price)."""
     for k in ("tech_current_price", "current_price"):
         v = row.get(k)
-        if isinstance(v, (int, float)):
+        if isinstance(v, (int, float)) and math.isfinite(float(v)):
             return v
     return None
 
@@ -709,16 +754,8 @@ def _is_rate_limited_row(row: dict) -> bool:
         str(row.get("tech_error") or ""),
         str(row.get("error") or ""),
     ]
-    text = " ".join(blobs).lower()
-    return any(
-        m in text
-        for m in (
-            "too many requests",
-            "rate limit",
-            "rate limited",
-            "empty history after retries",
-        )
-    )
+    text = " ".join(blobs)
+    return is_rate_limit_error(text) or "empty history after retries" in text.lower()
 
 
 def _recover_rate_limited_rows(
@@ -731,6 +768,7 @@ def _recover_rate_limited_rows(
     skip_holdings: bool,
     skip_corporate_actions: bool,
     lenient_external_gates: bool,
+    corporate_actions_payload: Optional[dict] = None,
     max_recover: int = 400,
     pause_every: int = 25,
     pause_s: float = 8.0,
@@ -767,6 +805,7 @@ def _recover_rate_limited_rows(
                 skip_holdings,
                 skip_corporate_actions,
                 lenient_external_gates,
+                corporate_actions_payload,
             )
             rows[i] = fresh
             if _row_price(fresh) is not None:
@@ -955,11 +994,10 @@ def compute_coverage(records: list) -> dict:
     rate_limited = 0
     for r in records:
         px = r.get("current_price")
-        if isinstance(px, (int, float)):
+        if isinstance(px, (int, float)) and math.isfinite(float(px)):
             priced += 1
         reason = r.get("gate_fail_reason") or ""
-        low = reason.lower()
-        if "too many requests" in low or "rate limit" in low or "rate limited" in low:
+        if is_rate_limit_error(reason):
             rate_limited += 1
     pct = round(priced / universe, 4) if universe else 0.0
     return {
@@ -986,6 +1024,7 @@ def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
         "coverage": coverage,
         "config": {
             "min_f_score": MIN_F_SCORE,
+            "min_f_score_components": MIN_F_SCORE_COMPONENTS,
             "min_delivery_value_inr": MIN_DELIVERY_VALUE_INR,
             "min_adv_value_inr": MIN_ADV_VALUE_INR,
             "min_holdings_conviction_pct": MIN_HOLDINGS_CONVICTION_PCT,
@@ -998,11 +1037,23 @@ def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
     # that slipped past to_json_records (e.g. raw float('inf') in a gate field
     # added by an external source) is also coerced to None before write.
     payload = _json_safe(payload)
-    outdir = os.path.dirname(output_path)
-    if outdir:
-        os.makedirs(outdir, exist_ok=True)
-    with open(output_path, "w") as f:
-        json.dump(payload, f, indent=2, allow_nan=False)
+    # Never replace an existing last-good scan with a half-blind result. Keep
+    # the payload return value so the CLI can report coverage and exit 2.
+    if (coverage.get("pct") or 0) < MIN_COVERAGE_PCT:
+        return payload
+
+    outdir = os.path.dirname(output_path) or "."
+    os.makedirs(outdir, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(prefix=".latest_scan.", suffix=".tmp", dir=outdir)
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(payload, f, indent=2, allow_nan=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, output_path)
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
     return payload
 
 
@@ -1050,7 +1101,7 @@ if __name__ == "__main__":
           f"coverage={cov.get('priced')}/{cov.get('universe')} "
           f"({(cov.get('pct') or 0)*100:.1f}% priced, "
           f"{cov.get('rate_limited', 0)} rate-limited). "
-          f"Wrote {args.output}")
+          f"{'Wrote' if (cov.get('pct') or 0) >= MIN_COVERAGE_PCT else 'Kept last-good; did not write'} {args.output}")
     if (cov.get("pct") or 0) < MIN_COVERAGE_PCT:
         print(
             f"::error::coverage {cov.get('pct')} < {MIN_COVERAGE_PCT} "

@@ -121,6 +121,10 @@ def test_run_scan_uses_thread_pool(monkeypatch):
         call_log.append("compute_nifty50_context")
         return stubs["compute_nifty50_context"]
 
+    def fake_fetch_corporate_actions_list():
+        call_log.append("fetch_corporate_actions_list")
+        return {"status": "ok", "source": "nse:corporate-actions", "data": {}}
+
     def fake_fetch_holdings(symbol):
         call_log.append(("fetch_holdings", symbol))
         return stubs["fetch_holdings"]
@@ -139,6 +143,7 @@ def test_run_scan_uses_thread_pool(monkeypatch):
     monkeypatch.setattr(scanner, "compute_nifty50_context", fake_compute_nifty50_context)
     monkeypatch.setattr(scanner, "fetch_holdings", fake_fetch_holdings)
     monkeypatch.setattr(scanner, "fetch_corporate_actions", fake_fetch_corporate_actions)
+    monkeypatch.setattr(scanner, "fetch_corporate_actions_list", fake_fetch_corporate_actions_list)
     monkeypatch.setattr(scanner, "evaluate_stock", fake_evaluate_stock)
 
     df = scanner.run_scan(top_n=100, sample_size=20, workers=4, sleep_between_calls=0)
@@ -150,8 +155,7 @@ def test_run_scan_uses_thread_pool(monkeypatch):
     # Per-stock fetches called once per stock (not per worker)
     holdings_calls = [c for c in call_log if isinstance(c, tuple) and c[0] == "fetch_holdings"]
     assert len(holdings_calls) == 20
-    corp_calls = [c for c in call_log if isinstance(c, tuple) and c[0] == "fetch_corporate_actions"]
-    assert len(corp_calls) == 20
+    assert call_log.count("fetch_corporate_actions_list") == 1
     eval_calls = [c for c in call_log if isinstance(c, tuple) and c[0] == "evaluate_stock"]
     assert len(eval_calls) == 20
     assert len(df) == 20
@@ -168,6 +172,7 @@ def test_run_scan_workers_capped_to_universe_size(monkeypatch):
     monkeypatch.setattr(scanner, "compute_nifty50_context", lambda: stubs["compute_nifty50_context"])
     monkeypatch.setattr(scanner, "fetch_holdings", lambda s: stubs["fetch_holdings"])
     monkeypatch.setattr(scanner, "fetch_corporate_actions", lambda s: stubs["fetch_corporate_actions"])
+    monkeypatch.setattr(scanner, "fetch_corporate_actions_list", lambda: {"status": "ok", "source": "nse:corporate-actions", "data": {}})
     monkeypatch.setattr(scanner, "evaluate_stock", lambda r, **k: stubs["evaluate_stock"](r, **k))
 
     # workers=20 should be silently capped to 3
@@ -186,6 +191,7 @@ def test_run_scan_worker_exception_does_not_kill_scan(monkeypatch):
     monkeypatch.setattr(scanner, "compute_nifty50_context", lambda: stubs["compute_nifty50_context"])
     monkeypatch.setattr(scanner, "fetch_holdings", lambda s: stubs["fetch_holdings"])
     monkeypatch.setattr(scanner, "fetch_corporate_actions", lambda s: stubs["fetch_corporate_actions"])
+    monkeypatch.setattr(scanner, "fetch_corporate_actions_list", lambda: {"status": "ok", "source": "nse:corporate-actions", "data": {}})
 
     def flaky_evaluate(rdict, **kwargs):
         if rdict["symbol"] == "SYM001":

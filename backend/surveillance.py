@@ -144,15 +144,16 @@ def fetch_surveillance_list(timeout: int = 10) -> dict:
     nse = _probe_nse_surveillance(timeout=timeout)
     if nse is not None:
         symbols = _extract_nse_restricted(nse)
-        per_symbol = {s: {"t_group": True, "gsm": False, "suspended": False, "source": nse["_endpoint"]}
-                      for s in symbols}
-        result = make_status(
-            source=f"nse:{nse['_endpoint']}",
-            status="ok",
-            data=per_symbol,
-        )
-        write_cache(cache_key, result)
-        return result
+        if symbols:
+            per_symbol = {s: {"t_group": True, "gsm": False, "suspended": False, "source": nse["_endpoint"]}
+                          for s in symbols}
+            result = make_status(
+                source=f"nse:{nse['_endpoint']}",
+                status="ok",
+                data=per_symbol,
+            )
+            write_cache(cache_key, result)
+            return result
 
     bse = _probe_bse_surveillance(timeout=timeout)
     if bse is not None:
@@ -166,12 +167,14 @@ def fetch_surveillance_list(timeout: int = 10) -> dict:
             )
             write_cache(cache_key, result)
             return result
-        per_symbol = {c: {"t_group": True, "gsm": False, "suspended": False, "source": "bse_surveillance"} for c in codes}
+        # BSE scrip codes cannot be compared directly with NSE symbols. Until
+        # an ISIN/NSE-symbol mapping is available, treating these as a clean
+        # list would create false passes. Surface the uncertainty instead.
         result = make_status(
             source=f"bse:{bse['_endpoint']}",
-            status="fallback_used",
-            data=per_symbol,
-            error="BSE codes mapped, cross-check required for NSE symbols",
+            status="flag_only",
+            data={},
+            error="BSE surveillance returned scrip codes without an NSE-symbol mapping",
         )
         write_cache(cache_key, result)
         return result

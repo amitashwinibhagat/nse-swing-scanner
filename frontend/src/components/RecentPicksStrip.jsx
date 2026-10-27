@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { buildRecentPicks, picksSummaryLine, resolveIndexEntry, isStripWorthy, formatSnapshotLabel } from "../utils/recentPicks.js";
 
-const HISTORY_URL = "/data/snapshots/history_index.json";
-const PERF_URL = "/data/performance.json";
 
 /**
  * "Receipts" banner, above the fold: the one-line public claim backed by the
@@ -13,25 +11,8 @@ const PERF_URL = "/data/performance.json";
  * or the top-band CI doesn't actually support the claim (the tracker owns
  * the truth; this banner only mirrors it).
  */
-export function ReceiptsBanner() {
-  const [perf, setPerf] = useState(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const r = await fetch(PERF_URL, { cache: "no-store" });
-        if (!r.ok) return;
-        const d = await r.json();
-        if (!cancelled) setPerf(d);
-      } catch {
-        /* performance.json absent → banner stays hidden */
-      }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
+export function ReceiptsBanner({ performance }) {
+  const perf = performance;
   if (!perf || !perf.windows) return null;
 
   const t5 = perf.windows["T+5"]?.buckets?.["63+"];
@@ -72,58 +53,25 @@ const MAX_PICK_CHIPS = 14;
  * Deliberately honest by construction — no pick is dropped; names without
  * a fresh price show as "unpriced".
  */
-export default function RecentPicksStrip({ currentGeneratedAt }) {
-  const [history, setHistory] = useState([]);
-  const [latestStocks, setLatestStocks] = useState(null);
+export default function RecentPicksStrip({ currentGeneratedAt, history = [], latestStocks = [] }) {
   const [built, setBuilt] = useState(null);
   const [priorMeta, setPriorMeta] = useState(null);
   const [dismissed, setDismissed] = useState(false);
 
-  // Latest-scan stocks for the price lookup. In dev the parent re-renders
-  // with new data; here we fetch the canonical committed file.
   useEffect(() => {
     let cancelled = false;
-    async function load() {
-      try {
-        const r = await fetch("/data/latest_scan.json", { cache: "no-store" });
-        if (!r.ok) return;
-        const d = await r.json();
-        if (!cancelled) setLatestStocks(d?.stocks ?? null);
-      } catch {
-        /* ignore */
-      }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const r = await fetch(HISTORY_URL, { cache: "no-store" });
-        if (!r.ok) return;
-        const d = await r.json();
-        if (!cancelled) setHistory(Array.isArray(d) ? d : []);
-      } catch {
-        /* ignore — no history is the common first-scan state */
-      }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
+    setDismissed(false);
     async function load() {
       const cur = resolveIndexEntry(history, currentGeneratedAt);
       if (!cur) {
         setPriorMeta(null);
+        setBuilt(null);
         return;
       }
       const idx = history.indexOf(cur);
       if (idx <= 0) {
         setPriorMeta(null);
+        setBuilt(null);
         return;
       }
       // Most recent prior snapshot (am-or-pm). Unlike DeltaStrip we do not

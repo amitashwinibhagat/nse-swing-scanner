@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-09-06 (1.4.1).
+> Last updated: 2026-10-27 (post-refactor).
 
 ## Project Overview
 
@@ -41,10 +41,10 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │    │                                                                     │
 │    └── ThreadPoolExecutor(workers=4, sleep=0.5) → per-stock evaluation:           │
 │           ├── fetch_holdings()              # backend/holdings.py       │
-│           ├── fetch_corporate_actions()     # backend/corporate_actions │
+│           ├── lookup_corporate_actions()    # indexed shared CA payload  │
 │           ├── compute_technicals()          # backend/technicals.py      │
 │           ├── compute_fscore()              # backend/fscore.py           │
-│           ├── approx_5y_avg_pe()            # backend/fscore.py           │
+│           ├── approx_5y_avg_pe()            # gate-passed names only      │
 │           └── 7 hard gates + soft score                                   │
 │                                                                          │
 │    ├── Validate JSON contract                                              │
@@ -62,7 +62,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ Netlify  (static SPA + 1 serverless function)                            │
 │                                                                          │
-│  Frontend (React 18 + Vite 5):                                           │
+│  Frontend (React 18 + Vite 8):                                           │
 │    - App.jsx (KPI dashboard, table, drawer)                              │
 │    - Components: Kpi, StockCard, ScoreRing, Rationale, DetailDrawer, ... │
 │    - Reads /data/latest_scan.json + /data/scan_status.json              │
@@ -78,7 +78,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 |---|---|---|
 | Scanner | Python 3.11 | yfinance / pandas / numpy ecosystem |
 | HTTP | `requests` + custom session | Simple, no extra deps |
-| Frontend | React 18 + Vite 5 | Smallest bundle, no SSR needed for static data |
+| Frontend | React 18 + Vite 8 | Smallest bundle, no SSR needed for static data |
 | Hosting | Netlify free tier | $0, auto-deploys on GH push |
 | CI/CD | GitHub Actions | Free for public repos, used for both scan + watchdog |
 | Monitoring | healthchecks.io free tier | Cron-drift alerting |
@@ -110,7 +110,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── settings.py        # All tunable thresholds + TTLs
 │   ├── cache.py           # JSON-file cache + cached_call() wrapper
 │   ├── nse_client.py      # Akamai-bypass session helpers
-│   ├── requirements.txt   # yfinance, pandas, numpy, requests, bs4, lxml
+│   ├── requirements.txt   # runtime: yfinance, pandas, numpy, requests, bs4, lxml
+│   ├── requirements-dev.txt # runtime requirements + pytest
 │   ├── scripts/
 │   │   ├── check_cron_consistency.py  # CI guard (cron windows)
 │   │   ├── check_workflow_scripts.py  # CI guard (script import path)
@@ -121,7 +122,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── generate_digest.py         # 1.4.3: public weekly accuracy digest (markdown)
 │   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
 │   ├── cache/             # On-disk JSON cache (gitignored, restored via actions/cache@v6)
-│   └── tests/             # 189 tests, all run in ~1s
+│   └── tests/             # 209 tests, all run in ~2s
 ├── frontend/
 │   ├── public/data/
 │   │   ├── latest_scan.json    # Committed by scan.yml after each run
@@ -158,7 +159,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │       ├── SegmentedControl.jsx, Skeleton.jsx
 │   ├── netlify/functions/
 │   │   └── trigger-scan.cjs     # Owner-only POST trigger (?admin=1)
-│   ├── package.json             # React 18.3, Vite 5.4
+│   ├── package.json             # React 18.3, Vite 8.2
 │   └── dist/                    # Build output (gitignored, deployed by Netlify)
 ├── plans/                        # Older planning docs (kept for context)
 ├── docs/
@@ -177,8 +178,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 cd backend
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-pytest -q                                            # 189 tests, ~1s
+pip install -r requirements-dev.txt
+pytest -q                                            # 209 tests, ~2s
 python scanner.py --top-n 500 --workers 8 --sleep 0.3 \
     --lenient-external-gates \
     --output ../frontend/public/data/latest_scan.json
@@ -270,6 +271,7 @@ a fallback; the GitHub-Integration auto-deploy handles most updates.
 |---|---|---|
 | `UNIVERSE_DEFAULT_TOP_N` | 500 | Nifty 500 universe |
 | `MIN_F_SCORE` | 6 | Piotroski F-Score ≥ 6 (relaxed from spec's ≥ 7) |
+| `MIN_F_SCORE_COMPONENTS` | 9 | Require all Piotroski components before the gate can pass |
 | `MIN_DELIVERY_VALUE_INR` | 5_00_00_000 | ₹5 cr/day delivery floor (only used when `delivery_kind == "actual"`) |
 | `MIN_ADV_VALUE_INR` | 10_00_00_000 | 20d average traded value floor (liquidity adequacy fallback path) |
 | `MIN_ADV_SECONDARY_FLOOR_INR` | 3_00_00_000 | ADV floor when real delivery path passes (anti-thin-stock guard) |
@@ -286,7 +288,7 @@ a fallback; the GitHub-Integration auto-deploy handles most updates.
 
 | Constant | Value | Notes |
 |---|---|---|
-| `HOLDINGS_CACHE_TTL_SECONDS` | 90 days | Screener (quarterly cadence) |
+| `HOLDINGS_CACHE_TTL_SECONDS` | 90 days | Successful Screener results (failures are not cached) |
 | `BHAVCOPY_CACHE_TTL_SECONDS` | 12 hours | Half a day |
 | `SURVEILLANCE_CACHE_TTL_SECONDS` | 7 days | Weekly |
 | `CORPORATE_ACTIONS_CACHE_TTL_SECONDS` | 12 hours | Half a day |
@@ -304,7 +306,7 @@ Documented in CHANGELOG 1.1.6; revisit if NSE splits become more frequent.
 | Universe CSV | NSE archives (`nsearchives.nseindia.com`) | niftyindices.com | (fail-closed) |
 | Shareholding | Screener.in | (no fallback — fail-closed) |
 | Surveillance | NSE + BSE consolidated | (fail-closed) |
-| Corporate actions | NSE `corporate-actions` API | (fail-closed) |
+| Corporate actions | NSE `corporate-actions` API, fetched once per scan | (fail-closed) |
 | Delivery value | NSE archives bhavcopy | **yfinance traded-value proxy** (volume × close) | BSE archives |
 | yfinance (technicals, F-Score, P/E) | yfinance | (no fallback — fail-closed) |
 | Nifty 50 context | yfinance `^NSEI` | (no fallback — fail-closed) |
@@ -368,19 +370,20 @@ a new cached call with a long key, hash it.
 - Steps:
   1. Checkout + Python 3.11
   2. `actions/cache@v6` (backend/cache/)
-  3. `pip install -r backend/requirements.txt`
-  4. `Run full scan` (scanner.py with --top-n 500 --workers 4 --sleep 0.5
+  3. `pip install -r backend/requirements.txt` (runtime-only dependencies)
+  4. Ping the scheduled healthcheck `/start` endpoint
+  5. `Run full scan` (scanner.py with --top-n 500 --workers 4 --sleep 0.5
      --lenient-external-gates; exits 2 below 85% coverage)
-  5. **3× healthchecks.io pings** (start, fail, success — gated by secrets)
+  6. **3× healthchecks.io pings** (start, fail, success — gated by secrets)
      plus a 4th cancellation ping (`HEALTHCHECK_PING_URL_CANCELLED`)
-  6. Validate JSON contract (asserts `generated_at` + `stocks` non-empty)
-  7. **Write dated snapshot** (`snapshot_writer.py`: minified
-     `data/snapshots/YYYY-MM-DD-{am|pm}.json` + `history_index.json` +
+  7. Validate JSON contract (asserts `generated_at` + `stocks` non-empty)
+  8. **Write dated compact snapshot** (`snapshot_writer.py`: minified
+     tracker/delta fields in `data/snapshots/YYYY-MM-DD-{am|pm}.json` + `history_index.json` +
      rolling 90-day prune)
-  8. Write `scan_status.json` (drift calc via `scan_schedule.py`, best-effort)
-  9. Commit + push latest_scan.json + scan_status.json + snapshots/
-  10. **Telegram digest** (`send_digest.py`, secrets-gated, soft-fails)
-  11. Frontend build + Netlify deploy (gated by `if: success()`, env-gated
+  9. Write `scan_status.json` (drift calc via `scan_schedule.py`, best-effort)
+  10. Commit + push latest_scan.json + scan_status.json + snapshots/
+  11. **Telegram digest** (`send_digest.py`, secrets-gated, soft-fails)
+  12. Frontend build + Netlify deploy (gated by `if: success()`, env-gated
       by NETLIFY_AUTH_TOKEN)
 
 ### `watchdog.yml` (cron drift detector)
@@ -570,7 +573,7 @@ Two places, kept in sync by `backend/scripts/check_cron_consistency.py`
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 189 tests in ~1s
+.venv/bin/python -m pytest -q          # 209 tests in ~2s
 ```
 
 Coverage (manual map):

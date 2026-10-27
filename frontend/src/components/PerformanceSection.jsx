@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
 import PerSymbolAccuracy from "./PerSymbolAccuracy.jsx";
-
-const PERFORMANCE_URL = "/data/performance.json";
 
 /**
  * C2: Score-bucket hit-rate view from data/performance.json.
@@ -13,37 +10,9 @@ const PERFORMANCE_URL = "/data/performance.json";
  *  - Explicit "descriptive" framing; not a backtest
  *  - Empty trackable state surfaces reason breakdown (P0 integrity)
  */
-export default function PerformanceSection() {
-  const [data, setData] = useState(null);
-  const [state, setState] = useState("loading"); // loading | loaded | empty | error
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const r = await fetch(PERFORMANCE_URL, { cache: "no-store" });
-        if (!r.ok) {
-          if (!cancelled) setState("empty");
-          return;
-        }
-        const j = await r.json();
-        if (cancelled) return;
-        if (!j || (j.meta && j.meta.snapshots_used === 0)) {
-          setState("empty");
-        } else {
-          setData(j);
-          setState("loaded");
-        }
-      } catch {
-        if (!cancelled) setState("error");
-      }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
-  if (state === "loading" || state === "error") return null;
-  if (state === "empty") {
+export default function PerformanceSection({ data }) {
+  if (!data) return null;
+  if (data.meta && data.meta.snapshots_used === 0) {
     return (
       <section className="performance">
         <h3>Forward-return attribution</h3>

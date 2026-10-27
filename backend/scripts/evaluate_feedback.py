@@ -186,15 +186,15 @@ def confirmation_ab(rows, window="T+5"):
 # Shadow re-scoring
 # --------------------------------------------------------------------------
 
-def _shadow_score(sub_scores, weights):
-    """Mirror scanner.py's renormalised weighted blend (100x scale)."""
+def _shadow_score(sub_scores, weights, market_factor=1.0):
+    """Mirror scanner.py's renormalised weighted blend and market multiplier."""
     num, den = 0.0, 0.0
     for k, w in weights.items():
         v = sub_scores.get(k)
         if isinstance(v, (int, float)):
             num += float(v) * w
             den += w
-    return 100.0 * num / den if den > 0 else None
+    return (100.0 * num / den * market_factor) if den > 0 else None
 
 
 def _normalize(weights):
@@ -227,7 +227,10 @@ def shadow_compare(rows, candidates):
     mismatch = 0
     for r in usable:
         sub = {k: float(v) for k, v in r["sub_scores"].items() if isinstance(v, (int, float))}
-        base_score = _shadow_score(sub, candidates["baseline"])
+        market_factor = r.get("market_correction_factor")
+        if not isinstance(market_factor, (int, float)):
+            market_factor = 1.0
+        base_score = _shadow_score(sub, candidates["baseline"], market_factor)
         if base_score is None:
             continue
         stored = r.get("score")
@@ -239,7 +242,11 @@ def shadow_compare(rows, candidates):
             if not isinstance(v, (int, float)) or cell.get("untrackable"):
                 continue
             for cname, cweights in candidates.items():
-                score = base_score if cname == "baseline" else _shadow_score(sub, cweights)
+                score = (
+                    base_score
+                    if cname == "baseline"
+                    else _shadow_score(sub, cweights, market_factor)
+                )
                 if score is None:
                     continue
                 buckets[w][cname][score_bucket(score)].append(float(v))

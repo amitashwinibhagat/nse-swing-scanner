@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { computeDeltas, pickPreviousSnapshot } from "../utils/delta.js";
 
-const HISTORY_URL = "/data/snapshots/history_index.json";
-
 /**
  * Dismissible banner that surfaces the actionable changes since the prior
  * snapshot. Visible only when there are non-zero deltas.
@@ -10,29 +8,15 @@ const HISTORY_URL = "/data/snapshots/history_index.json";
  * @param {{currentGeneratedAt:string, stocks:Array,
  *   watchlist:{has:(s:string)=>boolean}}} props
  */
-export default function DeltaStrip({ currentGeneratedAt, stocks, watchlist }) {
-  const [history, setHistory] = useState([]);
+export default function DeltaStrip({ currentGeneratedAt, stocks, watchlist, history = [] }) {
   const [latestMeta, setLatestMeta] = useState(null);
   const [previousStocks, setPreviousStocks] = useState(null);
   const [previousMeta, setPreviousMeta] = useState(null);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
     // Reset dismissal when the underlying scan changes.
     setDismissed(false);
-    async function load() {
-      try {
-        const r = await fetch(HISTORY_URL, { cache: "no-store" });
-        if (!r.ok) return;
-        const idx = await r.json();
-        if (!cancelled && Array.isArray(idx)) setHistory(idx);
-      } catch {
-        /* ignore — no history is the common first-scan state */
-      }
-    }
-    load();
-    return () => { cancelled = true; };
   }, [currentGeneratedAt]);
 
   useEffect(() => {

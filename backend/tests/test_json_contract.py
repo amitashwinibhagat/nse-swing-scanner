@@ -272,3 +272,15 @@ def test_write_scan_output_handles_nan_and_inf(tmp_path):
     assert reloaded["universe_size"] == 1
     assert reloaded["stocks"][0]["pct_off_52wk_high"] is None
     assert reloaded["stocks"][0]["volume_surge_factor"] is None
+
+
+def test_write_scan_output_keeps_existing_file_below_coverage_floor(tmp_path):
+    row = _make_df().iloc[0].to_dict()
+    row["tech_current_price"] = None
+    out = tmp_path / "scan.json"
+    out.write_text('{"generated_at":"previous-good"}')
+
+    payload = write_scan_output(pd.DataFrame([row]), str(out))
+
+    assert payload["coverage"]["pct"] == 0.0
+    assert out.read_text() == '{"generated_at":"previous-good"}'

@@ -40,7 +40,7 @@ swing-trade candidate list.
 ```bash
 cd backend
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install -r requirements-dev.txt
 
 # Default: Nifty 500 (top 500 by market cap), 8 workers, ~12-20 min cold / ~5-10 min warm
 .venv/bin/python scanner.py
@@ -86,7 +86,7 @@ See `docs/methodology.md` for the full table. In short:
 - F-Score ≥ 6 (configurable in `settings.py`; spec is >7)
 - Drawdown in [-40%, -15%]
 - RSI in [25, 40]
-- Delivery value ≥ ₹5cr (from NSE bhavcopy)
+- Liquidity adequacy: real delivery ≥ ₹5cr with ADV secondary floor, or 20-day ADV ≥ ₹10cr
 - Not in T-group / GSM / suspension (NSE → BSE → flag-only)
 - Promoter + FII + DII > 50% (Screener consolidated → standalone)
 - No excluded corporate action in next 30 days
@@ -114,7 +114,7 @@ were verified vs. which were skipped.
 
 The suite covers RSI/ATR math, named gate functions, bhavcopy parser,
 holdings parser, source-status envelope, and the JSON output contract.
-Total: 45 tests. Live network calls are not in the default test path —
+The suite contains 209 tests. Live network calls are not in the default test path —
 they are exercised by the GitHub Actions scan workflow.
 
 ## Limitations (carried over from Phase 1)

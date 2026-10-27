@@ -145,7 +145,7 @@ def fetch_holdings(symbol: str, *, sleep_between: float = 0.2) -> dict:
             status="source_failed",
             error="screener fetch failed",
         )
-        write_cache(cache_key, result)
+        # Do not poison the quarterly cache with a transient outage or block.
         return result
 
     parsed = _parse_shareholding_table(soup)
@@ -155,7 +155,6 @@ def fetch_holdings(symbol: str, *, sleep_between: float = 0.2) -> dict:
             status="missing",
             error="shareholding table not found",
         )
-        write_cache(cache_key, result)
         return result
 
     promoter = _best_pct(parsed, "promoter")
@@ -168,7 +167,6 @@ def fetch_holdings(symbol: str, *, sleep_between: float = 0.2) -> dict:
             status="missing",
             error="no promoter/fii/dii rows parsed",
         )
-        write_cache(cache_key, result)
         return result
 
     conviction = sum(v for v in (promoter, fii, dii) if v is not None)

@@ -28,18 +28,18 @@ from settings import (
 
 
 def test_gate_f_score_pass():
-    ok, why = gate_f_score(MIN_F_SCORE)
+    ok, why = gate_f_score(MIN_F_SCORE, 9)
     assert ok and why is None
 
 
 def test_gate_f_score_fail():
-    ok, why = gate_f_score(MIN_F_SCORE - 1)
+    ok, why = gate_f_score(MIN_F_SCORE - 1, 9)
     assert not ok
     assert why and "f_score" in why
 
 
 def test_gate_f_score_missing():
-    ok, why = gate_f_score(None)
+    ok, why = gate_f_score(None, 9)
     assert not ok
     assert why == "f_score_missing"
 
@@ -233,20 +233,31 @@ def test_gate_holdings_strict_still_rejects_low_conviction_in_lenient_mode():
 
 
 def test_gate_corporate_actions_no_action():
-    ok, why = gate_corporate_actions({"has_excluded_action": False, "actions": []})
+    ok, why = gate_corporate_actions({"has_excluded_action": False, "actions": []}, "ok")
     assert ok and why is None
 
 
 def test_gate_corporate_actions_excluded():
-    ok, why = gate_corporate_actions({"has_excluded_action": True, "actions": [{"action": "BONUS 2:1"}]})
+    ok, why = gate_corporate_actions({"has_excluded_action": True, "actions": [{"action": "BONUS 2:1"}]}, "ok")
     assert not ok
     assert "BONUS" in why
 
 
-def test_gate_corporate_actions_source_failed_passes():
-    # If we couldn't fetch, we don't claim to have screened it
+def test_gate_corporate_actions_source_failed_fails_closed():
     ok, why = gate_corporate_actions(None)
-    assert ok and why is None
+    assert not ok
+    assert why == "corporate_actions_source_failed"
+
+
+def test_gate_corporate_actions_can_be_disabled():
+    ok, why = gate_corporate_actions(None, enabled=False)
+    assert ok and why == "gate_disabled"
+
+
+def test_gate_f_score_requires_all_components():
+    ok, why = gate_f_score(MIN_F_SCORE, 8)
+    assert not ok
+    assert "components_missing" in why
 
 
 def test_relative_strength_penalty():

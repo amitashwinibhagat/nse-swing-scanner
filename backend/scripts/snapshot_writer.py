@@ -36,6 +36,41 @@ from typing import List, Optional, Tuple
 
 SNAPSHOT_FILENAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-(am|pm)\.json$")
 
+# Snapshots serve the outcome tracker and the frontend's delta/receipts views;
+# the full latest scan remains the detailed contract. Keeping only the fields
+# those consumers need prevents every twice-daily snapshot from duplicating the
+# full 1MB+ scan payload.
+SNAPSHOT_STOCK_FIELDS = (
+    "symbol",
+    "company_name",
+    "yf_ticker",
+    "gate_pass",
+    "swing_score",
+    "current_price",
+    "entry_zone_low",
+    "entry_zone_high",
+    "stop_loss",
+    "target_1",
+    "target_2",
+    "confirmation_state",
+    "sub_scores",
+    "score_version",
+    "market_index_pct_from_ema200",
+    "market_correction_factor",
+)
+
+
+def compact_scan_payload(scan: dict) -> dict:
+    """Return the stable, minimal snapshot contract."""
+    compact = dict(scan)
+    compact["snapshot_schema_version"] = 2
+    compact["stocks"] = [
+        {key: stock.get(key) for key in SNAPSHOT_STOCK_FIELDS if key in stock}
+        for stock in scan.get("stocks", [])
+        if isinstance(stock, dict)
+    ]
+    return compact
+
 
 def parse_iso_utc(s: str) -> datetime.datetime:
     """Parse a YYYY-MM-DD or full ISO-8601 string; returns tz-aware UTC."""
@@ -109,10 +144,12 @@ def write_snapshot(
     filename = f"{date_str}-{slot}.json"
     out_path = os.path.join(snapshots_dir, filename)
 
+    snapshot = compact_scan_payload(scan)
+
     # Minified write (smaller git footprint). Preserve insert order; do NOT
     # sort_keys — stock array order is meaningful (swing_score desc).
     with open(out_path, "w") as f:
-        json.dump(scan, f, separators=(",", ":"), ensure_ascii=False)
+        json.dump(snapshot, f, separators=(",", ":"), ensure_ascii=False)
 
     # Update history index
     index_path = os.path.join(snapshots_dir, "history_index.json")
@@ -141,7 +178,12 @@ def write_snapshot(
     index.append(entry)
     index.sort(key=lambda e: (e.get("date", ""), e.get("slot", "")))
 
-    prune_snapshots(snapshots_dir, index, retention_days)
+    prune_snapshots(
+        snapshots_dir,
+        index,
+        retention_days,
+        reference_date=datetime.date.fromisoformat(date_str),
+    )
 
     with open(index_path, "w") as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
@@ -149,13 +191,20 @@ def write_snapshot(
     return filename, {"entries": index, "file": filename}
 
 
-def prune_snapshots(snapshots_dir: str, index: List[dict], retention_days: int) -> None:
+def prune_snapshots(
+    snapshots_dir: str,
+    index: List[dict],
+    retention_days: int,
+    *,
+    reference_date: Optional[datetime.date] = None,
+) -> None:
     """
     Drop snapshot files older than retention_days AND any index entries
     pointing at them. Index entries referencing non-existent files are
     also removed.
     """
-    cutoff = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=retention_days)).date()
+    reference_date = reference_date or datetime.datetime.now(datetime.timezone.utc).date()
+    cutoff = reference_date - datetime.timedelta(days=retention_days)
     kept: List[dict] = []
     for e in index:
         d = e.get("date")

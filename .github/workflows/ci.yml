@@ -17,7 +17,7 @@ jobs:
           python-version: "3.11"
       - name: Install backend deps
         working-directory: backend
-        run: pip install -r requirements.txt
+         run: pip install -r requirements-dev.txt
       - name: Check cron consistency (scan.yml vs WINDOWS)
         working-directory: backend
         # Fails fast if the YAML cron entries drift from the WINDOWS list

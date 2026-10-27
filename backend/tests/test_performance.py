@@ -335,11 +335,11 @@ class TestSessionIndexAndCloses(unittest.TestCase):
             {"end_date": "2026-08-01", "closes": {}}, min_end_date="2026-08-01"
         ))
         self.assertTrue(performance.cache_entry_usable(
-            {"end_date": "2026-08-15", "closes": {"2026-07-13": 1.0}},
+            {"end_date": "2026-08-15", "closes": {"2026-08-15": 1.0}},
             min_end_date="2026-08-01",
         ))
         self.assertFalse(performance.cache_entry_usable(
-            {"end_date": "2026-07-01", "closes": {"2026-07-13": 1.0}},
+            {"end_date": "2026-07-01", "closes": {"2026-08-02": 1.0}},
             min_end_date="2026-08-01",
         ))
 
@@ -547,6 +547,7 @@ class TestCoverageHelper(unittest.TestCase):
                 sleep_between_calls=0,
                 surveillance_payload={},
                 bhavcopy_payload={},
+                corporate_actions_payload=None,
                 skip_holdings=True,
                 skip_corporate_actions=True,
                 lenient_external_gates=False,

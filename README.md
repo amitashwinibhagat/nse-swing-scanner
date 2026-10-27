@@ -148,7 +148,7 @@ row fails that gate rather than passing it silently.
 
 | Gate | Criterion | Source |
 |---|---|---|
-| **F-Score** | Piotroski F-Score ≥ 6 (configurable; spec is > 7) | yfinance financials |
+| **F-Score** | Piotroski F-Score ≥ 6 with all 9 components available (configurable; spec is > 7) | yfinance financials |
 | **Drawdown** | −40% ≤ % off 52-week high ≤ −15% | yfinance |
 | **RSI** | 25 ≤ RSI(14) ≤ 40 | yfinance |
 | **Liquidity adequacy** | real NSE delivery ≥ ₹5 cr **or** 20-day ADV ≥ ₹10 cr | NSE bhavcopy (preferred) / yfinance ADV |

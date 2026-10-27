@@ -208,6 +208,8 @@ function exportCsv(rows, filename = "nse_swing_scan.csv") {
 
 export default function App() {
   const [data, setData] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [performance, setPerformance] = useState(null);
   const [error, setError] = useState(null);
   const [scanStatus, setScanStatus] = useState(null);
   const [search, setSearch] = useState("");
@@ -269,13 +271,28 @@ export default function App() {
   const [triggerError, setTriggerError] = useState(null);
 
   useEffect(() => {
-    fetch("/data/latest_scan.json")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
+    let cancelled = false;
+    const optionalJson = (url) =>
+      fetch(url, { cache: "no-store" })
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null);
+    Promise.all([
+      fetch("/data/latest_scan.json", { cache: "no-store" }),
+      optionalJson("/data/snapshots/history_index.json"),
+      optionalJson("/data/performance.json"),
+    ])
+      .then(async ([scanRes, historyRes, performanceRes]) => {
+        if (!scanRes.ok) throw new Error(`HTTP ${scanRes.status}`);
+        const scan = await scanRes.json();
+        if (cancelled) return;
+        setData(scan);
+        setHistory(Array.isArray(historyRes) ? historyRes : []);
+        setPerformance(performanceRes);
       })
-      .then(setData)
-      .catch((e) => setError(e.message));
+      .catch((e) => {
+        if (!cancelled) setError(e.message);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -563,7 +580,7 @@ export default function App() {
           </div>
         </div>
 
-        <ReceiptsBanner />
+        <ReceiptsBanner performance={performance} />
 
         <div className="filter-bar">
           <label className="search-wrap">
@@ -737,8 +754,13 @@ export default function App() {
             currentGeneratedAt={data.generated_at}
             stocks={data.stocks}
             watchlist={watchlist}
+            history={history}
           />
-          <RecentPicksStrip currentGeneratedAt={data.generated_at} />
+          <RecentPicksStrip
+            currentGeneratedAt={data.generated_at}
+            latestStocks={data.stocks}
+            history={history}
+          />
         </div>
       </details>
 
@@ -817,6 +839,7 @@ export default function App() {
                 onClose={() => setExpanded(null)}
                 watchlist={watchlist}
                 scanDate={data.generated_at}
+                performance={performance}
               />
             ) : null;
           })()}
@@ -833,6 +856,7 @@ export default function App() {
                 expanded={expanded === s.symbol}
                 onToggle={() => toggleDrawer(s.symbol)}
                 watchlist={watchlist}
+                performance={performance}
               />
             ))}
           </div>
@@ -844,6 +868,7 @@ export default function App() {
                 onClose={() => setExpanded(null)}
                 watchlist={watchlist}
                 scanDate={data.generated_at}
+                performance={performance}
               />
             ) : null;
           })()}
@@ -1035,7 +1060,7 @@ export default function App() {
         <summary>Methodology &amp; track record</summary>
         <div className="more-panel-body">
           <Rationale />
-          <PerformanceSection />
+          <PerformanceSection data={performance} />
         </div>
       </details>
 
