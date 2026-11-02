@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-30T16:48:57.678858+00:00",
-  "triggered_at": "2026-10-30T16:48:58.374608+00:00",
-  "commit_sha": "4709522229d63f8701596fb63d27fb7354a50daa",
-  "run_id": "41092854285",
-  "trigger": "schedule",
-  "scheduled_window_utc": "10:30",
+  "generated_at": "2026-11-02T07:32:04.083993+00:00",
+  "triggered_at": "2026-11-02T07:32:04.750913+00:00",
+  "commit_sha": "d34b1435081ed9981f609ac22413b5cb1e98ce38",
+  "run_id": "41405841100",
+  "trigger": "workflow_dispatch",
+  "scheduled_window_utc": null,
   "scheduled_cron": "30 3 * * 1-5, 30 10 * * 1-5",
-  "next_expected_utc": "2026-11-02T03:30:00+00:00",
-  "drift_minutes": 378
+  "next_expected_utc": "2026-11-02T10:30:00+00:00",
+  "drift_minutes": null
 }
