@@ -231,7 +231,8 @@ netlify deploy --prod --dir=frontend/dist \
 whatever site is linked or, with no link, to an interactive picker. On
 2026-10-27T07:22Z a manual deploy ran without `--site`, the picker offered the
 Klinote site (`luminous-speculoos-4764fd`, id `23f9c904-a146-464e-96eb-3d9db3fd15e0`,
-whose generated name gives no clue it is Klinote), and the scanner build shipped
+whose generated name gave no clue it was Klinote; renamed to `klinote` on
+2026-11-05), and the scanner build shipped
 to **klinote.one**. That domain served the trading screener for 9 days until it
 was restored from the 2026-10-21 Klinote deploy. The GitHub Action above is
 unaffected: it passes `--site="$NETLIFY_SITE_ID"` explicitly.
