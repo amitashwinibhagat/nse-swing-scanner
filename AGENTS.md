@@ -223,8 +223,21 @@ gh workflow run watchdog.yml --repo amitashwinibhagat/nse-swing-scanner
 
 ```bash
 netlify deploy --prod --dir=frontend/dist \
+    --site 360b23fb-e215-46d8-8072-58f589a165b9 \
     --message="manual deploy: <reason>"
 ```
+
+**`--site` is mandatory, never optional.** Without it the CLI falls back to
+whatever site is linked or, with no link, to an interactive picker. On
+2026-10-27T07:22Z a manual deploy ran without `--site`, the picker offered the
+Klinote site (`luminous-speculoos-4764fd`, id `23f9c904-a146-464e-96eb-3d9db3fd15e0`,
+whose generated name gives no clue it is Klinote), and the scanner build shipped
+to **klinote.one**. That domain served the trading screener for 9 days until it
+was restored from the 2026-10-21 Klinote deploy. The GitHub Action above is
+unaffected: it passes `--site="$NETLIFY_SITE_ID"` explicitly.
+
+After any manual deploy, curl the domain and assert the `<title>` is
+`NSE Swing Scanner`, not merely that the command exited 0.
 
 This bypasses the GitHub-Integration auto-deploy and uploads directly. Used when:
 - Workflow's `Trigger Netlify production deploy` step skipped (missing secrets).
