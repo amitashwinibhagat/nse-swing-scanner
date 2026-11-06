@@ -1,3 +1,6 @@
 -r requirements.txt
 pytest>=7.4
 pyflakes>=3.2
+# Needed by scripts/check_workflows_parse.py (CI guard) and by the
+# workflow-script smoke guard, which imports every entrypoint.
+pyyaml>=6.0

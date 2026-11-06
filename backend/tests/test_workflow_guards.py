@@ -255,3 +255,13 @@ def test_scan_workflow_accepts_a_window_from_the_dispatch_payload():
     step = _step("scan.yml", "scan", "Resolve schedule context")
     env_values = " ".join(str(v) for v in (step.get("env") or {}).values())
     assert "client_payload.window" in env_values
+
+
+def test_dev_requirements_cover_the_ci_guards():
+    """`check_workflow_scripts.py` runs every entrypoint under CI, including
+    `check_workflows_parse.py`, which imports PyYAML. PyYAML was only installed
+    in the lint-workflows job, so the backend job failed the moment the guard
+    started checking itself — CI caught it on the first real run."""
+    reqs = (BACKEND / "requirements-dev.txt").read_text().lower()
+    assert "pyyaml" in reqs, "check_workflows_parse.py needs PyYAML in CI"
+    assert "pyflakes" in reqs, "the lint step needs pyflakes in CI"
