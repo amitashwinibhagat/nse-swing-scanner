@@ -309,6 +309,34 @@ buy zone — consider entering now", every day.
 
 ---
 
+## 1.8.0 — scoring defects found by asking why zero picks
+
+Two real bugs in the *formula*, not the data pipeline:
+
+1. **`support_proximity` was a constant.** 0.00 for **80%** of gate-passed names
+   (mean 0.09, rank IC negative at T+5/T+10/T+20), because the gates select
+   names 15–40% off their high and those sit far from the 200EMA — the same
+   input the relative-strength factor already used. With it at zero the maximum
+   attainable base score was 85, and `85 × 0.70 = 59.5` sat below the 63 cut:
+   **14.3% of tracked rows could never be a top pick**, regardless of quality.
+2. **The `1.05×` "index correcting" bonus marked the worst cohort** — T+20 excess
+   −6.45% vs −0.00% at 1.0× and +0.66% at 0.70×. It rewarded weakness in a weak
+   tape. Removed; the factor is now penalty-only.
+
+Fixing (1) exposed the same ceiling one layer down: a `×0.70` multiplier caps a
+score at 70, and the band is 74 — still an arithmetic exclusion for 13.5% of
+rows. The penalty is therefore **additive** (−15 / −8 points), which demotes a
+name without forbidding the top of the scale.
+
+The bands were recalibrated (`pass_v3` → `pass_v4`) to keep the *same selection
+share* per band, since the fixes lifted the distribution ~7 points:
+**63→74, 60→70, 55→64, 45→53**. This is not a loosened threshold — it re-scores
+the same names, and the top band's measured outcome is unchanged (T+5 −0.25%
+vs −0.26%, T+20 −0.63% vs −0.96%) and still has **no established edge**.
+
+Verified live: `ATUL` — base 92.6, penalty 15.0 (19.3pp worse than the index),
+swing score 77.6, six components, all gates verified.
+
 ## Still not fixed (and why)
 
 | Item | Reason |
