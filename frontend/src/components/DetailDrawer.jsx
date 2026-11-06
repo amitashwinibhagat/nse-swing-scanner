@@ -265,6 +265,13 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
               >
                 {stock.gate_pass ? "GATES PASSED" : "GATES FAILED"}
               </span>
+              {Array.isArray(stock.unverified_gates) && stock.unverified_gates.length > 0 && (
+                <div className="fail-reason" style={{ marginTop: 8 }}>
+                  Partial check: {stock.unverified_gates.join(", ")} could not be
+                  verified when this scan ran (lenient mode). Treat the gate as
+                  unknown, not as passed.
+                </div>
+              )}
               {!stock.gate_pass && stock.gate_fail_reason && (
                 <div className="fail-reason" style={{ marginTop: 8 }}>
                   Gate fail: {stock.gate_fail_reason}

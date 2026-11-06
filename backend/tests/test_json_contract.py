@@ -291,6 +291,13 @@ def test_write_scan_output_includes_source_health(tmp_path):
     and the dashboard can tell a source outage from a quiet market."""
     row = _make_df().iloc[0].to_dict()
     row["corporate_actions_status"] = "source_failed"
+    # The gate fails closed, so this row cannot pass: that is what makes the
+    # outage "critical" rather than merely degraded.
+    row["gate_pass"] = False
+    row["gate_results"] = [
+        {"gate": "corporate_actions", "passed": False,
+         "reason": "corporate_actions_source_failed"}
+    ]
     out = tmp_path / "scan.json"
 
     payload = write_scan_output(pd.DataFrame([row]), str(out))
@@ -300,6 +307,23 @@ def test_write_scan_output_includes_source_health(tmp_path):
     assert health["critical_source_failed"] is True
     assert "corporate_actions" in health["degraded_gates"]
     assert json.loads(out.read_text())["source_health"]["critical_source_failed"] is True
+
+
+def test_source_health_is_degraded_but_not_critical_when_rows_still_pass(tmp_path):
+    """A lenient run publishes picks; the outage is labelled per row instead of
+    being escalated to an incident (which would be a false alarm)."""
+    row = _make_df().iloc[0].to_dict()
+    row["corporate_actions_status"] = "source_failed"
+    row["gate_pass"] = True
+    row["unverified_gates"] = ["corporate_actions_unverified"]
+    out = tmp_path / "scan.json"
+
+    payload = write_scan_output(pd.DataFrame([row]), str(out))
+
+    health = payload["source_health"]
+    assert "corporate_actions" in health["degraded_gates"]
+    assert health["critical_source_failed"] is False
+    assert payload["stocks"][0]["unverified_gates"] == ["corporate_actions_unverified"]
 
 
 def test_write_scan_output_reports_clean_source_health(tmp_path):

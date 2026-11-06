@@ -71,6 +71,21 @@ export function sourceHealthOf(scan, scanStatus) {
   };
 }
 
+/**
+ * Gates that passed only because a source was unreachable and the scanner ran
+ * in lenient mode. A pick carrying one of these was NOT fully checked, and the
+ * card must say so rather than showing a clean "GATES PASSED".
+ *
+ * @returns {string[]} human labels, empty when the row is fully verified
+ */
+export function unverifiedGateLabels(stock, dict = SOURCE_GATE_LABELS) {
+  const keys = Array.isArray(stock?.unverified_gates) ? stock.unverified_gates : [];
+  return keys.map((k) => {
+    const normalized = String(k).replace(/_unverified$/, "");
+    return dict[normalized] || String(k).replace(/_/g, " ");
+  });
+}
+
 /** Human labels for the gate keys used in `source_health.degraded_gates`. */
 export const SOURCE_GATE_LABELS = {
   corporate_actions: "corporate actions",

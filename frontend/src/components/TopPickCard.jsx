@@ -1,6 +1,7 @@
 import { memo } from "react";
 import ScoreRing from "./ScoreRing.jsx";
 import { planAction } from "../utils/scanPlan.js";
+import { unverifiedGateLabels } from "../utils/scanData.js";
 import { pickReasons, upsideToT1 } from "../utils/picks.js";
 import { planRiskReward, computePositionSize, readSizing } from "../utils/sizing.js";
 
@@ -46,6 +47,8 @@ function TopPickCard({ stock, onOpen, watchlist, journal, scanDate, priorPlan })
   // asserting the price is "in the buy zone" purely because the scanner set
   // entry_zone_high = current_price.
   const action = planAction(stock, priorPlan);
+  // A PASS that skipped an unverifiable gate must not read as fully checked.
+  const unverified = unverifiedGateLabels(stock);
   const reasons = pickReasons(stock);
   const upside = upsideToT1(stock);
   const rr = planRiskReward(stock);
@@ -167,6 +170,12 @@ function TopPickCard({ stock, onOpen, watchlist, journal, scanDate, priorPlan })
       <div className="pick-meta">
         <span className="pick-price">Last {fmtINR(stock.current_price)}</span>
       </div>
+
+      {unverified.length > 0 && (
+        <p className="pick-unverified" title="These gates could not be verified when the scan ran; the row passed because the scanner is running with --lenient-external-gates.">
+          Not verified: {unverified.join(", ")}
+        </p>
+      )}
 
       {reasons.length > 0 && (
         <ul className="pick-reasons">

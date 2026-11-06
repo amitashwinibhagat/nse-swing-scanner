@@ -54,6 +54,28 @@ close for the whole session.
   `scripts/resolve_schedule_context.py` so `check_workflow_scripts.py` covers it
   and it can be unit-tested.
 
+### Follow-up found by the first real CI run (same day)
+
+- **`--lenient-external-gates` did not cover the corporate-actions gate.** NSE
+  blocks `/api/corporates-corporateActions` from GitHub Actions egress (Akamai;
+  it works from a residential IP), so the flag that exists precisely for that
+  situation left this one gate failing closed — and that single gate zeroed the
+  whole PASS list again on the first post-deploy scan. The flag now covers it,
+  and a lenient pass is **labelled** (`unverified_gates` per row, amber "Not
+  verified" chip on the card, "Partial check" in the drawer) instead of being
+  silently counted as a clean PASS.
+- **`source_health.critical_source_failed`** now means "a gate blocked the
+  entire universe". A degraded-but-passing run reports `degraded_gates` without
+  escalating to an incident, so the dashboard does not cry outage when picks
+  are being published.
+- **The CA probe reports its real failure cause** (HTTP status + body preview +
+  the exact query) instead of an opaque "not reachable" — the previous message
+  was undiagnosable from a CI log.
+- **`pyyaml`** was missing from `requirements-dev.txt`, so the backend CI job
+  failed the first time `check_workflow_scripts.py` started checking the new
+  workflow-lint script. Caught by CI on its first real run, fixed, and pinned
+  by a test.
+
 ### Fixed — data integrity
 
 - **Corporate actions**: correct endpoint parameters, a `DD-Mon-YYYY` parser

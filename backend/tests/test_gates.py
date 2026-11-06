@@ -333,3 +333,47 @@ def test_source_health_flags_flag_only_surveillance():
     records = [_row(surv="flag_only") for _ in range(3)]
     health = compute_source_health(records)
     assert "surveillance" in health["degraded_gates"]
+
+
+def test_gate_corporate_actions_lenient_allows_an_unverifiable_feed():
+    """NSE blocks this endpoint from Actions egress, and this gate alone zeroed
+    the PASS list in 2026-10/11. The documented opt-out must cover it."""
+    ok, why = gate_corporate_actions(None, "source_failed", lenient=True)
+    assert ok
+    assert "unverified" in why
+
+
+def test_gate_corporate_actions_still_fails_closed_without_lenient():
+    ok, why = gate_corporate_actions(None, "source_failed")
+    assert not ok
+    assert why == "corporate_actions_source_failed"
+
+
+def test_gate_corporate_actions_lenient_does_not_excuse_a_real_action():
+    ok, why = gate_corporate_actions(
+        {"has_excluded_action": True, "actions": [{"action": "BONUS 1:1"}]},
+        "ok",
+        lenient=True,
+    )
+    assert not ok
+    assert "BONUS" in why
+
+
+def test_lenient_pass_is_labelled_and_not_counted_as_critical():
+    """The label travels: gate reason -> unverified_gates -> JSON -> UI."""
+    ok, why = gate_corporate_actions(None, "source_failed", lenient=True)
+    assert ok and "(lenient)" in why
+    # The reporting rule used by evaluate_stock: strip the marker for display.
+    assert why.split(" (lenient)")[0] == "corporate_actions_unverified"
+
+    import scanner
+    records = [{
+        "corporate_actions_status": "source_failed",
+        "surveillance_source_status": "ok",
+        "holdings_source_status": "ok",
+        "gate_pass": True,
+    }]
+    health = scanner.compute_source_health(records)
+    assert "corporate_actions" in health["degraded_gates"]
+    # Rows still pass, so this is a labelled degradation, not an incident.
+    assert health["critical_source_failed"] is False

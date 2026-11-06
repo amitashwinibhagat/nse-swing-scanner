@@ -2609,3 +2609,16 @@ body {
   color: var(--text-faint);
   font-size: var(--t-micro);
 }
+
+/* A PASS that skipped an unverifiable gate. Amber, not green: the row was not
+   fully checked, and the card must not imply otherwise. */
+.pick-unverified {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  color: var(--warning);
+  background: var(--warning-dim);
+  border: 1px solid #fbbf2459;
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+}

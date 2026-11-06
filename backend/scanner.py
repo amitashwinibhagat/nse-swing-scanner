@@ -305,10 +305,24 @@ def gate_corporate_actions(
     ca_data: Optional[dict],
     ca_status: str = "source_failed",
     enabled: bool = True,
+    lenient: bool = False,
 ) -> tuple[bool, Optional[str]]:
+    """
+    Hard gate: no excluded corporate action inside the lookahead window.
+
+    Fails closed when the feed is unreachable: we cannot claim "no pending
+    action" if we never saw the list.
+
+    `lenient` is the documented `--lenient-external-gates` opt-out. It matters
+    more here than for any other gate: NSE blocks the JSON endpoint from GitHub
+    Actions egress (Akamai), so failing closed on this one gate alone zeroes the
+    whole PASS list — which is exactly how the 2026-10-27 → 11-05 outage looked.
+    """
     if not enabled:
         return True, "gate_disabled"
     if ca_status in ("source_failed", "missing") or ca_data is None:
+        if lenient:
+            return True, "corporate_actions_unverified (lenient)"
         return False, "corporate_actions_source_failed"
     if ca_data.get("has_excluded_action"):
         actions = ca_data.get("actions") or []
@@ -501,6 +515,7 @@ def evaluate_stock(
         ca_data,
         ca_status=ca_status,
         enabled=ca_gate_enabled,
+        lenient=lenient_external_gates,
     )
     gate_results.append({"gate": "corporate_actions", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
@@ -509,6 +524,14 @@ def evaluate_stock(
     result["gate_pass"] = len(fail_reasons) == 0
     result["gate_fail_reason"] = "; ".join(fail_reasons) if fail_reasons else None
     result["gate_results"] = gate_results
+    # Gates that passed only because --lenient-external-gates let an
+    # unverifiable source through. Published so the UI can label a PASS that
+    # was not fully checked instead of implying it was.
+    result["unverified_gates"] = [
+        g["reason"].split(" (lenient)")[0]
+        for g in gate_results
+        if isinstance(g.get("reason"), str) and "(lenient)" in g["reason"]
+    ]
 
     # --- earnings proximity (B3) ---
     # Warning-only, never a gate. Fetched only for gate-passed names so the
@@ -998,6 +1021,11 @@ def to_json_records(df: pd.DataFrame) -> list:
             # Existing
             "gate_pass": bool(r.get("gate_pass")) if r.get("gate_pass") is not None else False,
             "gate_fail_reason": r.get("gate_fail_reason") if isinstance(r.get("gate_fail_reason"), str) else None,
+            "unverified_gates": (
+                _json_safe(r.get("unverified_gates"))
+                if isinstance(r.get("unverified_gates"), list)
+                else []
+            ),
             "gate_results": (
                 _json_safe(r.get("gate_results"))
                 if isinstance(r.get("gate_results"), list)
@@ -1067,7 +1095,11 @@ def compute_source_health(records: list) -> dict:
     return {
         **health,
         "degraded_gates": degraded,
-        "critical_source_failed": bool(degraded),
+        # Only a *blocking* outage is critical. Individual rows that passed a
+        # gate in lenient mode are labelled in `unverified_gates` instead.
+        "critical_source_failed": bool(
+            degraded and not any(r.get("gate_pass") for r in records)
+        ),
     }
 
 

@@ -9,6 +9,7 @@ import {
   sourceHealthOf,
   topBandClaim,
   topBandEvidence,
+  unverifiedGateLabels,
 } from "./scanData.js";
 
 /**
@@ -143,4 +144,21 @@ test("scan timestamps are formatted in one timezone", () => {
   // 20:30 UTC is 02:00 IST the NEXT day — date and time must agree.
   assert.equal(formatScanTimestamp("2026-11-05T20:30:00Z"), "06 Nov · 02:00 am IST");
   assert.equal(formatScanTimestamp("not-a-date"), "");
+});
+
+test("unverifiedGateLabels names gates that were skipped, not checked", () => {
+  assert.deepEqual(unverifiedGateLabels({ unverified_gates: [] }), []);
+  assert.deepEqual(
+    unverifiedGateLabels({ unverified_gates: ["corporate_actions_unverified"] }),
+    ["corporate actions"],
+  );
+  assert.deepEqual(
+    unverifiedGateLabels({
+      unverified_gates: ["corporate_actions_unverified", "holdings_conviction_unverified"],
+    }),
+    ["corporate actions", "shareholding (Screener.in)"],
+  );
+  // A payload from before the field existed must not blow up.
+  assert.deepEqual(unverifiedGateLabels({}), []);
+  assert.deepEqual(unverifiedGateLabels(null), []);
 });
