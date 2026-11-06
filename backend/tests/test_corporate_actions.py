@@ -1,3 +1,4 @@
+import json
 from datetime import date
 
 import pytest
@@ -134,18 +135,30 @@ def test_lookup_corporate_actions_marks_absent_symbol_not_applicable():
 
 # --- fetch: request construction (the "Missing index" regression) ----------
 
+class _FakeResponse:
+    def __init__(self, payload, status=200):
+        self._payload = payload
+        self.status_code = status
+        self.text = json.dumps(payload) if not isinstance(payload, str) else payload
+
+    def json(self):
+        return json.loads(self.text)
+
+
 def test_fetch_requests_index_and_date_range(monkeypatch):
     """Without ?index=equities&from_date=...&to_date=... NSE answers HTTP 200
     with the body `Missing index`, which json-decode rejects. Assert we always
     send all three."""
     captured = {}
 
-    def fake_get_json(path, **kwargs):
+    def fake_get(path, **kwargs):
         captured["path"] = path
         captured.update(kwargs.get("params") or {})
-        return [{"symbol": "ACME", "subject": "Bonus 1:1", "exDate": "20-Nov-2026"}]
+        return _FakeResponse(
+            [{"symbol": "ACME", "subject": "Bonus 1:1", "exDate": "20-Nov-2026"}]
+        )
 
-    monkeypatch.setattr("corporate_actions.nse_get_json", fake_get_json)
+    monkeypatch.setattr("corporate_actions.nse_get", fake_get)
     payload = fetch_corporate_actions_list(today=date(2026, 11, 6))
 
     assert captured["path"] == "/api/corporates-corporateActions"
@@ -159,20 +172,35 @@ def test_fetch_requests_index_and_date_range(monkeypatch):
 
 
 def test_fetch_returns_source_failed_when_endpoint_is_unreachable(monkeypatch):
-    monkeypatch.setattr("corporate_actions.nse_get_json", lambda *a, **k: None)
+    monkeypatch.setattr("corporate_actions.nse_get", lambda *a, **k: None)
     payload = fetch_corporate_actions_list(today=date(2026, 11, 6))
     assert payload["status"] == "source_failed"
     assert payload["error"]
 
 
+def test_source_failed_message_names_the_actual_cause(monkeypatch):
+    """A bare "not reachable" was undiagnosable from a CI log. NSE's failure
+    modes differ (Akamai block, `Missing index`, non-JSON body) and need
+    different fixes, so the envelope carries the status and a body preview."""
+    monkeypatch.setattr(
+        "corporate_actions.nse_get",
+        lambda *a, **k: _FakeResponse("Missing index", status=200),
+    )
+    payload = fetch_corporate_actions_list(today=date(2026, 11, 6))
+    assert payload["status"] == "source_failed"
+    assert "not JSON" in payload["error"]
+    assert "HTTP 200" in payload["error"]
+    assert "Missing index" in payload["error"]
+
+
 def test_fetch_does_not_cache_failures(monkeypatch):
     calls = {"n": 0}
 
-    def fake_get_json(*a, **k):
+    def fake_get(*a, **k):
         calls["n"] += 1
         return None
 
-    monkeypatch.setattr("corporate_actions.nse_get_json", fake_get_json)
+    monkeypatch.setattr("corporate_actions.nse_get", fake_get)
     fetch_corporate_actions_list(today=date(2026, 11, 6))
     fetch_corporate_actions_list(today=date(2026, 11, 6))
     assert calls["n"] == 2

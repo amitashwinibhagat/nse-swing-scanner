@@ -27,7 +27,7 @@ from datetime import date, datetime, timedelta, timezone
 from collections import defaultdict
 from typing import List, Optional
 
-from nse_client import nse_get_json
+from nse_client import nse_get
 from source_status import make_status
 from cache import cache_disabled, read_cache, write_cache
 from settings import CORPORATE_ACTION_LOOKAHEAD_DAYS, CORPORATE_ACTIONS_CACHE_TTL_SECONDS
@@ -105,12 +105,19 @@ def _probe_nse_corporate_actions(
     lookahead_days: int = CORPORATE_ACTION_LOOKAHEAD_DAYS,
     today: Optional[date] = None,
     timeout: int = 15,
+    diagnostics: Optional[dict] = None,
 ) -> Optional[dict]:
     """
     Fetch the market-wide action list for [today-3d, today+lookahead].
 
     Returns the decoded JSON (a list of action rows) or None when the endpoint
     is unreachable or returned a non-list body.
+
+    `diagnostics` (optional dict) is filled with what actually happened — HTTP
+    status, body preview, the exact query — so a `source_failed` in CI can be
+    diagnosed from the workflow log instead of guessed at. NSE has several
+    distinct failure modes here (Akamai block, "Missing index", a cookie that
+    expired mid-run) and they need different fixes.
     """
     today = today or ist_today()
     frm = today - timedelta(days=3)
@@ -120,11 +127,42 @@ def _probe_nse_corporate_actions(
         "from_date": frm.strftime("%d-%m-%Y"),
         "to_date": to.strftime("%d-%m-%Y"),
     }
-    data = nse_get_json(NSE_CA_ENDPOINT, params=params, timeout=timeout)
+    if diagnostics is not None:
+        diagnostics["url"] = NSE_CA_ENDPOINT
+        diagnostics["params"] = dict(params)
+
+    # Fetch the raw response (not just the decoded JSON) so the status code and
+    # body are available for the failure message.
+    resp = nse_get(NSE_CA_ENDPOINT, params=params, timeout=timeout)
+    if resp is None:
+        if diagnostics is not None:
+            diagnostics["error"] = "no 2xx response (blocked, timed out, or non-200)"
+        return None
+
+    body = resp.text or ""
+    if diagnostics is not None:
+        diagnostics["status"] = resp.status_code
+        diagnostics["body_preview"] = body[:200].replace("\n", " ")
+
+    try:
+        data = resp.json()
+    except ValueError:
+        if diagnostics is not None:
+            diagnostics["error"] = "response was not JSON"
+        return None
+
+    if diagnostics is not None:
+        diagnostics["type"] = type(data).__name__
+        if isinstance(data, dict):
+            diagnostics["keys"] = list(data.keys())[:8]
+
+    window = {"from": frm.isoformat(), "to": to.isoformat()}
     if isinstance(data, list):
-        return {"_raw": data, "_window": {"from": frm.isoformat(), "to": to.isoformat()}}
+        return {"_raw": data, "_window": window}
     if isinstance(data, dict) and isinstance(data.get("data"), list):
-        return {"_raw": data["data"], "_window": {"from": frm.isoformat(), "to": to.isoformat()}}
+        return {"_raw": data["data"], "_window": window}
+    if diagnostics is not None:
+        diagnostics["error"] = "JSON body did not contain a row list"
     return None
 
 
@@ -205,16 +243,23 @@ def fetch_corporate_actions_list(
         if cached is not None:
             return cached
 
-    payload = _probe_nse_corporate_actions(lookahead_days=lookahead_days, today=today)
+    diagnostics: dict = {}
+    payload = _probe_nse_corporate_actions(
+        lookahead_days=lookahead_days, today=today, diagnostics=diagnostics
+    )
     if payload is None:
+        detail = diagnostics.get("error") or "unknown failure"
+        if diagnostics.get("status"):
+            detail = f"{detail} (HTTP {diagnostics['status']})"
+        preview = diagnostics.get("body_preview")
+        if preview:
+            detail = f"{detail}: {preview!r}"
+        print(f"::warning::corporate_actions: {detail} — params={diagnostics.get('params')}")
         return make_status(
             source="nse:corporate-actions",
             status="source_failed",
             data=None,
-            error=(
-                "NSE corporate-actions endpoint not reachable (expects "
-                "?index=equities&from_date=DD-MM-YYYY&to_date=DD-MM-YYYY)"
-            ),
+            error=detail,
         )
 
     rows = _normalise_action_rows(payload)
