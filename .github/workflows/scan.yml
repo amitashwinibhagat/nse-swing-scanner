@@ -350,39 +350,72 @@ jobs:
         # class of failure that let a scanner build ship to klinote.one for
         # nine days: a deploy step can "succeed" while the wrong site (or no
         # site) is serving users.
+        #
+        # POLLS, because the deploy is asynchronous: this step runs seconds
+        # after the push, while Netlify's GitHub integration needs 20-60 s to
+        # build. A single check 10 s after commit fails on a perfectly healthy
+        # deploy (observed 2026-11-06: the site served the right build ~30 s
+        # later).
         if: success() && steps.ctx.outputs.skip != 'true'
         env:
           SITE_URL: ${{ vars.SITE_URL }}
         run: |
-          url="${SITE_URL:-https://nse-swing-scanner.netlify.app}"
-          echo "Verifying $url …"
-
-          title=$(curl -fsS -m 20 --retry 3 "$url/" | grep -o '<title>[^<]*</title>' | head -1 || true)
-          if [ "$title" != "<title>NSE Swing Scanner</title>" ]; then
-            echo "::error::deployed site title is '$title', expected '<title>NSE Swing Scanner</title>' — wrong site or broken deploy"
-            exit 1
-          fi
-
           python - <<'PY'
-          import datetime, json, os, subprocess, sys, urllib.request
+          import json, os, sys, time, urllib.error, urllib.request
 
           url = os.environ.get("SITE_URL") or "https://nse-swing-scanner.netlify.app"
           local = "frontend/public/data/latest_scan.json"
           with open(local) as fh:
               expected = json.load(fh)["generated_at"]
 
-          with urllib.request.urlopen(f"{url}/data/latest_scan.json?t={datetime.datetime.now().timestamp()}", timeout=30) as r:
-              served = json.load(r)["generated_at"]
+          # 40 attempts x 15 s = 10 minutes, comfortably inside the job timeout
+          # and longer than any observed Netlify build.
+          attempts, delay = 40, 15
+          last_served = None
+          last_error = None
 
-          if served != expected:
-              print(
-                  f"::error::served generated_at {served} != committed {expected}. "
-                  f"The CDN is serving a stale build (cache TTL on /data/* is 60 s; "
-                  f"retry once before assuming the deploy failed).",
-                  file=sys.stderr,
-              )
-              sys.exit(1)
-          print(f"deploy verified: served generated_at {served}")
+          for attempt in range(1, attempts + 1):
+              try:
+                  title_req = urllib.request.Request(f"{url}/", method="GET")
+                  with urllib.request.urlopen(title_req, timeout=20) as r:
+                      html = r.read().decode("utf-8", "replace")
+                  if "<title>NSE Swing Scanner</title>" not in html:
+                      print(
+                          "::error::deployed site title is not 'NSE Swing Scanner' "
+                          "— wrong site or broken deploy",
+                          file=sys.stderr,
+                      )
+                      sys.exit(1)
+
+                  stamp = time.time()
+                  with urllib.request.urlopen(f"{url}/data/latest_scan.json?t={stamp}", timeout=30) as r:
+                      served = json.load(r)["generated_at"]
+
+                  if served == expected:
+                      print(f"deploy verified after {attempt} attempt(s): {served}")
+                      sys.exit(0)
+                  last_served = served
+              except (urllib.error.URLError, TimeoutError, ValueError, KeyError) as exc:
+                  last_error = exc
+
+              if attempt < attempts:
+                  print(
+                      f"  attempt {attempt}/{attempts}: served={last_served} "
+                      f"expected={expected}"
+                      + (f" ({last_error})" if last_error else "")
+                      + f" — waiting {delay}s for the deploy"
+                  )
+                  time.sleep(delay)
+
+          print(
+              f"::error::after {attempts} attempts the site still serves "
+              f"{last_served or 'nothing'} but the commit is {expected}. "
+              f"Either the Netlify auto-deploy is broken (scans would freeze the "
+              f"site silently) or the wrong site/domain is configured."
+              + (f" Last error: {last_error}" if last_error else ""),
+              file=sys.stderr,
+          )
+          sys.exit(1)
           PY
 
       - name: Ping healthchecks.io (scan succeeded)

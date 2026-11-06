@@ -265,3 +265,19 @@ def test_dev_requirements_cover_the_ci_guards():
     reqs = (BACKEND / "requirements-dev.txt").read_text().lower()
     assert "pyyaml" in reqs, "check_workflows_parse.py needs PyYAML in CI"
     assert "pyflakes" in reqs, "the lint step needs pyflakes in CI"
+
+
+def test_deploy_verification_polls_instead_of_racing_the_build():
+    """The verify step ran ~10 s after the push and failed on a healthy deploy:
+    Netlify's GitHub integration needs 20-60 s to build. It must retry."""
+    step = _step("scan.yml", "scan", "Verify the deployed site serves this scan")
+    code = step["run"]
+    assert "attempts" in code and "time.sleep" in code
+    assert "for attempt in range" in code
+    # It must still fail loudly once the retries are exhausted.
+    assert "sys.exit(1)" in code
+
+
+def test_verify_step_still_asserts_the_title():
+    step = _step("scan.yml", "scan", "Verify the deployed site serves this scan")
+    assert "NSE Swing Scanner" in step["run"]
