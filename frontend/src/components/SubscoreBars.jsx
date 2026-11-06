@@ -23,15 +23,15 @@ const ORDER = [
   "conviction_holding",
 ];
 
-export default function SubscoreBars({ subScores, marketCorrectionFactor }) {
+export default function SubscoreBars({ subScores, rsPenalty = 0, baseScore = null }) {
   if (!subScores) {
     return <p className="na">No sub-score breakdown available for this stock.</p>;
   }
   const n = scoredOnCount(subScores);
-  const showAdj =
-    typeof marketCorrectionFactor === "number" &&
-    Number.isFinite(marketCorrectionFactor) &&
-    Math.abs(marketCorrectionFactor - 1) > 0.001;
+  // The relative-strength adjustment is ADDITIVE (points), not a multiplier:
+  // a multiplier imposed a ceiling on the attainable score. Show points, and
+  // show the base score it was subtracted from when the row carries one.
+  const showAdj = typeof rsPenalty === "number" && Math.abs(rsPenalty) >= 0.5;
   const showShort = n < SCORE_KEY_TOTAL;
 
   return (
@@ -48,10 +48,11 @@ export default function SubscoreBars({ subScores, marketCorrectionFactor }) {
           )}
           {showAdj && (
             <span
-              className={`subscore-meta-item rs-adjust rs-${marketCorrectionFactor >= 1 ? "up" : "down"}`}
-              title={`Relative-strength adjustment vs Nifty 50 / 200EMA (client-side mirror of scanner.relative_strength_factor).`}
+              className="subscore-meta-item rs-adjust rs-down"
+              title={`Points subtracted for relative weakness vs the Nifty 50 / 200EMA (scanner.relative_strength_penalty). Additive, so the score is never capped.`}
             >
-              Market adjustment ×{marketCorrectionFactor.toFixed(2)}
+              Relative-strength penalty −{rsPenalty}
+              {baseScore != null && ` (base ${baseScore})`}
             </span>
           )}
         </div>

@@ -187,14 +187,29 @@ def confirmation_ab(rows, window="T+5"):
 # --------------------------------------------------------------------------
 
 def _shadow_score(sub_scores, weights, market_factor=1.0):
-    """Mirror scanner.py's renormalised weighted blend and market multiplier."""
+    """
+    Mirror scanner.py: renormalised weighted blend, then an ADDITIVE
+    relative-strength penalty.
+
+    `market_factor` is the reported *equivalent multiplier* (1.0 - penalty/base),
+    kept in the stored rows for contract compatibility. Converting it back to
+    points here keeps the shadow re-scoring on the same rule as production — a
+    multiplicative application would silently reintroduce the score ceiling the
+    additive change removed.
+    """
     num, den = 0.0, 0.0
     for k, w in weights.items():
         v = sub_scores.get(k)
         if isinstance(v, (int, float)):
             num += float(v) * w
             den += w
-    return (100.0 * num / den * market_factor) if den > 0 else None
+    if den <= 0:
+        return None
+    base = 100.0 * num / den
+    if isinstance(market_factor, (int, float)) and market_factor < 1.0:
+        # base * factor == base - penalty  =>  penalty == base * (1 - factor)
+        return max(0.0, base - base * (1.0 - float(market_factor)))
+    return base
 
 
 def _normalize(weights):

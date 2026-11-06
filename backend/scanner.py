@@ -56,6 +56,8 @@ from earnings import fetch_earnings
 from yf_retry import is_rate_limit_error
 
 from settings import (
+    RELATIVE_STRENGTH_HARD_PENALTY,
+    RELATIVE_STRENGTH_MILD_PENALTY,
     MIN_F_SCORE,
     MIN_F_SCORE_COMPONENTS,
     MIN_DELIVERY_VALUE_INR,
@@ -327,35 +329,41 @@ def gate_corporate_actions(
 # ---------------------------------------------------------------------------
 # Relative-strength adjustment
 # ---------------------------------------------------------------------------
-def relative_strength_factor(stock_pct_from_ema200: Optional[float], index_pct_from_ema200: Optional[float]) -> float:
+def relative_strength_penalty(
+    stock_pct_from_ema200: Optional[float],
+    index_pct_from_ema200: Optional[float],
+) -> float:
     """
-    Returns a multiplier in {0.70, 0.85, 1.0} applied to the swing_score.
+    Points subtracted from the base score for breaking down relative to the
+    index. Returns 0.0 / 8.0 / 15.0.
 
-    Penalty only: a name breaking down materially worse than the index is
-    discounted (x0.85 beyond -5pp, x0.70 beyond -10pp). Everything else is 1.0.
+    ADDITIVE, not multiplicative. This was a {0.70, 0.85, 1.0} multiplier until
+    SCORE_VERSION weights-2026-11-v2, and a multiplier imposes a hard ceiling:
+    `base * 0.70 <= 70`, so no name carrying the heavy penalty could ever reach
+    the 72 top band no matter how good its components were. That is the same
+    structural defect that made `support_proximity` worth removing — a band that
+    is arithmetically unreachable for 13.5% of tracked rows is not a ranking, it
+    is an exclusion dressed as one.
 
-    The former x1.05 "index is correcting and the stock is tracking it" bonus
-    was REMOVED in SCORE_VERSION weights-2026-11-v2. Measured over the tracked
-    history it marked the single worst cohort rather than the best:
+    Subtracting points moves a penalised name *down the ranking* while leaving
+    the top of the scale reachable for everyone. Measured on the tracked
+    history, the top band is at least as good either way (T+20 -0.63% additive
+    vs -1.01% multiplicative), so the change costs no measurable signal.
 
-        T+20 excess vs Nifty    x1.05: -6.45% (n=192)     <- bonus
-                                x1.00: -0.00% (n=1352)
-                                x0.70: +0.66% (n=531)     <- penalty
-
-    (T+5: x1.05 -0.95% vs x1.00 +0.18%.) It was rewarding "the stock is weak
-    AND the market is weak" — a falling-knife signature, not relative strength.
-    Awards are now reserved for evidence, and there is none for a bonus.
+    The x1.05 "index is correcting, stock is tracking it" bonus was removed
+    earlier for the same reason it was introduced: it marked the *worst*
+    cohort (T+20 -6.45%), rewarding weakness in a weak tape.
     """
     if stock_pct_from_ema200 is None or index_pct_from_ema200 is None:
-        return 1.0
+        return 0.0
     if np.isnan(stock_pct_from_ema200) or np.isnan(index_pct_from_ema200):
-        return 1.0
+        return 0.0
     delta = stock_pct_from_ema200 - index_pct_from_ema200
     if delta < -10:
-        return 0.7
+        return RELATIVE_STRENGTH_HARD_PENALTY
     if delta < -5:
-        return 0.85
-    return 1.0
+        return RELATIVE_STRENGTH_MILD_PENALTY
+    return 0.0
 
 
 def _gate_reason(ok: bool, why: Optional[str]) -> Optional[str]:
@@ -610,12 +618,21 @@ def evaluate_stock(
         weight_total += w
 
     base_score = 100 * weighted_sum / weight_total if weight_total > 0 else None
-    rs_mult = relative_strength_factor(
+    penalty = relative_strength_penalty(
         tech.get("pct_from_ema200"),
         result.get("market_index_pct_from_ema200"),
     )
-    result["market_correction_factor"] = round(rs_mult, 3)
-    result["swing_score"] = round(base_score * rs_mult, 1) if base_score is not None else None
+    # Kept for contract compatibility: the frontend and the tracker both read
+    # `market_correction_factor`, and it is now reported as the *equivalent
+    # multiplier* rather than applied as one.
+    result["market_correction_factor"] = round(
+        1.0 - (penalty / base_score if base_score else 0.0), 3
+    )
+    result["relative_strength_penalty"] = penalty
+    result["base_score"] = round(base_score, 1) if base_score is not None else None
+    result["swing_score"] = (
+        round(max(0.0, base_score - penalty), 1) if base_score is not None else None
+    )
     result["sub_scores"] = sub_scores
 
     return result
@@ -1043,6 +1060,11 @@ def to_json_records(df: pd.DataFrame) -> list:
             "pending_corporate_action": bool((ca_data.get("has_excluded_action") or False)),
             "corporate_actions_status": r.get("corporate_actions_status"),
             "market_index_pct_from_ema200": _json_safe(r.get("market_index_pct_from_ema200")),
+            # The score is additive (base - penalty). `market_correction_factor`
+            # is the penalty re-expressed as an equivalent multiplier for
+            # display/contract compatibility; never re-apply it to the score.
+            "base_score": _json_safe(r.get("base_score")),
+            "relative_strength_penalty": _json_safe(r.get("relative_strength_penalty")),
             "market_correction_factor": _json_safe(r.get("market_correction_factor")),
             # Existing
             "gate_pass": bool(r.get("gate_pass")) if r.get("gate_pass") is not None else False,

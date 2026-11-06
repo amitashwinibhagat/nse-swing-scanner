@@ -41,7 +41,7 @@ export default function PerformanceSection({ data }) {
 
   const windows = Object.keys(data.windows || {});
   const buckets = [
-    ...(meta.buckets || ["72+", "68-72", "62-68", "52-62", "<52"]),
+    ...(meta.buckets || ["74+", "70-74", "64-70", "53-64", "<53"]),
     // `unknown` holds rows with no score. It exists in the payload and was
     // silently omitted from the table.
     ...(data.windows?.["T+5"]?.buckets?.unknown?.n ? ["unknown"] : []),

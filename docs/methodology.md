@@ -79,23 +79,30 @@ Missing inputs are excluded from the denominator (not silently zeroed).
 
 `base_score = 100 * sum(weight_i * sub_i) / sum(weight_i over non-NaN)`
 
-## Relative-strength factor
+## Relative-strength penalty
 
-A penalty-only multiplier in {0.70, 0.85, 1.0} applied to `base_score`:
+**Additive**, not a multiplier:
 
-- Stock worse than the index by more than 10pp from the 200EMA → 0.70x
-- Worse by more than 5pp → 0.85x
-- Otherwise → 1.0x
+- Stock worse than the index by more than 10pp from the 200EMA → **−15 points**
+- Worse by more than 5pp → **−8 points**
+- Otherwise → no change
 
-`swing_score = base_score * relative_strength_factor`
+`swing_score = base_score − relative_strength_penalty`
 
-The former **1.05x "index is correcting and the stock is tracking it" bonus was
-removed** in `weights-2026-11-v2`. Measured over the tracked history it marked
-the *worst* cohort rather than the best: T+20 excess vs Nifty was **−6.45%** for
-1.05x against **−0.00%** for 1.0x and **+0.66%** for 0.70x (T+5: −0.95% vs
-+0.18%). It was rewarding "weak stock in a weak market" — a falling-knife
-signature, not relative strength. Awards now require evidence, and there is none
-for a bonus.
+It was a `{0.70, 0.85, 1.0}` multiplier until `weights-2026-11-v2`. A multiplier
+imposes a ceiling — `base × 0.70 ≤ 70`, so **no heavily-penalised name could
+ever reach the 72 top band**, no matter how strong its components were. That was
+the same structural defect that retired `support_proximity`: 13.5% of tracked
+rows were excluded by arithmetic rather than by merit. Subtracting points
+demotes a name in the ranking while leaving the top of the scale open. Measured
+on the tracked history the top band is no worse (T+20 −0.63% additive vs −1.01%
+multiplicative).
+
+The former **1.05× "index correcting, stock tracking it" bonus was removed** in
+the same release. It marked the *worst* cohort rather than the best: T+20 excess
+vs Nifty was **−6.45%** at 1.05× against **−0.00%** at 1.0× and **+0.66%** at
+0.70×. It rewarded "weak stock in a weak market" — a falling-knife signature,
+not relative strength. Awards require evidence; there is none for a bonus.
 
 ## ATR-based targets
 

@@ -42,21 +42,27 @@ Awards now require evidence, and there is none for a bonus.
   **proportionally** across the rest (each keeps its relative weight) rather
   than handed to the strongest one — in-sample IC weighting is the overfit the
   promotion checklist forbids. Exact values are `n/17` so the sum is exactly 1.0.
-- `relative_strength_factor` is penalty-only: {0.70, 0.85, 1.0}.
+- `relative_strength_factor` is penalty-only **and additive**: −15 points beyond
+  −10pp vs the index, −8 points beyond −5pp. The multiplier form was replaced
+  because it imposed a score ceiling — `base × 0.70 ≤ 70`, so the top band was
+  arithmetically unreachable for **13.5% of tracked rows**. That is the same
+  structural defect that retired `support_proximity`, and it was only visible
+  after that one was fixed. The top band is no worse under the additive form
+  (T+20 −0.63% vs −1.01%).
 - `SCORE_VERSION` → `weights-2026-11-v2`. Every row is stamped, so the tracker
   can attribute the regime change to a date.
 - **Band scheme `pass_v3` → `pass_v4`.** The two changes lifted the whole score
   distribution by ~7 points, so keeping 63 would have reclassified 38.6% of the
   universe as "top" instead of the 18.4% the band was calibrated to select. The
   new cuts are the old bands re-expressed with the same selection share —
-  63→72, 60→68, 55→62, 45→52 — not new thresholds:
+  63→74, 60→70, 55→64, 45→53 — not new thresholds:
 
   | band | selects | T+5 excess | vs old band |
   |---|---|---|---|
-  | 72+ (was 63+) | 18.5% | −0.22% | −0.26% |
-  | 68-72 | 26.5% | −0.75% | |
-  | 62-68 | 39.8% | −0.26% | |
-  | 52-62 | 70.4% | −0.30% | |
+  | 74+ (was 63+) | 18.4% | −0.25% | −0.26% |
+  | 70-74 | 25.3% | −0.47% | |
+  | 64-70 | 39.8% | −0.27% | |
+  | 53-64 | 70.4% | −0.39% | |
 
   The top band's measured outcome is unchanged, which is the point: this
   re-scores the same names, it does not invent an edge. It still has **no
@@ -76,9 +82,10 @@ Awards now require evidence, and there is none for a bonus.
 ### Note on today's zero
 
 On 2026-11-06 the Nifty sat **+3.0% above** its 200EMA with a median RSI of
-53.7 — only 54 of 491 names were in the 25–40 RSI gate. The 14 survivors are
-14–18% *below* their 200EMA, so they score near zero on proximity, and the
-63 band was calibrated in a −6.1% regime. Historically the shortlist is empty in
+53.7 — only 54 of 491 names were in the 25–40 RSI gate. The 14 survivors sit
+14–18% *below* their 200EMA, which is precisely the configuration the
+relative-strength penalty targets, and the top band was calibrated in a −6.1%
+regime. Historically the shortlist is empty in
 1 of 112 scans, and this was that scan. The recalibration does not change that
 arithmetic; the "On deck" fallback is what makes the page useful on such days.
 See the entry below.

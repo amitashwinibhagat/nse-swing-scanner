@@ -104,7 +104,7 @@ export function joinLabels(keys, dict = SOURCE_GATE_LABELS) {
 /**
  * Does the tracker currently support "the top band is the evidenced band"?
  *
- * The label is read from the tracker's current scheme (pass_v4, "72+"), which
+ * The label is read from the tracker's current scheme (pass_v4, "74+"), which
  * is the v2-weights recalibration of the v3 "63+" band — same selection share,
  * same measured outcome. On the committed payload that band is NEGATIVE
  * (T+5 -0.22%, T+10 -0.92%, T+20 -1.01%), so the honest answer is "no edge".
@@ -113,7 +113,7 @@ export function joinLabels(keys, dict = SOURCE_GATE_LABELS) {
  *
  * @returns {{established: boolean, n: number, mean: number|null, ci: object|null, window: string}}
  */
-export const TOP_BAND_LABEL = "72+"; // mirrors performance.BUCKET_ORDER[0]
+export const TOP_BAND_LABEL = "74+"; // mirrors performance.BUCKET_ORDER[0]
 
 export function topBandEvidence(performance, { minN = 20 } = {}) {
   const cell = performance?.windows?.["T+5"]?.buckets?.[TOP_BAND_LABEL];

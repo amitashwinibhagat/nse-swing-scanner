@@ -82,6 +82,20 @@ WEIGHTS = {
 
 SCORE_VERSION = "weights-2026-11-v2"
 
+# Relative-strength penalty, in SCORE POINTS (additive), not as a multiplier.
+#
+# A multiplier imposes a ceiling: with x0.70 no name could exceed 70 and the 72
+# top band was arithmetically unreachable for 13.5% of tracked rows — the same
+# defect that retired support_proximity. Subtracting points preserves the
+# ranking information without forbidding the top of the scale.
+#
+# The magnitudes are the ones the multiplier implied at a typical base score of
+# ~65: x0.70 ≈ -20 points, x0.85 ≈ -10. We use slightly smaller values (15/8)
+# because the multiplicative version was measurably *not* better. Re-derive
+# these if the base-score distribution shifts materially.
+RELATIVE_STRENGTH_HARD_PENALTY = 15.0   # stock >10pp worse than the index
+RELATIVE_STRENGTH_MILD_PENALTY = 8.0    # stock >5pp worse than the index
+
 # Scheduled scan windows — SINGLE SOURCE OF TRUTH for the twice-daily cadence.
 # Consumed by:
 #   - scan.yml's "Write scan_status.json" heredoc (imports this module)

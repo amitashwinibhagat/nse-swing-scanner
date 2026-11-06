@@ -220,17 +220,36 @@ export function regimeFromMarketIndex(idxPct) {
 }
 
 /**
- * Relative-strength multiplier applied to the composite score.
- * Client-side mirror of backend/relative_strength_factor — see scanner.py.
+ * Relative-strength penalty, in score points. Client-side mirror of
+ * backend/scanner.py::relative_strength_penalty.
+ *
+ * ADDITIVE on purpose: the old multiplier capped the attainable score
+ * (base x 0.70 <= 70) and made the top band unreachable for heavily-penalised
+ * names. Returns 0 / 8 / 15 points.
+ */
+export function relativeStrengthPenalty(stockPctFromEma200, idxPctFromEma200) {
+  if (!num(stockPctFromEma200) || !num(idxPctFromEma200)) return 0;
+  const delta = stockPctFromEma200 - idxPctFromEma200;
+  if (delta < -10) return HARD_PENALTY;
+  if (delta < -5) return MILD_PENALTY;
+  return 0;
+}
+
+// Mirrors settings.RELATIVE_STRENGTH_HARD/MILD_PENALTY.
+const HARD_PENALTY = 15;
+const MILD_PENALTY = 8;
+
+/**
+ * The penalty expressed as the equivalent multiplier of the base score, for
+ * display only ("market adjustment x0.85"). Never multiply a score by this —
+ * that is the behaviour the additive change removed.
  */
 export function relativeStrengthFactor(stockPctFromEma200, idxPctFromEma200) {
-  if (!num(stockPctFromEma200) || !num(idxPctFromEma200)) return 1.0;
-  const delta = stockPctFromEma200 - idxPctFromEma200;
-  if (delta < -10) return 0.7;
-  if (delta < -5) return 0.85;
-  if (idxPctFromEma200 < -5 && stockPctFromEma200 >= idxPctFromEma200 - 2)
-    return 1.05;
-  return 1.0;
+  const penalty = relativeStrengthPenalty(stockPctFromEma200, idxPctFromEma200);
+  if (penalty === 0) return 1.0;
+  // Without the base score to hand, report the multiplier the penalty implies
+  // at the typical base (~65), matching what the scanner publishes per row.
+  return Number((1 - penalty / 65).toFixed(2));
 }
 
 /**
@@ -312,17 +331,17 @@ export function earningsChip(stock) {
  * mirrors it.
  */
 // Mirrors backend/performance.py BUCKET_BANDS (pass_v4). Keep in sync.
-const TOP_BAND_LABEL = "72+";
-const TOP_BAND_MIN = 72;
-const WEAK_BAND_LABEL = "62-68";
-const WEAK_BAND_MIN = 62;
-const WEAK_BAND_MAX = 68;
+const TOP_BAND_LABEL = "74+";
+const TOP_BAND_MIN = 74;
+const WEAK_BAND_LABEL = "64-70";
+const WEAK_BAND_MIN = 64;
+const WEAK_BAND_MAX = 70;
 
 export function scoreBandChip(score, performance) {
   if (!num(score)) return null;
   const evidence = (window) => performance?.windows?.[window]?.buckets;
   // Band labels come from the tracker payload, not literals: they were
-  // recalibrated in pass_v4 (63+ -> 72+) when the score scale changed.
+  // recalibrated in pass_v4 (63+ -> 74+) when the score scale changed.
   if (score >= TOP_BAND_MIN) {
     const cells = ["T+5", "T+10", "T+20"].map((window) => ({
       window,

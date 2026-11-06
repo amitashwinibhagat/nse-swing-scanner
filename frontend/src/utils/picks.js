@@ -5,18 +5,19 @@
 // scheme (pass_v4), which is itself a recalibration of the old pass_v3 "63+"
 // band onto the weights-2026-11-v2 score scale — same 18% selection share, not
 // a new hypothesis. This module mirrors backend/performance.py so the
-// dashboard can never drift from the tracker.
+// dashboard can never drift from the tracker (check_cron_consistency.py
+// asserts the top cut matches performance.BUCKET_BANDS[0]).
 
-export const TOP_PICK_MIN_SCORE = 72;
+export const TOP_PICK_MIN_SCORE = 74;
 
 // Descending inclusive lower bounds — mirrors BUCKET_BANDS in
 // backend/performance.py (pass_v4). Update both together; the backend CI guard
 // and picks.test.js pin the top label.
 const BUCKET_BANDS = [
-  ["72+", 72],
-  ["68-72", 68],
-  ["62-68", 62],
-  ["52-62", 52],
+  ["74+", 74],
+  ["70-74", 70],
+  ["64-70", 64],
+  ["53-64", 53],
 ];
 
 function isNum(v) {
@@ -28,7 +29,7 @@ export function bandOf(score) {
   for (const [label, lower] of BUCKET_BANDS) {
     if (score >= lower) return label;
   }
-  return "<52";
+  return "<53";
 }
 
 // Mirrors regime_tag in backend/performance.py.

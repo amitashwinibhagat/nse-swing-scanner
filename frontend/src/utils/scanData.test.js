@@ -77,18 +77,18 @@ test("joinLabels reads like a sentence", () => {
 
 test("topBandEvidence refuses to claim an edge the data does not show", () => {
   const negative = {
-    windows: { "T+5": { buckets: { "72+": { n: 1029, mean: -0.22, ci95: { low: -0.47, high: 0.04 } } } } },
+    windows: { "T+5": { buckets: { "74+": { n: 1029, mean: -0.22, ci95: { low: -0.47, high: 0.04 } } } } },
   };
   assert.equal(topBandEvidence(negative).established, false);
 
   const positive = {
-    windows: { "T+5": { buckets: { "72+": { n: 96, mean: 3.76, ci95: { low: 2.56, high: 4.95 } } } } },
+    windows: { "T+5": { buckets: { "74+": { n: 96, mean: 3.76, ci95: { low: 2.56, high: 4.95 } } } } },
   };
   assert.equal(topBandEvidence(positive).established, true);
 
   // A positive CI on a tiny cohort is not evidence either.
   const tiny = {
-    windows: { "T+5": { buckets: { "72+": { n: 5, mean: 4.0, ci95: { low: 0.5, high: 8.0 } } } } },
+    windows: { "T+5": { buckets: { "74+": { n: 5, mean: 4.0, ci95: { low: 0.5, high: 8.0 } } } } },
   };
   assert.equal(topBandEvidence(tiny).established, false);
 
@@ -104,7 +104,7 @@ test("topBandEvidence refuses to claim an edge the data does not show", () => {
 
 test("topBandClaim never asserts an edge without evidence", () => {
   const negative = {
-    windows: { "T+5": { buckets: { "72+": { n: 1029, mean: -0.22, ci95: { low: -0.47, high: 0.04 } } } } },
+    windows: { "T+5": { buckets: { "74+": { n: 1029, mean: -0.22, ci95: { low: -0.47, high: 0.04 } } } } },
   };
   const claim = topBandClaim(negative);
   assert.match(claim, /no established edge/);

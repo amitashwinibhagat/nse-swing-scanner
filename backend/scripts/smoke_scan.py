@@ -151,6 +151,8 @@ def _priced_row(rdict: dict) -> dict:
             "corporate_actions_data": {"has_excluded_action": False, "actions": []},
             "market_index_pct_from_ema200": -1.5,
             "market_correction_factor": 1.0,
+            "relative_strength_penalty": 0.0,
+            "base_score": 71.5,
             "liquidity_gate_path": "delivery_actual",
             "gate_pass": True,
             "gate_fail_reason": None,

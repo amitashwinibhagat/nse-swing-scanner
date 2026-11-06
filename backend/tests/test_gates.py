@@ -7,7 +7,7 @@ from scanner import (
     gate_surveillance,
     gate_holdings,
     gate_corporate_actions,
-    relative_strength_factor,
+    relative_strength_penalty,
 )
 from settings import (
     MIN_F_SCORE,
@@ -287,21 +287,40 @@ def test_gate_f_score_requires_all_components():
     assert "components_missing" in why
 
 
-def test_relative_strength_penalty():
-    # Stock much weaker than index -> penalty
-    f = relative_strength_factor(-25.0, -5.0)
-    assert f < 0.9
+def test_relative_strength_penalty_is_additive():
+    """Points subtracted, not a multiplier: a multiplier caps the top score
+    (base x 0.70 <= 70) and made the 72 band unreachable for 13.5% of rows."""
+    from settings import RELATIVE_STRENGTH_HARD_PENALTY, RELATIVE_STRENGTH_MILD_PENALTY
+
+    assert relative_strength_penalty(-25.0, -5.0) == RELATIVE_STRENGTH_HARD_PENALTY
+    # Boundary is strict: delta == -10 is mild; -10.1 is hard.
+    assert relative_strength_penalty(-12.0, -2.0) == RELATIVE_STRENGTH_MILD_PENALTY
+    assert relative_strength_penalty(-12.1, -2.0) == RELATIVE_STRENGTH_HARD_PENALTY
+    assert relative_strength_penalty(-8.0, -2.0) == RELATIVE_STRENGTH_MILD_PENALTY
+    assert relative_strength_penalty(-4.0, -2.0) == 0.0
 
 
-def test_relative_strength_bonus():
-    # Index correcting and stock tracking it
-    f = relative_strength_factor(-7.0, -8.0)
-    assert f >= 1.0
+def test_relative_strength_has_no_bonus():
+    """The former x1.05 'index correcting, stock tracking it' bonus marked the
+    WORST cohort (T+20 -6.45%): weakness in a weak tape, not strength."""
+    assert relative_strength_penalty(-7.0, -8.0) == 0.0
+    assert relative_strength_penalty(0.0, -9.0) == 0.0
 
 
 def test_relative_strength_neutral_when_missing():
-    assert relative_strength_factor(None, -5.0) == 1.0
-    assert relative_strength_factor(-5.0, None) == 1.0
+    assert relative_strength_penalty(None, -5.0) == 0.0
+    assert relative_strength_penalty(-5.0, None) == 0.0
+
+
+def test_additive_penalty_keeps_the_top_band_reachable():
+    """The whole point of the change: a perfect base score still reaches the top
+    band even with the heaviest penalty applied."""
+    from performance import BUCKET_BANDS
+
+    top_cut = BUCKET_BANDS[0][1]
+    from settings import RELATIVE_STRENGTH_HARD_PENALTY
+
+    assert 100.0 - RELATIVE_STRENGTH_HARD_PENALTY >= top_cut
 
 
 # --- source-health rollup (P0: silent gate outage) -------------------------

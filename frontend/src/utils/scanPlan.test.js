@@ -8,6 +8,7 @@ import {
   evaluatePlanState,
   planAction,
   relativeStrengthFactor,
+  relativeStrengthPenalty,
   scoredOnCount,
   SCORE_KEY_TOTAL,
   exitWarnings,
@@ -66,12 +67,21 @@ test("entryAction is a thin wrapper with no duplicated copy drift", () => {
   assert.deepEqual(entryAction(fresh), fromPlanAction);
 });
 
-test("relativeStrengthFactor mirrors the backend thresholds", () => {
-  assert.equal(relativeStrengthFactor(-20, -5), 0.7);   // delta -15
-  assert.equal(relativeStrengthFactor(-8, -2), 0.85);   // delta -6
+test("relativeStrengthPenalty mirrors the backend additive thresholds", () => {
+  // Points subtracted, not a multiplier: a multiplier capped the top score.
+  assert.equal(relativeStrengthPenalty(-20, -5), 15);   // delta -15 -> hard
+  assert.equal(relativeStrengthPenalty(-8, -2), 8);     // delta -6  -> mild
+  assert.equal(relativeStrengthPenalty(-4, -1), 0);
+  assert.equal(relativeStrengthPenalty(-6, -6), 0);     // no bonus any more
+  assert.equal(relativeStrengthPenalty(null, -1), 0);
+});
+
+test("relativeStrengthFactor is display-only and never exceeds 1", () => {
   assert.equal(relativeStrengthFactor(-4, -1), 1.0);
-  assert.equal(relativeStrengthFactor(-6, -6), 1.05);   // index correcting, stock tracking
-  assert.equal(relativeStrengthFactor(null, -1), 1.0);
+  assert.ok(relativeStrengthFactor(-20, -5) < 1.0);
+  assert.ok(relativeStrengthFactor(-8, -2) < 1.0);
+  // The retired x1.05 bonus must not be reproduced.
+  assert.equal(relativeStrengthFactor(-6, -6), 1.0);
 });
 
 test("scoredOnCount tracks the six live weighted components", () => {
@@ -161,7 +171,7 @@ test("the fallback only engages when picks are empty AND passes exist", () => {
 });
 
 test("the band threshold tracks the tracker's top band, not the page's mood", () => {
-  // A guard against "just lower it so the page looks busy". 72 is the pass_v4
+  // A guard against "just lower it so the page looks busy". 74 is the pass_v4
   // top band: the v3 63 re-expressed on the v2 score scale (same 18% share).
-  assert.equal(TOP_PICK_MIN_SCORE, 72);
+  assert.equal(TOP_PICK_MIN_SCORE, 74);
 });

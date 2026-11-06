@@ -63,16 +63,16 @@ class TestScoreBucket(unittest.TestCase):
         """pass_v4 is the current scheme, recalibrated to the v2 weights so each
         band selects the same share of the population as its v3 predecessor."""
         self.assertEqual(performance.BUCKET_SCHEME, "pass_v4")
-        self.assertEqual(performance.score_bucket(85.0), "72+")
-        self.assertEqual(performance.score_bucket(72.0), "72+")
-        self.assertEqual(performance.score_bucket(71.9), "68-72")
-        self.assertEqual(performance.score_bucket(68.0), "68-72")
-        self.assertEqual(performance.score_bucket(67.9), "62-68")
-        self.assertEqual(performance.score_bucket(62.0), "62-68")
-        self.assertEqual(performance.score_bucket(61.9), "52-62")
-        self.assertEqual(performance.score_bucket(52.0), "52-62")
-        self.assertEqual(performance.score_bucket(51.9), "<52")
-        self.assertEqual(performance.score_bucket(21.9), "<52")
+        self.assertEqual(performance.score_bucket(85.0), "74+")
+        self.assertEqual(performance.score_bucket(74.0), "74+")
+        self.assertEqual(performance.score_bucket(73.9), "70-74")
+        self.assertEqual(performance.score_bucket(70.0), "70-74")
+        self.assertEqual(performance.score_bucket(69.9), "64-70")
+        self.assertEqual(performance.score_bucket(64.0), "64-70")
+        self.assertEqual(performance.score_bucket(63.9), "53-64")
+        self.assertEqual(performance.score_bucket(53.0), "53-64")
+        self.assertEqual(performance.score_bucket(52.9), "<53")
+        self.assertEqual(performance.score_bucket(21.9), "<53")
         self.assertEqual(performance.score_bucket(None), "unknown")
 
     def test_band_cutoffs_preserve_the_v3_selection_share(self):
@@ -80,8 +80,8 @@ class TestScoreBucket(unittest.TestCase):
         share of the tracked population (~18%). If a future weights change
         moves the distribution again, this test is the reminder to re-derive."""
         thresholds = dict(performance.BUCKET_BANDS)
-        self.assertEqual(thresholds["72+"], 72)
-        self.assertEqual(performance.BUCKET_ORDER[0], "72+")
+        self.assertEqual(thresholds["74+"], 74)
+        self.assertEqual(performance.BUCKET_ORDER[0], "74+")
 
     def test_pass_v2_legacy_unchanged(self):
         # pass_v2 is kept for re-bucketing historical per_name rows —
@@ -191,14 +191,16 @@ class TestBuildPayload(unittest.TestCase):
         #   A(62) + E(65)            -> 62-68 = 2
         #   A(61) + B(57) + B(56) + C(52) -> 52-62 = 4
         #   D(40) is untrackable, so it appears in no bucket.
-        self.assertEqual(buckets["62-68"]["n"], 2)
-        self.assertEqual(buckets["68-72"]["n"], 0)
-        self.assertEqual(buckets["72+"]["n"], 0)
-        self.assertEqual(buckets["52-62"]["n"], 4)
-        self.assertEqual(buckets["<52"]["n"], 0)
-        self.assertEqual(buckets["62-68"]["median"], 2.0)
-        self.assertEqual(buckets["62-68"]["hit_rate"], 1.0)
-        self.assertEqual(buckets["62-68"]["ci95"], None)  # n=2 < BOOTSTRAP_MIN_N
+        # v4 (final cuts): A(62)+E(65) -> 53-64 = 2; A(61)+B(57)+B(56)+C(52)
+        # all land in 53-64 as well -> 4 total; nothing reaches 64+ except E(65).
+        self.assertEqual(buckets["64-70"]["n"], 1)   # E(65)
+        self.assertEqual(buckets["53-64"]["n"], 4)   # A62, A61, B57, B56
+        self.assertEqual(buckets["70-74"]["n"], 0)
+        self.assertEqual(buckets["74+"]["n"], 0)
+        self.assertEqual(buckets["<53"]["n"], 1)     # C(52) is below the floor
+        self.assertEqual(buckets["64-70"]["median"], 2.0)
+        self.assertEqual(buckets["64-70"]["hit_rate"], 1.0)
+        self.assertEqual(buckets["64-70"]["ci95"], None)  # n=1 < BOOTSTRAP_MIN_N
 
         self.assertEqual(payload["windows"]["T+20"]["untrackable_count"], 1)
         self.assertEqual(payload["windows"]["T+5"]["untrackable_count"], 1)
@@ -269,7 +271,7 @@ class TestRegimeAndPerName(unittest.TestCase):
         by_sym = {r["symbol"]: r for r in per_name}
         self.assertEqual(by_sym["A"]["regime"], "risk_off")
         self.assertEqual(by_sym["A"]["confirmation"], "confirmed")
-        self.assertEqual(by_sym["A"]["bucket"], "62-68")  # 62 on the v4 scale
+        self.assertEqual(by_sym["A"]["bucket"], "53-64")  # 62 on the v4 scale
         self.assertEqual(by_sym["B"]["confirmation"], "anticipatory")
         self.assertEqual(by_sym["B"]["windows"]["T+20"]["excess_return_pct"], -1.0)
         self.assertEqual(payload["per_scan"][0]["regime"], "risk_off")
@@ -308,13 +310,13 @@ class TestRegimeAndPerName(unittest.TestCase):
         }
         payload = performance.build_performance_payload(snapshots, forward)
         cross = payload["windows"]["T+5"]["by_regime_buckets"]
-        # 64 lands in 62-68 on the v4 scale; 57 lands in 52-62.
-        self.assertEqual(cross["62-68"]["risk_on"]["n"], 1)
-        self.assertEqual(cross["62-68"]["risk_on"]["mean"], 4.0)
-        self.assertEqual(cross["62-68"]["risk_off"]["n"], 1)
-        self.assertEqual(cross["62-68"]["risk_off"]["mean"], -2.0)
-        self.assertEqual(cross["52-62"]["risk_on"]["n"], 1)
-        self.assertEqual(cross["52-62"]["risk_off"]["n"], 0)
+        # 64 lands in 64-70 on the v4 scale; 57 lands in 53-64.
+        self.assertEqual(cross["64-70"]["risk_on"]["n"], 1)
+        self.assertEqual(cross["64-70"]["risk_on"]["mean"], 4.0)
+        self.assertEqual(cross["64-70"]["risk_off"]["n"], 1)
+        self.assertEqual(cross["64-70"]["risk_off"]["mean"], -2.0)
+        self.assertEqual(cross["53-64"]["risk_on"]["n"], 1)
+        self.assertEqual(cross["53-64"]["risk_off"]["n"], 0)
         # Every bucket label present, every regime key present (frontend
         # iterates both unconditionally).
         for b in performance.BUCKET_ORDER:
@@ -322,7 +324,7 @@ class TestRegimeAndPerName(unittest.TestCase):
             for rg in ("risk_on", "neutral", "risk_off", "unknown"):
                 self.assertIn(rg, cross[b])
         # CI present on populated cells (n=1 < MIN_N so None here)
-        self.assertIsNone(cross["62-68"]["risk_on"]["ci95"])
+        self.assertIsNone(cross["64-70"]["risk_on"]["ci95"])
 
     def test_per_name_untrackable_marked(self):
         snapshots = [("2026-07-15-pm", _scan([("A", 62)]))]

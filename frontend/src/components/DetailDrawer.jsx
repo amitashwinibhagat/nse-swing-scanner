@@ -10,7 +10,7 @@ import {
   exitWarnings,
   scoreBandChip,
   GATE_LABELS,
-  relativeStrengthFactor,
+  relativeStrengthPenalty,
   formatScanDate,
   scoredOnCount,
   SCORE_KEY_TOTAL,
@@ -168,10 +168,11 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
   const exits = exitWarnings(stock);
   const ea = earningsChip(stock);
   const watched = watchlist?.has?.(stock.symbol) ?? false;
-  const rsFactor = relativeStrengthFactor(
-    stock.pct_from_ema200,
-    stock.market_index_pct_from_ema200,
-  );
+  // Fall back to the client mirror only for rows scanned before the penalty
+  // was published per row (relative_strength_penalty / base_score).
+  const rsPenalty = Number.isFinite(stock.relative_strength_penalty)
+    ? stock.relative_strength_penalty
+    : relativeStrengthPenalty(stock.pct_from_ema200, stock.market_index_pct_from_ema200);
   const n = scoredOnCount(stock.sub_scores);
   const dateLabel = formatScanDate(scanDate);
 
@@ -541,7 +542,8 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
             </h4>
             <SubscoreBars
               subScores={stock.sub_scores}
-              marketCorrectionFactor={rsFactor}
+              rsPenalty={rsPenalty}
+              baseScore={stock.base_score}
             />
           </section>
 
@@ -621,11 +623,11 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
 // Mirrors backend/performance.py BUCKET_BANDS (pass_v4). Keep in sync with
 // app/utils/picks.js — the drawer must not disagree with the card.
 const BANDS = [
-  { key: "72+", label: "72+" },
-  { key: "68-72", label: "68-72" },
-  { key: "62-68", label: "62-68" },
-  { key: "52-62", label: "52-62" },
-  { key: "<52", label: "<52" },
+  { key: "74+", label: "74+" },
+  { key: "70-74", label: "70-74" },
+  { key: "64-70", label: "64-70" },
+  { key: "53-64", label: "53-64" },
+  { key: "<53", label: "<53" },
 ];
 const REGIMES = [
   { key: "risk_on", label: "Risk-on" },
