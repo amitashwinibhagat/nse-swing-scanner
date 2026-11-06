@@ -533,7 +533,7 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
               {n < SCORE_KEY_TOTAL && (
                 <span
                   className="plan-asof"
-                  title={`Composite score was computed over ${n} of ${SCORE_KEY_TOTAL} weighted components; missing components renormalise the weight; the score is not directly comparable to a 7-component score.`}
+                  title={`Composite score was computed over ${n} of ${SCORE_KEY_TOTAL} weighted components; missing components renormalise the weight; the score is not directly comparable to one computed on all components.`}
                 >
                   scored on {n}/{SCORE_KEY_TOTAL}
                 </span>
@@ -618,12 +618,14 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
 
 // Module-level band/regime keys for the evidence cross-tab. Keys match
 // performance.json bucket labels (pass_v3) and regime_tag values.
+// Mirrors backend/performance.py BUCKET_BANDS (pass_v4). Keep in sync with
+// app/utils/picks.js — the drawer must not disagree with the card.
 const BANDS = [
-  { key: "63+", label: "63+" },
-  { key: "60-63", label: "60-63" },
-  { key: "55-60", label: "55-60" },
-  { key: "45-55", label: "45-55" },
-  { key: "<45", label: "<45" },
+  { key: "72+", label: "72+" },
+  { key: "68-72", label: "68-72" },
+  { key: "62-68", label: "62-68" },
+  { key: "52-62", label: "52-62" },
+  { key: "<52", label: "<52" },
 ];
 const REGIMES = [
   { key: "risk_on", label: "Risk-on" },

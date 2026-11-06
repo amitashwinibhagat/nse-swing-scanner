@@ -13,7 +13,6 @@ export const ENTRY_STATES = {
 const SCORE_KEYS = [
   "valuation_compression",
   "oversold_positioning",
-  "support_proximity",
   "drawdown_sweetspot",
   "volume_capitulation",
   "quality_composite",
@@ -235,7 +234,7 @@ export function relativeStrengthFactor(stockPctFromEma200, idxPctFromEma200) {
 }
 
 /**
- * Count how many of the seven weighted sub-scores actually contributed.
+ * Count how many of the weighted sub-scores actually contributed.
  * Renormalisation means missing components change what the score means;
  * callers should surface this so the user knows.
  */
@@ -297,28 +296,37 @@ export function earningsChip(stock) {
 /**
  * 1.4.0: Score-band evidence chip from the forward-return tracker.
  *
- * Maps the swing score to its pass_v3 band and surfaces what the outcome
+ * Maps the swing score to its pass_v4 band and surfaces what the outcome
  * tracker currently measures from the supplied performance payload:
- *   - 63+: mean excess vs Nifty has a 95% bootstrap CI above zero at
- *     T+5, T+10 AND T+20 — the only band with an established edge when the
- *     payload supports that claim.
- *   - 55-60: mean excess CI BELOW zero at T+5 —
- *     this band underperformed the index at the short horizon.
- *   - mid/low bands: CIs straddle zero — no established edge, so no chip
- *     (absence of a chip is the honest signal for a coin flip).
+ *   - 72+ (the top band; formerly 63+ under pass_v3): chip only when the
+ *     mean excess vs Nifty has a 95% bootstrap CI above zero at T+5, T+10 AND
+ *     T+20.
+ *   - 62-68 (formerly 55-60): chip only when the T+5 CI is BELOW zero, i.e.
+ *     the tracker actively measured underperformance.
+ *   - everything else: no chip. Absence of a chip is the honest signal for a
+ *     band whose interval straddles zero.
  *
  * Deliberately NOT a gate: single market regime, ~6 weeks of data, and the
  * 1.3.0 rule stands — no new hard gates until existing ones are validated.
  * Revisit as cohorts accumulate; the tracker owns the truth, this only
  * mirrors it.
  */
+// Mirrors backend/performance.py BUCKET_BANDS (pass_v4). Keep in sync.
+const TOP_BAND_LABEL = "72+";
+const TOP_BAND_MIN = 72;
+const WEAK_BAND_LABEL = "62-68";
+const WEAK_BAND_MIN = 62;
+const WEAK_BAND_MAX = 68;
+
 export function scoreBandChip(score, performance) {
   if (!num(score)) return null;
   const evidence = (window) => performance?.windows?.[window]?.buckets;
-  if (score >= 63) {
+  // Band labels come from the tracker payload, not literals: they were
+  // recalibrated in pass_v4 (63+ -> 72+) when the score scale changed.
+  if (score >= TOP_BAND_MIN) {
     const cells = ["T+5", "T+10", "T+20"].map((window) => ({
       window,
-      cell: evidence(window)?.["63+"],
+      cell: evidence(window)?.[TOP_BAND_LABEL],
     }));
     const established = cells.every(({ cell }) =>
       cell && cell.n >= 20 && cell.ci95 && cell.ci95.low > 0
@@ -328,20 +336,20 @@ export function scoreBandChip(score, performance) {
       .map(({ window, cell }) => `${window} n=${cell.n}, CI +${cell.ci95.low} to +${cell.ci95.high}`)
       .join("; ");
     return {
-      label: "Top band 63+",
+      label: `Top band ${TOP_BAND_LABEL}`,
       tone: "success",
       tooltip:
-        `Forward-return tracker: the 63+ band's 95% CI is above zero at T+5, T+10 and T+20 (${detail}). Only band with an established edge in the available history; descriptive, not predictive.`,
+        `Forward-return tracker: the ${TOP_BAND_LABEL} band's 95% CI is above zero at T+5, T+10 and T+20 (${detail}). Only band with an established edge in the available history; descriptive, not predictive.`,
     };
   }
-  if (score >= 55 && score < 60) {
-    const cell = evidence("T+5")?.["55-60"];
+  if (score >= WEAK_BAND_MIN && score < WEAK_BAND_MAX) {
+    const cell = evidence("T+5")?.[WEAK_BAND_LABEL];
     if (!cell || cell.n < 20 || !cell.ci95 || cell.ci95.high >= 0) return null;
     return {
-      label: "Weak band 55-60",
+      label: `Weak band ${WEAK_BAND_LABEL}`,
       tone: "warning",
       tooltip:
-        `Forward-return tracker: the 55-60 band's T+5 CI is below zero (n=${cell.n}, CI ${cell.ci95.low} to ${cell.ci95.high}). This band underperformed in the available history; prefer the 63+ band or demand confirmation.`,
+        `Forward-return tracker: the ${WEAK_BAND_LABEL} band's T+5 CI is below zero (n=${cell.n}, CI ${cell.ci95.low} to ${cell.ci95.high}). This band underperformed in the available history; prefer the ${TOP_BAND_LABEL} band or demand confirmation.`,
     };
   }
   return null;

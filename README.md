@@ -95,8 +95,9 @@ only server-side endpoint is an owner-only, bearer-token scan trigger.
 - **Seven hard gates, fail-closed.** An unreachable source fails a gate rather
   than silently passing it, and the dashboard shows a source-outage banner so
   an outage is never mistaken for a quiet market.
-- **A transparent soft score.** Seven named sub-scores blended into 0–100, with a
-  relative-strength multiplier vs the Nifty 50. Every component is visible.
+- **A transparent soft score.** Six named sub-scores blended into 0–100, with a
+  penalty-only relative-strength multiplier vs the Nifty 50. Every component is
+  visible, and the weights are measured rather than asserted.
 - **Decision-complete cards.** Each pick leads with the action, the ATR-based
   buy zone, the stop, two targets, the per-share risk, and a share-count preview.
 - **A public track record.** A weekly outcome tracker computes T+5 / T+10 / T+20
@@ -161,9 +162,12 @@ row fails that gate rather than passing it silently.
 | **Holdings conviction** | promoter + FII + DII > 50% | Screener.in |
 | **Pending corporate actions** | no excluded action in the next 30 days | NSE corporate actions |
 
-Survivors get a soft 0–100 score from seven sub-scores (valuation, RSI, EMA,
-drawdown, volume, F-Score, holdings) plus a relative-strength-vs-Nifty-50
-multiplier, and an ATR(14)-based entry zone, stop, and two targets.
+Survivors get a soft 0–100 score from six sub-scores (valuation, RSI, drawdown,
+volume, F-Score, holdings) plus a penalty-only relative-strength-vs-Nifty-50
+multiplier, and an ATR(14)-based entry zone, stop, and two targets. (A seventh
+component, 200EMA proximity, was retired in `weights-2026-11-v2`: it was
+mechanically zero for 80% of gate-passed names and duplicated the
+relative-strength multiplier.)
 
 See [`docs/methodology.md`](docs/methodology.md) for the full formula, weights,
 and the source-status policy.

@@ -167,10 +167,11 @@ def _priced_row(rdict: dict) -> dict:
                 )
             ],
             "swing_score": 71.5,
+            # Must match settings.WEIGHTS key-for-key (six components since
+            # weights-2026-11-v2 retired support_proximity).
             "sub_scores": {
                 "valuation_compression": 0.6,
                 "oversold_positioning": 0.85,
-                "support_proximity": 0.4,
                 "drawdown_sweetspot": 0.5,
                 "volume_capitulation": 0.2,
                 "quality_composite": 0.8,

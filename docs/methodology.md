@@ -61,13 +61,19 @@ Sum of weighted sub-scores in [0, 1], each in [0, 1].
 
 | Sub-score | Source | Weight |
 |---|---|---|
-| `valuation_compression` | trailingPE vs 5Y avg PE | 0.20 |
-| `oversold_positioning` | RSI(14) | 0.15 |
-| `support_proximity` | pct from 200EMA | 0.15 |
-| `drawdown_sweetspot` | pct off 52W high | 0.10 |
-| `volume_capitulation` | peak down-day volume / 30d avg | 0.10 |
-| `quality_composite` | F-Score | 0.20 |
-| `conviction_holding` | promoter+FII+DII | 0.10 |
+| `valuation_compression` | trailingPE vs 5Y avg PE | 4/17 ≈ 0.235 |
+| `oversold_positioning` | RSI(14) | 3/17 ≈ 0.176 |
+| `drawdown_sweetspot` | pct off 52W high | 2/17 ≈ 0.118 |
+| `volume_capitulation` | peak down-day volume / 30d avg | 2/17 ≈ 0.118 |
+| `quality_composite` | F-Score | 4/17 ≈ 0.235 |
+| `conviction_holding` | promoter+FII+DII | 2/17 ≈ 0.118 |
+
+`support_proximity` was removed in `weights-2026-11-v2`. It scored
+`1 - |pct_from_ema200| / 5`, which is **0.0 for 80% of gate-passed names**:
+the gates select stocks 15–40% off their high, which in practice sit far from
+the 200EMA. It also read the same input as the relative-strength multiplier, so
+a name far below support was penalised twice. Its 15% was redistributed
+proportionally across the other six components.
 
 Missing inputs are excluded from the denominator (not silently zeroed).
 
@@ -75,13 +81,21 @@ Missing inputs are excluded from the denominator (not silently zeroed).
 
 ## Relative-strength factor
 
-A multiplier in [0.7, 1.05] applied to `base_score`:
+A penalty-only multiplier in {0.70, 0.85, 1.0} applied to `base_score`:
 
-- Stock ≥ 5pp worse than index from 200EMA → penalty (0.85x or 0.7x)
-- Index correcting and stock tracking it → small bonus (1.05x)
-- Otherwise → neutral (1.0x)
+- Stock worse than the index by more than 10pp from the 200EMA → 0.70x
+- Worse by more than 5pp → 0.85x
+- Otherwise → 1.0x
 
 `swing_score = base_score * relative_strength_factor`
+
+The former **1.05x "index is correcting and the stock is tracking it" bonus was
+removed** in `weights-2026-11-v2`. Measured over the tracked history it marked
+the *worst* cohort rather than the best: T+20 excess vs Nifty was **−6.45%** for
+1.05x against **−0.00%** for 1.0x and **+0.66%** for 0.70x (T+5: −0.95% vs
++0.18%). It was rewarding "weak stock in a weak market" — a falling-knife
+signature, not relative strength. Awards now require evidence, and there is none
+for a bonus.
 
 ## ATR-based targets
 

@@ -45,17 +45,30 @@ WINDOWS = [5, 10, 20]
 #   pass_v2 — 60+/55-59/50-54/<50. Fine bands showed 60-64 behaving
 #             differently from 63+ while 55-59 was the worst cohort, so the
 #             5-point bands hid the top-end inflection (1.4.0 review).
-#   pass_v3 — current. Finer cut at the top (63+), weak band kept visible
-#             (55-60) rather than merged away, mid-range left coarse
-#             (45-55) where the fine-band signal is a coin flip. Cut points
-#             come from the 2026-09-06 fine-band review of per_name rows
-#             (69 snapshots, n=1454); not from an optimisation pass.
+#   pass_v3 — 63+/60-63/55-60/45-55/<45, on the weights-2026-06-v1 score.
+#   pass_v4 — CURRENT, on the weights-2026-11-v2 score (support_proximity
+#             retired, x1.05 bonus removed). Those two changes lifted the
+#             whole distribution by ~7 points, so keeping the old numbers would
+#             have reclassified 38.6% of the universe as "top" instead of the
+#             18.4% the band was calibrated to select. The cut points below are
+#             therefore the OLD bands re-expressed on the new scale with the
+#             same selection share per band, not new thresholds:
+#
+#                 old 63 -> 72   (18.4% selected)
+#                 old 60 -> 68   (25.3%)
+#                 old 55 -> 62   (39.8%)
+#                 old 45 -> 52   (70.4%)
+#
+#             Measured on realised excess vs Nifty, the top band is unchanged
+#             (T+5 -0.22% vs -0.26%, T+10 -0.92% vs -1.03%, T+20 -1.01% vs
+#             -0.96%) — which is the point: this re-scores the same names, it
+#             does not invent an edge.
 # BUCKET_BANDS pairs each label with its INCLUSIVE lower bound, descending.
-# Anything below the last lower bound falls into "<45". Keep BUCKET_ORDER
+# Anything below the last lower bound falls into "<52". Keep BUCKET_ORDER
 # (display order, consumed by meta.buckets and the empty bucket maps) in sync.
-BUCKET_SCHEME = "pass_v3"
-BUCKET_BANDS = [("63+", 63), ("60-63", 60), ("55-60", 55), ("45-55", 45)]
-BUCKET_ORDER = [label for label, _ in BUCKET_BANDS] + ["<45", "unknown"]
+BUCKET_SCHEME = "pass_v4"
+BUCKET_BANDS = [("72+", 72), ("68-72", 68), ("62-68", 62), ("52-62", 52)]
+BUCKET_ORDER = [label for label, _ in BUCKET_BANDS] + ["<52", "unknown"]
 
 # Deterministic bootstrap CI for cohort means.
 # BOOTSTRAP_SEED pins the resampling RNG so identical input always yields
@@ -167,7 +180,7 @@ def score_bucket(score: Optional[float]) -> str:
     for label, lower in BUCKET_BANDS:
         if score >= lower:
             return label
-    return "<45"
+    return "<52"
 
 
 # Regime tag thresholds — mirror the frontend regime chip (scanPlan.js).
@@ -469,7 +482,7 @@ def build_performance_payload(
             # CURRENT scheme — regeneration re-buckets history from the
             # stored scores (lossless: score is the immutable source of
             # truth; score_bucket_pass_v2 is retained for old-scheme views).
-            "bucket_scheme_history": ["pass_v2", "pass_v3"],
+            "bucket_scheme_history": ["pass_v2", "pass_v3", "pass_v4"],
             "scan_phases": sorted(
                 {infer_scan_phase(scan) for _, scan in snapshots}
             ),

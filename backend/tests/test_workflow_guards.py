@@ -281,3 +281,33 @@ def test_deploy_verification_polls_instead_of_racing_the_build():
 def test_verify_step_still_asserts_the_title():
     step = _step("scan.yml", "scan", "Verify the deployed site serves this scan")
     assert "NSE Swing Scanner" in step["run"]
+
+
+def test_frontend_top_band_mirrors_the_tracker():
+    """picks.js hardcodes the top band because the frontend cannot import
+    Python. A recalibration must move both, or the dashboard filters on a band
+    the tracker no longer produces."""
+    from performance import BUCKET_BANDS, BUCKET_ORDER, BUCKET_SCHEME
+
+    picks = (REPO / "frontend" / "src" / "utils" / "picks.js").read_text()
+    top_label, top_cut = BUCKET_BANDS[0]
+    assert BUCKET_ORDER[0] == top_label
+    assert f"TOP_PICK_MIN_SCORE = {top_cut};" in picks
+    assert f'["{top_label}", {top_cut}]' in picks
+    for label, cut in BUCKET_BANDS:
+        assert f'["{label}", {cut}]' in picks, f"{label} missing from picks.js"
+    assert BUCKET_SCHEME == "pass_v4"
+
+
+def test_score_version_tracks_the_weights():
+    """The tracker stamps score_version per row so a weights change is
+    attributable to a date. A stale version makes old and new scores
+    indistinguishable in the band series."""
+    from settings import SCORE_VERSION, WEIGHTS
+
+    assert SCORE_VERSION == "weights-2026-11-v2"
+    assert "support_proximity" not in WEIGHTS, (
+        "support_proximity was retired: it was mechanically 0 for 80% of gated "
+        "names and duplicated the relative-strength multiplier"
+    )
+    assert abs(sum(WEIGHTS.values()) - 1.0) < 1e-9

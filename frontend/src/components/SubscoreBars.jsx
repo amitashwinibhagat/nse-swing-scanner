@@ -4,7 +4,6 @@ import { scoredOnCount, SCORE_KEY_TOTAL } from "../utils/scanPlan.js";
 const LABELS = {
   valuation_compression: "Valuation vs 5Y",
   oversold_positioning: "RSI positioning",
-  support_proximity: "200-EMA proximity",
   drawdown_sweetspot: "Drawdown zone",
   volume_capitulation: "Volume capitulation",
   quality_composite: "Quality (F-Score etc)",
@@ -14,11 +13,10 @@ const LABELS = {
 // Must list every key in WEIGHTS (backend/settings.py). It used to omit
 // conviction_holding, so a weighted 10% of the composite was never rendered
 // while "Scored on N/7" counted it — the drawer showed six bars and claimed
-// seven components.
+// settings.WEIGHTS.
 const ORDER = [
   "valuation_compression",
   "oversold_positioning",
-  "support_proximity",
   "drawdown_sweetspot",
   "volume_capitulation",
   "quality_composite",
@@ -43,7 +41,7 @@ export default function SubscoreBars({ subScores, marketCorrectionFactor }) {
           {showShort && (
             <span
               className="subscore-meta-item"
-              title={`Score was computed over ${n} of ${SCORE_KEY_TOTAL} weighted components; missing components renormalise the weight, so this score is not directly comparable to a 7-component score.`}
+              title={`Score was computed over ${n} of ${SCORE_KEY_TOTAL} weighted components; missing components renormalise the weight, so this score is not directly comparable to one computed on all components.`}
             >
               Scored on {n}/{SCORE_KEY_TOTAL} components
             </span>

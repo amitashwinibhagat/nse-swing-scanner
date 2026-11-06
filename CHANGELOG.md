@@ -1,5 +1,88 @@
 # Changelog
 
+## 1.8.0 — The score measured its own selection, and lost
+
+### Why
+
+The dashboard showed zero top picks on a day when 14 names had passed all seven
+gates. Investigating that turned up two real defects in the scoring formula, not
+in the gates.
+
+**1. `support_proximity` was a constant, not a signal.**
+
+It scored `1 - |pct_from_ema200| / 5`, i.e. 0 beyond 5% from the 200EMA. But the
+gates select names 15–40% off their high, and in practice those sit far from the
+200EMA. Measured across all 5,796 tracked rows: **0.0 in 80% of cases**, mean
+0.09, rank IC negative at every window (−0.010 / −0.011 / −0.028). It also read
+the same input as the relative-strength multiplier, so a name far below support
+was penalised twice.
+
+Its effect was structural rather than gradual. With support at 0 the best
+attainable base score was 85, and `85 × 0.70 = 59.5` — below the 63 shortlist
+cut. **14.3% of all tracked rows were arithmetically incapable of ever being a
+top pick**, no matter how strong their other six components were.
+
+**2. The 1.05 "index correcting" bonus marked the worst cohort.**
+
+The relative-strength factor awarded 1.05× when the index was below −5% and the
+stock was tracking it. Realised excess vs Nifty:
+
+| RS multiplier | T+20 | T+5 |
+|---|---|---|
+| 1.05 (bonus) | **−6.45%** (n=192) | **−0.95%** |
+| 1.00 | −0.00% (n=1352) | +0.18% |
+| 0.70 (penalty) | +0.66% (n=531) | −0.45% |
+
+It was rewarding "weak stock in a weak market" — a falling-knife signature.
+Awards now require evidence, and there is none for a bonus.
+
+### Changed
+
+- `WEIGHTS` is now six components; `support_proximity`'s 15% was redistributed
+  **proportionally** across the rest (each keeps its relative weight) rather
+  than handed to the strongest one — in-sample IC weighting is the overfit the
+  promotion checklist forbids. Exact values are `n/17` so the sum is exactly 1.0.
+- `relative_strength_factor` is penalty-only: {0.70, 0.85, 1.0}.
+- `SCORE_VERSION` → `weights-2026-11-v2`. Every row is stamped, so the tracker
+  can attribute the regime change to a date.
+- **Band scheme `pass_v3` → `pass_v4`.** The two changes lifted the whole score
+  distribution by ~7 points, so keeping 63 would have reclassified 38.6% of the
+  universe as "top" instead of the 18.4% the band was calibrated to select. The
+  new cuts are the old bands re-expressed with the same selection share —
+  63→72, 60→68, 55→62, 45→52 — not new thresholds:
+
+  | band | selects | T+5 excess | vs old band |
+  |---|---|---|---|
+  | 72+ (was 63+) | 18.5% | −0.22% | −0.26% |
+  | 68-72 | 26.5% | −0.75% | |
+  | 62-68 | 39.8% | −0.26% | |
+  | 52-62 | 70.4% | −0.30% | |
+
+  The top band's measured outcome is unchanged, which is the point: this
+  re-scores the same names, it does not invent an edge. It still has **no
+  established edge**, and the dashboard still says so.
+
+### Added
+
+- `check_cron_consistency.py` now also asserts that the frontend's hardcoded
+  top band (`picks.js`) matches `performance.BUCKET_BANDS[0]` — the dashboard
+  cannot import Python, so the mirror can only be verified mechanically.
+- Tests pinning: the retired component is gone from `WEIGHTS` and from the JSON
+  contract's `sub_scores`, `SCORE_VERSION` matches the weights, the frontend
+  mirrors every band, and the band cut-offs preserve the v3 selection share.
+- `BUCKET_ORDER` is the single source of truth for band labels; the feedback
+  report's `top_band_lift` no longer hardcodes `"63+"`.
+
+### Note on today's zero
+
+On 2026-11-06 the Nifty sat **+3.0% above** its 200EMA with a median RSI of
+53.7 — only 54 of 491 names were in the 25–40 RSI gate. The 14 survivors are
+14–18% *below* their 200EMA, so they score near zero on proximity, and the
+63 band was calibrated in a −6.1% regime. Historically the shortlist is empty in
+1 of 112 scans, and this was that scan. The recalibration does not change that
+arithmetic; the "On deck" fallback is what makes the page useful on such days.
+See the entry below.
+
 ## 1.7.0 — Correctness pass: the zero-PASS outage, dead CI, and the missing edge
 
 ### Why

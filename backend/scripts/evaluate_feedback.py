@@ -64,7 +64,7 @@ def _bootstrap_path() -> None:
 
 _bootstrap_path()
 from settings import WEIGHTS  # noqa: E402  (backend/settings.py)
-from performance import cohort_stats, score_bucket  # noqa: E402
+from performance import BUCKET_ORDER, cohort_stats, score_bucket  # noqa: E402
 
 WINDOWS = ["T+5", "T+10", "T+20"]
 IC_MIN_N = 30          # below this, an IC is reported but flagged unusable
@@ -270,8 +270,16 @@ def shadow_compare(rows, candidates):
     return result
 
 
-def top_band_lift(shadow, window="T+5", band="63+"):
-    """Mean excess of a candidate's top band vs baseline's, same rows basis."""
+def top_band_lift(shadow, window="T+5", band=None):
+    """
+    Mean excess of a candidate's top band vs baseline's, same rows basis.
+
+    `band` defaults to the CURRENT scheme's top label (performance.BUCKET_ORDER[0])
+    so a bucket recalibration cannot silently make this compare a band that no
+    longer exists — it used to be hardcoded to "63+".
+    """
+    if band is None:
+        band = BUCKET_ORDER[0]
     out = {}
     cell = shadow["windows"].get(window, {})
     base = (cell.get("baseline", {}).get(band) or {}).get("mean")

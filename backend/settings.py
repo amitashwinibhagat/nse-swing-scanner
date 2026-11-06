@@ -45,21 +45,42 @@ RSI_UPPER = 40
 CORPORATE_ACTION_LOOKAHEAD_DAYS = 30
 
 # Soft score weights — sum to 1.0. See README/methodology for rationale.
-# `conviction_holding` activates once holdings data is wired in.
+#
 # Bump SCORE_VERSION whenever WEIGHTS changes: snapshots stamp it per row
-# (scanner.to_json_records) so the tracker can attribute score-regime
-# changes to a date. Promotion protocol: docs/feedback + evaluate_feedback.
+# (scanner.to_json_records) so the tracker can attribute score-regime changes
+# to a date. Promotion protocol: docs/feedback + evaluate_feedback.
+#
+# 2026-11 v2 — `support_proximity` REMOVED (was 0.15).
+#
+# It measured |pct_from_ema200| and scored 0 beyond 5%. The gates select names
+# 15-40% off their high, which in practice means they sit far from the 200EMA:
+# across 5,796 tracked rows it was **0.0 in 80% of cases**, mean 0.09. A
+# component that is mechanically zero for the population it scores is not a
+# signal — it is a constant that caps the achievable score. Worse, it read the
+# SAME input as the relative-strength multiplier (which already penalises
+# distance below the 200EMA), so a name far below support was punished twice:
+# once by a 0.00 component and again by an x0.70 multiplier.
+#
+# The effect was structural: with support at 0 the best attainable base score
+# is 85.0, and 85.0 x 0.70 = 59.5 — below the 63 shortlist cut. 14.3% of all
+# tracked rows were therefore *incapable* of ever being a top pick no matter
+# how good their other six components were. Its rank IC was negative at every
+# window (-0.010 / -0.011 / -0.028).
+#
+# The freed 15% was redistributed PROPORTIONALLY across the remaining
+# components (each keeps its relative weight), not handed to the strongest
+# one — an in-sample IC-weighting pass is the overfit this project's own
+# promotion checklist forbids.
 WEIGHTS = {
-    "valuation_compression": 0.20,
-    "oversold_positioning": 0.15,
-    "support_proximity": 0.15,
-    "drawdown_sweetspot": 0.10,
-    "volume_capitulation": 0.10,
-    "quality_composite": 0.20,
-    "conviction_holding": 0.10,
+    "valuation_compression": 4 / 17,   # 0.235294…
+    "oversold_positioning": 3 / 17,    # 0.176471…
+    "drawdown_sweetspot": 2 / 17,      # 0.117647…
+    "volume_capitulation": 2 / 17,
+    "quality_composite": 4 / 17,
+    "conviction_holding": 2 / 17,
 }
 
-SCORE_VERSION = "weights-2026-06-v1"
+SCORE_VERSION = "weights-2026-11-v2"
 
 # Scheduled scan windows — SINGLE SOURCE OF TRUTH for the twice-daily cadence.
 # Consumed by:

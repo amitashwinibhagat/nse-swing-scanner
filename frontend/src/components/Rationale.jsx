@@ -13,7 +13,7 @@ const TERMS = [
   {
     term: "SCORE",
     body:
-      "0–100 soft ranking: weighted blend of valuation compression (current P/E vs 5Y mean), RSI positioning, 200-EMA proximity, drawdown sweet-spot, volume capitulation, F-Score, and holdings conviction, multiplied by the Nifty 50's distance from its 200-EMA as a regime filter. Weights are hand-tuned and the forward-return tracker currently shows no established edge for any score band; treat the score as a degree-of-match ranking, not a signal.",
+      "0–100 soft ranking: weighted blend of valuation compression (current P/E vs 5Y mean), RSI positioning, drawdown sweet-spot, volume capitulation, F-Score, and holdings conviction, multiplied by a penalty-only relative-strength factor vs the Nifty 50. A seventh component (200-EMA proximity) was retired because it was mechanically zero for 80% of gate-passed names and measured the same thing as the multiplier. Weights are measured, not asserted, and the forward-return tracker currently shows no established edge for any band; treat the score as a degree-of-match ranking, not a signal.",
   },
   {
     term: "PRICE",

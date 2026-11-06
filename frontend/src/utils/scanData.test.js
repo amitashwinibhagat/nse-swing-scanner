@@ -77,27 +77,34 @@ test("joinLabels reads like a sentence", () => {
 
 test("topBandEvidence refuses to claim an edge the data does not show", () => {
   const negative = {
-    windows: { "T+5": { buckets: { "63+": { n: 1025, mean: -0.26, ci95: { low: -0.54, high: 0.02 } } } } },
+    windows: { "T+5": { buckets: { "72+": { n: 1029, mean: -0.22, ci95: { low: -0.47, high: 0.04 } } } } },
   };
   assert.equal(topBandEvidence(negative).established, false);
 
   const positive = {
-    windows: { "T+5": { buckets: { "63+": { n: 96, mean: 3.76, ci95: { low: 2.56, high: 4.95 } } } } },
+    windows: { "T+5": { buckets: { "72+": { n: 96, mean: 3.76, ci95: { low: 2.56, high: 4.95 } } } } },
   };
   assert.equal(topBandEvidence(positive).established, true);
 
   // A positive CI on a tiny cohort is not evidence either.
   const tiny = {
-    windows: { "T+5": { buckets: { "63+": { n: 5, mean: 4.0, ci95: { low: 0.5, high: 8.0 } } } } },
+    windows: { "T+5": { buckets: { "72+": { n: 5, mean: 4.0, ci95: { low: 0.5, high: 8.0 } } } } },
   };
   assert.equal(topBandEvidence(tiny).established, false);
+
+  // The retired pass_v3 label must NOT be read: a stale payload would
+  // otherwise resurrect the old claim under a band that no longer exists.
+  const stale = {
+    windows: { "T+5": { buckets: { "63+": { n: 900, mean: 9.9, ci95: { low: 5, high: 14 } } } } },
+  };
+  assert.equal(topBandEvidence(stale).established, false);
 
   assert.equal(topBandEvidence(null).established, false);
 });
 
 test("topBandClaim never asserts an edge without evidence", () => {
   const negative = {
-    windows: { "T+5": { buckets: { "63+": { n: 1025, mean: -0.26, ci95: { low: -0.54, high: 0.02 } } } } },
+    windows: { "T+5": { buckets: { "72+": { n: 1029, mean: -0.22, ci95: { low: -0.47, high: 0.04 } } } } },
   };
   const claim = topBandClaim(negative);
   assert.match(claim, /no established edge/);

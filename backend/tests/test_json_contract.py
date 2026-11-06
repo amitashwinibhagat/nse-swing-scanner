@@ -330,3 +330,21 @@ def test_write_scan_output_reports_clean_source_health(tmp_path):
     out = tmp_path / "scan.json"
     payload = write_scan_output(_make_df(), str(out))
     assert payload["source_health"]["critical_source_failed"] is False
+
+
+def test_sub_scores_never_carry_a_retired_component():
+    """Every key in the payload's sub_scores must exist in settings.WEIGHTS.
+
+    The fixture only populates two components (a partial score is legal — the
+    weights are renormalised), but a key that is NOT in WEIGHTS means a retired
+    component is still being emitted, and the frontend would render a bar for
+    something the score no longer uses.
+    """
+    from settings import WEIGHTS
+
+    row = _make_df().iloc[0].to_dict()
+    records = to_json_records(pd.DataFrame([row]))
+    sub = records[0]["sub_scores"]
+    unknown = set(sub) - set(WEIGHTS)
+    assert not unknown, f"retired component(s) still in the payload: {sorted(unknown)}"
+    assert "support_proximity" not in sub

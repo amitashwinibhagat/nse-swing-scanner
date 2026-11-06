@@ -9,6 +9,7 @@ import {
   planAction,
   relativeStrengthFactor,
   scoredOnCount,
+  SCORE_KEY_TOTAL,
   exitWarnings,
 } from "./scanPlan.js";
 
@@ -73,19 +74,23 @@ test("relativeStrengthFactor mirrors the backend thresholds", () => {
   assert.equal(relativeStrengthFactor(null, -1), 1.0);
 });
 
-test("scoredOnCount counts all seven weighted components", () => {
+test("scoredOnCount tracks the six live weighted components", () => {
+  // support_proximity was retired in weights-2026-11-v2; SCORE_KEYS must not
+  // still count it, or every row looks permanently under-scored.
   const sub = {
     valuation_compression: 1,
     oversold_positioning: 1,
-    support_proximity: 1,
     drawdown_sweetspot: 1,
     volume_capitulation: 1,
     quality_composite: 1,
     conviction_holding: 1,
   };
-  assert.equal(scoredOnCount(sub), 7);
-  assert.equal(scoredOnCount({ ...sub, conviction_holding: null }), 6);
+  assert.equal(SCORE_KEY_TOTAL, 6);
+  assert.equal(scoredOnCount(sub), 6);
+  assert.equal(scoredOnCount({ ...sub, conviction_holding: null }), 5);
   assert.equal(scoredOnCount(null), 0);
+  // A retired key present in an old payload must not inflate the count.
+  assert.equal(scoredOnCount({ ...sub, support_proximity: 1 }), 6);
 });
 
 test("exitWarnings needs a full 63-session swing high, not a 21-session one", () => {
@@ -117,8 +122,8 @@ import { TOP_PICK_MIN_SCORE, splitShortlist } from "./picks.js";
 
 test("splitShortlist separates evidenced picks from on-deck passes", () => {
   const stocks = [
-    { symbol: "TOP", gate_pass: true, swing_score: 71 },
-    { symbol: "DECK", gate_pass: true, swing_score: 49 },
+    { symbol: "TOP", gate_pass: true, swing_score: 81 },
+    { symbol: "DECK", gate_pass: true, swing_score: 66 },
     { symbol: "LOW", gate_pass: true, swing_score: 34 },
     { symbol: "FAIL", gate_pass: false, swing_score: 88 },
   ];
@@ -136,14 +141,14 @@ test("a high score does not make a failing row a pick", () => {
 });
 
 test("on-deck is empty when everything clears the band", () => {
-  const s = splitShortlist([{ symbol: "A", gate_pass: true, swing_score: 70 }]);
+  const s = splitShortlist([{ symbol: "A", gate_pass: true, swing_score: 79 }]);
   assert.equal(s.counts.topPicks, 1);
   assert.equal(s.counts.onDeck, 0);
 });
 
 test("the fallback only engages when picks are empty AND passes exist", () => {
   const allBelow = splitShortlist([
-    { symbol: "A", gate_pass: true, swing_score: 55 },
+    { symbol: "A", gate_pass: true, swing_score: 66 },
     { symbol: "B", gate_pass: true, swing_score: 41 },
   ]);
   assert.equal(allBelow.counts.topPicks, 0);
@@ -151,11 +156,12 @@ test("the fallback only engages when picks are empty AND passes exist", () => {
   // This is the exact condition App.jsx uses to switch the heading.
   assert.equal(allBelow.counts.topPicks === 0 && allBelow.counts.onDeck > 0, true);
 
-  const nothingPassed = splitShortlist([{ symbol: "A", gate_pass: false, swing_score: 55 }]);
+  const nothingPassed = splitShortlist([{ symbol: "A", gate_pass: false, swing_score: 66 }]);
   assert.equal(nothingPassed.counts.topPicks === 0 && nothingPassed.counts.onDeck > 0, false);
 });
 
-test("the band threshold is not silently relaxed", () => {
-  // A guard against "just lower it to 55 so the page looks busy".
-  assert.equal(TOP_PICK_MIN_SCORE, 63);
+test("the band threshold tracks the tracker's top band, not the page's mood", () => {
+  // A guard against "just lower it so the page looks busy". 72 is the pass_v4
+  // top band: the v3 63 re-expressed on the v2 score scale (same 18% share).
+  assert.equal(TOP_PICK_MIN_SCORE, 72);
 });

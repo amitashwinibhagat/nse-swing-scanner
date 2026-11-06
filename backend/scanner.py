@@ -96,13 +96,6 @@ def _score_rsi(rsi) -> float:
     return float(max(0, (45 - rsi) / 7))
 
 
-def _score_support(pct_from_ema200) -> float:
-    if pct_from_ema200 is None or np.isnan(pct_from_ema200):
-        return np.nan
-    dist = abs(pct_from_ema200)
-    return float(np.clip(1 - dist / 5, 0, 1))
-
-
 def _score_drawdown(pct_off_high) -> float:
     if pct_off_high is None or np.isnan(pct_off_high):
         return np.nan
@@ -336,24 +329,32 @@ def gate_corporate_actions(
 # ---------------------------------------------------------------------------
 def relative_strength_factor(stock_pct_from_ema200: Optional[float], index_pct_from_ema200: Optional[float]) -> float:
     """
-    Returns a multiplier in {0.70, 0.85, 1.0, 1.05} applied to the swing_score.
-    - If the index is also correcting heavily, the stock's drawdown is normal market
-      behavior; small bonus.
-    - If the stock is breaking down materially worse than the index, penalize.
-    - If the index is healthy and the stock is also weak, neutral.
+    Returns a multiplier in {0.70, 0.85, 1.0} applied to the swing_score.
+
+    Penalty only: a name breaking down materially worse than the index is
+    discounted (x0.85 beyond -5pp, x0.70 beyond -10pp). Everything else is 1.0.
+
+    The former x1.05 "index is correcting and the stock is tracking it" bonus
+    was REMOVED in SCORE_VERSION weights-2026-11-v2. Measured over the tracked
+    history it marked the single worst cohort rather than the best:
+
+        T+20 excess vs Nifty    x1.05: -6.45% (n=192)     <- bonus
+                                x1.00: -0.00% (n=1352)
+                                x0.70: +0.66% (n=531)     <- penalty
+
+    (T+5: x1.05 -0.95% vs x1.00 +0.18%.) It was rewarding "the stock is weak
+    AND the market is weak" — a falling-knife signature, not relative strength.
+    Awards are now reserved for evidence, and there is none for a bonus.
     """
     if stock_pct_from_ema200 is None or index_pct_from_ema200 is None:
         return 1.0
     if np.isnan(stock_pct_from_ema200) or np.isnan(index_pct_from_ema200):
         return 1.0
-    # Both negative and stock worse than index by more than 5pp -> penalty
     delta = stock_pct_from_ema200 - index_pct_from_ema200
     if delta < -10:
         return 0.7
     if delta < -5:
         return 0.85
-    if index_pct_from_ema200 < -5 and stock_pct_from_ema200 >= index_pct_from_ema200 - 2:
-        return 1.05
     return 1.0
 
 
@@ -591,7 +592,9 @@ def evaluate_stock(
     sub_scores = {
         "valuation_compression": _score_valuation(pe_now, pe5y.get("avg_pe_5y")),
         "oversold_positioning": _score_rsi(rsi),
-        "support_proximity": _score_support(tech.get("pct_from_ema200")),
+        # `support_proximity` removed in SCORE_VERSION weights-2026-11-v2: it was
+        # mechanically 0 for 80% of gated names and measured the same thing as
+        # the relative-strength multiplier. See settings.WEIGHTS.
         "drawdown_sweetspot": _score_drawdown(pct_off_high),
         "volume_capitulation": _score_volume(tech.get("volume_surge_factor")),
         "quality_composite": _score_quality(None, None, f_score, None),

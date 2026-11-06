@@ -128,6 +128,29 @@ def main() -> int:
     else:
         failures.append("netlify.toml not found — the punctual scheduler is unconfigured.")
 
+    # --- the score band scheme is mirrored in the frontend ---
+    #
+    # picks.js and scanData.js hardcode the top band's label and cut. They are a
+    # deliberate mirror of performance.BUCKET_BANDS (the frontend cannot import
+    # Python), so a recalibration must move both or the dashboard silently
+    # compares against a band that no longer exists.
+    picks_js = REPO_ROOT / "frontend" / "src" / "utils" / "picks.js"
+    if picks_js.exists():
+        from performance import BUCKET_BANDS as _BANDS
+        top_label, top_cut = _BANDS[0]
+        text = picks_js.read_text()
+        if f'TOP_PICK_MIN_SCORE = {top_cut};' not in text:
+            failures.append(
+                f"frontend/src/utils/picks.js TOP_PICK_MIN_SCORE does not match "
+                f"performance.BUCKET_BANDS[0] ({top_label} = {top_cut}). The "
+                f"dashboard would filter on a band the tracker no longer has."
+            )
+        if f'["{top_label}", {top_cut}]' not in text:
+            failures.append(
+                f"frontend/src/utils/picks.js BUCKET_BANDS is missing the current "
+                f"top band [{top_label}, {top_cut}]."
+            )
+
     # --- watchdog cron sanity: 15-min cadence, weekday hours 1-20 UTC ---
     if WATCHDOG_YML.exists():
         wtext = WATCHDOG_YML.read_text()

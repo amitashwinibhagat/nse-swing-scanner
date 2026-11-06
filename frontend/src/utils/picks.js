@@ -1,20 +1,22 @@
 // Pure shortlist logic: which gate-passed names have an evidenced edge, why,
 // and how strong. No React, no I/O.
 //
-// The 63+ threshold is not a hand-tuned UI number: it is the pass_v3 top band
-// in backend/performance.py, and it is the only band whose mean excess vs
-// Nifty 50 has a 95% bootstrap CI above zero at T+5, T+10 AND T+20 (see
-// docs/feedback/feedback-report.md). This module mirrors the backend so the
+// The shortlist threshold is the top band of the tracker's CURRENT bucket
+// scheme (pass_v4), which is itself a recalibration of the old pass_v3 "63+"
+// band onto the weights-2026-11-v2 score scale — same 18% selection share, not
+// a new hypothesis. This module mirrors backend/performance.py so the
 // dashboard can never drift from the tracker.
 
-export const TOP_PICK_MIN_SCORE = 63;
+export const TOP_PICK_MIN_SCORE = 72;
 
-// Descending inclusive lower bounds — mirrors BUCKET_BANDS in performance.py.
+// Descending inclusive lower bounds — mirrors BUCKET_BANDS in
+// backend/performance.py (pass_v4). Update both together; the backend CI guard
+// and picks.test.js pin the top label.
 const BUCKET_BANDS = [
-  ["63+", 63],
-  ["60-63", 60],
-  ["55-60", 55],
-  ["45-55", 45],
+  ["72+", 72],
+  ["68-72", 68],
+  ["62-68", 62],
+  ["52-62", 52],
 ];
 
 function isNum(v) {
@@ -26,7 +28,7 @@ export function bandOf(score) {
   for (const [label, lower] of BUCKET_BANDS) {
     if (score >= lower) return label;
   }
-  return "<45";
+  return "<52";
 }
 
 // Mirrors regime_tag in backend/performance.py.

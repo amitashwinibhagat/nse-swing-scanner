@@ -109,13 +109,22 @@ class TestShadow(unittest.TestCase):
         shadow = ef.shadow_compare(rows, candidates)
         self.assertEqual(shadow["rows_used"], 48)
         t5 = shadow["windows"]["T+5"]
-        # 63+ band must exist for both candidates on this synthetic data.
-        self.assertIn("63+", t5["baseline"])
-        self.assertIn("63+", t5["all_quality"])
-        # The all-quality candidate's top band should not be worse.
-        base_top = t5["baseline"]["63+"]
-        cand_top = t5["all_quality"]["63+"]
-        self.assertIsNotNone(cand_top["mean"])
+        # Assert on the highest POPULATED band rather than a hardcoded label:
+        # the band cuts are recalibrated whenever the score scale changes
+        # (pass_v3 -> pass_v4), and this synthetic fixture tops out below the
+        # current top band. The property under test is "both candidates are
+        # compared on the same highest band", not "a specific label exists".
+        from performance import BUCKET_ORDER
+        populated = [
+            b for b in BUCKET_ORDER
+            if (t5["baseline"].get(b) or {}).get("n", 0) > 0
+        ]
+        self.assertTrue(populated, "fixture produced no scored band")
+        top = populated[0]  # BUCKET_ORDER is descending
+        self.assertIn(top, t5["all_quality"])
+        self.assertIsNotNone(t5["all_quality"][top]["mean"])
+        # And the schema must be the live scheme, not a stale one.
+        self.assertTrue(set(t5["baseline"]) <= set(BUCKET_ORDER))
 
     def test_baseline_mismatch_flag(self):
         rows = [make_row(90.0, {"quality_composite": 0.1}, t5=1.0) for _ in range(3)]
@@ -153,7 +162,16 @@ class TestEndToEnd(unittest.TestCase):
         try:
             fb = ef.build_feedback(__import__("pathlib").Path(path))
             self.assertGreaterEqual(fb["meta"]["rows_closed_any_window"], 2)
-            self.assertAlmostEqual(fb["meta"]["baseline_weights"]["quality_composite"], 0.2)
+            # Assert against the live weights rather than a hardcoded number:
+            # the feedback report must always describe the regime that produced
+            # the rows, and weights legitimately change (see SCORE_VERSION).
+            from settings import WEIGHTS as LIVE_WEIGHTS
+            for name, weight in LIVE_WEIGHTS.items():
+                self.assertAlmostEqual(
+                    fb["meta"]["baseline_weights"][name], round(weight, 4), places=4
+                )
+            # support_proximity was retired in weights-2026-11-v2.
+            self.assertNotIn("support_proximity", fb["meta"]["baseline_weights"])
             rep = ef.render_report(fb)
             self.assertIn("Promotion checklist", rep)
             self.assertIn("IN-SAMPLE", rep)

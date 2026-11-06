@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { buildRecentPicks, picksSummaryLine, resolveIndexEntry, isStripWorthy, formatSnapshotLabel } from "../utils/recentPicks.js";
+import { TOP_BAND_LABEL } from "../utils/scanData.js";
 
 
 /**
@@ -15,7 +16,7 @@ export function ReceiptsBanner({ performance }) {
   const perf = performance;
   if (!perf || !perf.windows) return null;
 
-  const t5 = perf.windows["T+5"]?.buckets?.["63+"];
+  const t5 = perf.windows["T+5"]?.buckets?.[TOP_BAND_LABEL];
   if (!t5 || typeof t5.mean !== "number" || !t5.ci95) return null;
   // The claim requires the CI to be entirely above zero — verify, don't assume.
   if (!(t5.ci95.low > 0)) return null;
@@ -27,7 +28,7 @@ export function ReceiptsBanner({ performance }) {
     <section className="receipts-banner" aria-label="Tracker evidence summary">
       <span className="receipts-tag" aria-hidden="true">RECEIPTS</span>
       <p>
-        Suggestions with a score of <b>63+</b> have beaten the Nifty 50 by{" "}
+        Suggestions in the <b>{TOP_BAND_LABEL}</b> band have beaten the Nifty 50 by{" "}
         <b>{pct(t5.mean)}</b> on average within 5 sessions{" "}
         <span className="receipts-ci">(95% CI {pct(t5.ci95.low)} to {pct(t5.ci95.high)}, n={t5.n})</span>.
         Every pick is scored against what actually happened —{" "}
