@@ -368,22 +368,29 @@ export default function App() {
     return () => { cancelled = true; };
   }, []);
 
-  // Performance payload is fetched on demand (first time a surface that needs
-  // it opens) rather than on every page load.
-  const [performanceRequested, setPerformanceRequested] = useState(false);
+  // The evidence layer. This used to be deferred until a panel was opened,
+  // which was a mistake: the KPI delta and the shortlist subhead render on
+  // first paint and both read it, so the dashboard said "tracker not loaded"
+  // until you clicked something. The payload is ~6 MB, but it is the
+  // difference between "no picks" and "no picks, and here is the evidence".
+  const [performanceError, setPerformanceError] = useState(null);
   useEffect(() => {
-    if (!performanceRequested || performance) return;
     let cancelled = false;
     fetch("/data/performance.json", { cache: "no-cache" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((payload) => {
-        if (!cancelled && payload) setPerformance(payload);
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
       })
-      .catch(() => {
-        /* the track-record panel degrades to "not yet available" */
+      .then((payload) => {
+        if (!cancelled) setPerformance(payload);
+      })
+      .catch((e) => {
+        // Never block the dashboard on it: the copy degrades to "unavailable"
+        // rather than implying the tracker found nothing.
+        if (!cancelled) setPerformanceError(e.message || "unavailable");
       });
     return () => { cancelled = true; };
-  }, [performanceRequested, performance]);
+  }, []);
 
   useEffect(() => {
     fetch(SCAN_STATUS_URL, { cache: "no-store" })
@@ -443,11 +450,20 @@ export default function App() {
   // header counts never lie about what the scan actually found.
   const shortlist = useMemo(() => splitShortlist(data?.stocks), [data]);
 
+  // No name cleared the evidenced band, but some did pass every gate: show
+  // them, labelled, rather than an empty screen.
+  const picksAreFallback = shortlist.counts.topPicks === 0 && shortlist.counts.onDeck > 0;
+
   const rows = useMemo(() => {
     if (!data) return [];
     let r = data.stocks;
     if (filter === "picks") {
-      r = r.filter((s) => s.gate_pass && (s.swing_score || 0) >= TOP_PICK_MIN_SCORE);
+      // When nothing clears the evidenced band, show the gate-passed names
+      // that are closest to it instead of a dead page. They are explicitly
+      // labelled as below the band in the heading below — the threshold itself
+      // is not relaxed, because the tracker says the 55-60 band is the worst
+      // performing one and quietly redefining "top pick" would be a lie.
+      r = shortlist.topPicks.length > 0 ? shortlist.topPicks : shortlist.onDeck;
     }
     if (filter === "passed") r = r.filter((s) => s.gate_pass);
     if (filter === "watchlist") r = r.filter((s) => watchlist.has(s.symbol));
@@ -474,7 +490,7 @@ export default function App() {
       return sortDir === "asc" ? av - bv : bv - av;
     });
     return sorted;
-  }, [data, search, filter, sortKey, sortDir, watchlist.symbols]);
+  }, [data, search, filter, sortKey, sortDir, watchlist.symbols, shortlist]);
 
   function toggleSort(key) {
     if (sortKey === key) {
@@ -637,7 +653,7 @@ export default function App() {
             <Kpi
               label="Top picks"
               value={shortlist.counts.topPicks}
-              delta={`score ${TOP_PICK_MIN_SCORE}+ · ${topBandClaim(performance)}`}
+              delta={`score ${TOP_PICK_MIN_SCORE}+ · ${topBandClaim(performance, performanceError)}`}
               accent={shortlist.counts.topPicks > 0 ? "success" : "warning"}
             />
             {regime && (
@@ -842,12 +858,7 @@ export default function App() {
         onUpdate={journal.update}
       />
 
-      <details
-        className="more-panel"
-        onToggle={(e) => {
-          if (e.currentTarget.open) setPerformanceRequested(true);
-        }}
-      >
+      <details className="more-panel">
         <summary>What changed since the last scan</summary>
         <div className="more-panel-body">
           <DeltaStrip
@@ -865,7 +876,10 @@ export default function App() {
       </details>
 
       {rows.length === 0 ? (
-        filter === "picks" && shortlist.counts.topPicks === 0 && !search.trim() ? (
+        filter === "picks" &&
+        shortlist.counts.topPicks === 0 &&
+        shortlist.counts.onDeck === 0 &&
+        !search.trim() ? (
           <div className="empty-state">
             <h2>No top picks today</h2>
             <p>
@@ -913,12 +927,25 @@ export default function App() {
       ) : filter === "picks" ? (
         <>
           <div className="pick-section-head">
-            <h2 aria-label={`Top picks, ${rows.length}`}>
-              Top picks
+            <h2 aria-label={`${picksAreFallback ? "On deck" : "Top picks"}, ${rows.length}`}>
+              {picksAreFallback ? "On deck" : "Top picks"}
               <span className="pick-count" aria-hidden="true">{rows.length}</span>
             </h2>
             <p className="pick-section-sub">
-              Gate-passed names scoring {TOP_PICK_MIN_SCORE}+. {topBandClaim(performance)}.
+              {picksAreFallback ? (
+                <>
+                  Nothing cleared the {TOP_PICK_MIN_SCORE}+ band today, so this is
+                  every gate-passed name — ranked by score, <strong>below</strong>{" "}
+                  the evidenced band. {topBandClaim(performance, performanceError)}.
+                  The band is not being lowered to fill the page: the tracker
+                  measures the bands below it as no better than the index.
+                </>
+              ) : (
+                <>
+                  Gate-passed names scoring {TOP_PICK_MIN_SCORE}+.{" "}
+                  {topBandClaim(performance, performanceError)}.
+                </>
+              )}{" "}
               Click a card for the full plan and the gate checklist.
               {regimeKey === "risk_off" && (
                 <span className="pick-regime-warn">
@@ -1190,13 +1217,7 @@ export default function App() {
         </>
       )}
 
-      <details
-        className="more-panel"
-        id="track-record"
-        onToggle={(e) => {
-          if (e.currentTarget.open) setPerformanceRequested(true);
-        }}
-      >
+      <details className="more-panel" id="track-record">
         <summary>Methodology &amp; track record</summary>
         <div className="more-panel-body">
           <Rationale />

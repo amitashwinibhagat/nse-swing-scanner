@@ -107,3 +107,55 @@ test("exitWarnings needs a full 63-session swing high, not a 21-session one", ()
   assert.equal(expanding.length, 1);
   assert.equal(expanding[0].key, "atr_expanding");
 });
+
+// --- shortlist fallback -----------------------------------------------------
+// The default view is `gate_pass && score >= 63`. When nothing clears that band
+// the page used to be empty even though names had passed every gate. These pin
+// the split the fallback relies on.
+
+import { TOP_PICK_MIN_SCORE, splitShortlist } from "./picks.js";
+
+test("splitShortlist separates evidenced picks from on-deck passes", () => {
+  const stocks = [
+    { symbol: "TOP", gate_pass: true, swing_score: 71 },
+    { symbol: "DECK", gate_pass: true, swing_score: 49 },
+    { symbol: "LOW", gate_pass: true, swing_score: 34 },
+    { symbol: "FAIL", gate_pass: false, swing_score: 88 },
+  ];
+  const s = splitShortlist(stocks);
+  assert.deepEqual(s.topPicks.map((x) => x.symbol), ["TOP"]);
+  assert.deepEqual(s.onDeck.map((x) => x.symbol), ["DECK", "LOW"]);
+  assert.deepEqual(s.screened.map((x) => x.symbol), ["FAIL"]);
+});
+
+test("a high score does not make a failing row a pick", () => {
+  const s = splitShortlist([{ symbol: "X", gate_pass: false, swing_score: 99 }]);
+  assert.equal(s.counts.topPicks, 0);
+  assert.equal(s.counts.onDeck, 0, "a failed row is never on deck");
+  assert.equal(s.counts.screened, 1);
+});
+
+test("on-deck is empty when everything clears the band", () => {
+  const s = splitShortlist([{ symbol: "A", gate_pass: true, swing_score: 70 }]);
+  assert.equal(s.counts.topPicks, 1);
+  assert.equal(s.counts.onDeck, 0);
+});
+
+test("the fallback only engages when picks are empty AND passes exist", () => {
+  const allBelow = splitShortlist([
+    { symbol: "A", gate_pass: true, swing_score: 55 },
+    { symbol: "B", gate_pass: true, swing_score: 41 },
+  ]);
+  assert.equal(allBelow.counts.topPicks, 0);
+  assert.equal(allBelow.counts.onDeck, 2);
+  // This is the exact condition App.jsx uses to switch the heading.
+  assert.equal(allBelow.counts.topPicks === 0 && allBelow.counts.onDeck > 0, true);
+
+  const nothingPassed = splitShortlist([{ symbol: "A", gate_pass: false, swing_score: 55 }]);
+  assert.equal(nothingPassed.counts.topPicks === 0 && nothingPassed.counts.onDeck > 0, false);
+});
+
+test("the band threshold is not silently relaxed", () => {
+  // A guard against "just lower it to 55 so the page looks busy".
+  assert.equal(TOP_PICK_MIN_SCORE, 63);
+});

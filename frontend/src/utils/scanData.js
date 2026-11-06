@@ -132,9 +132,14 @@ export function topBandEvidence(performance, { minN = 20 } = {}) {
  * Used by the KPI delta and the shortlist subhead so the copy can never
  * contradict the tracker again.
  */
-export function topBandClaim(performance) {
+export function topBandClaim(performance, error) {
   const ev = topBandEvidence(performance);
-  if (!performance) return "tracker not loaded";
+  // Distinguish "not loaded yet / failed" from "loaded, and it says no edge".
+  // Collapsing those into one string is how the dashboard ended up implying the
+  // tracker had found nothing when it had simply not arrived.
+  if (!performance) {
+    return error ? `tracker unavailable (${error})` : "tracker loading…";
+  }
   if (ev.established) {
     const mean = ev.mean == null ? "—" : `${ev.mean > 0 ? "+" : ""}${ev.mean.toFixed(2)}%`;
     return `63+ band: ${mean} vs Nifty at T+5 (n=${ev.n}, CI ${ev.ci.low}..${ev.ci.high})`;

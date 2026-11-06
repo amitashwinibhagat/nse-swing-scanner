@@ -103,7 +103,8 @@ test("topBandClaim never asserts an edge without evidence", () => {
   assert.match(claim, /no established edge/);
   assert.doesNotMatch(claim, /edge vs the Nifty/);
 
-  assert.match(topBandClaim(null), /tracker not loaded/);
+  assert.match(topBandClaim(null), /tracker loading/);
+  assert.match(topBandClaim(null, "HTTP 404"), /tracker unavailable \(HTTP 404\)/);
   assert.match(topBandClaim({ windows: {} }), /no closed outcomes/);
 });
 
