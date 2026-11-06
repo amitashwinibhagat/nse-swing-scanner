@@ -260,7 +260,7 @@ def gate_surveillance(
         return False, "t_group_or_suspended"
     if source_status in ("flag_only", "source_failed"):
         if lenient:
-            return True, None
+            return True, "surveillance_unverified (lenient)"
         return False, f"surveillance_unverified ({source_status})"
     return True, None
 
@@ -285,16 +285,16 @@ def gate_holdings(
         return True, "gate_disabled"
     if holdings_status in ("source_failed",):
         if lenient:
-            return True, None
+            return True, "holdings_conviction_unverified (lenient)"
         return False, "holdings_source_failed"
     if holdings_data is None:
         if lenient:
-            return True, None
+            return True, "holdings_conviction_unverified (lenient)"
         return False, "holdings_missing"
     conviction = holdings_data.get("conviction_pct")
     if conviction is None:
         if lenient:
-            return True, None
+            return True, "holdings_conviction_unverified (lenient)"
         return False, "holdings_missing"
     if conviction <= MIN_HOLDINGS_CONVICTION_PCT:
         return False, f"holdings_conviction {conviction:.1f}% <= {MIN_HOLDINGS_CONVICTION_PCT}%"
@@ -355,6 +355,23 @@ def relative_strength_factor(stock_pct_from_ema200: Optional[float], index_pct_f
     if index_pct_from_ema200 < -5 and stock_pct_from_ema200 >= index_pct_from_ema200 - 2:
         return 1.05
     return 1.0
+
+
+def _gate_reason(ok: bool, why: Optional[str]) -> Optional[str]:
+    """
+    The `reason` recorded in `gate_results`.
+
+    A failing gate keeps its reason. A *passing* gate normally has none — but a
+    conditional pass (lenient mode, or a disabled gate) carries a marker, and
+    dropping it made the UI unable to say "this passed without being checked".
+    """
+    if why is None:
+        return None
+    if not ok:
+        return why
+    if "(lenient)" in why or why == "gate_disabled":
+        return why
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -442,7 +459,7 @@ def evaluate_stock(
     f_score = fsc.get("f_score")
 
     ok, why = gate_f_score(f_score, fsc.get("f_score_components_available"))
-    gate_results.append({"gate": "f_score", "passed": bool(ok), "reason": why if not ok else None})
+    gate_results.append({"gate": "f_score", "passed": bool(ok), "reason": _gate_reason(ok, why)})
     if not ok:
         fail_reasons.append(why)
 
@@ -451,13 +468,13 @@ def evaluate_stock(
         pct_off_high,
         partial_52wk_window=bool(tech.get("fifty_two_wk_high_partial")),
     )
-    gate_results.append({"gate": "drawdown", "passed": bool(ok), "reason": why if not ok else None})
+    gate_results.append({"gate": "drawdown", "passed": bool(ok), "reason": _gate_reason(ok, why)})
     if not ok:
         fail_reasons.append(why)
 
     rsi = tech.get("rsi14")
     ok, why = gate_rsi(rsi)
-    gate_results.append({"gate": "rsi", "passed": bool(ok), "reason": why if not ok else None})
+    gate_results.append({"gate": "rsi", "passed": bool(ok), "reason": _gate_reason(ok, why)})
     if not ok:
         fail_reasons.append(why)
 
@@ -497,7 +514,7 @@ def evaluate_stock(
         surv["source_status"],
         lenient=lenient_external_gates,
     )
-    gate_results.append({"gate": "surveillance", "passed": bool(ok), "reason": why if not ok else None})
+    gate_results.append({"gate": "surveillance", "passed": bool(ok), "reason": _gate_reason(ok, why)})
     if not ok:
         fail_reasons.append(why)
 
@@ -507,7 +524,7 @@ def evaluate_stock(
         lenient=lenient_external_gates,
         enabled=holdings_gate_enabled,
     )
-    gate_results.append({"gate": "holdings_conviction", "passed": bool(ok), "reason": why if not ok else None})
+    gate_results.append({"gate": "holdings_conviction", "passed": bool(ok), "reason": _gate_reason(ok, why)})
     if not ok:
         fail_reasons.append(why)
 
@@ -517,7 +534,13 @@ def evaluate_stock(
         enabled=ca_gate_enabled,
         lenient=lenient_external_gates,
     )
-    gate_results.append({"gate": "corporate_actions", "passed": bool(ok), "reason": why if not ok else None})
+    # Keep the reason when the pass was *conditional* (lenient / disabled):
+    # discarding it is what made a lenient PASS look fully checked.
+    gate_results.append({
+        "gate": "corporate_actions",
+        "passed": bool(ok),
+        "reason": _gate_reason(ok, why),
+    })
     if not ok:
         fail_reasons.append(why)
 
@@ -530,7 +553,7 @@ def evaluate_stock(
     result["unverified_gates"] = [
         g["reason"].split(" (lenient)")[0]
         for g in gate_results
-        if isinstance(g.get("reason"), str) and "(lenient)" in g["reason"]
+        if g.get("passed") and isinstance(g.get("reason"), str) and "(lenient)" in g["reason"]
     ]
 
     # --- earnings proximity (B3) ---

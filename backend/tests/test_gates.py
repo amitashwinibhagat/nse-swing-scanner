@@ -194,8 +194,11 @@ def test_gate_surveillance_fails_closed_when_unverified():
 
 
 def test_gate_surveillance_lenient_override_allows_unverified():
+    """Lenient passes now carry a marker instead of None, so the row can be
+    labelled "not verified" rather than reading as a clean pass."""
     ok, why = gate_surveillance(False, "flag_only", lenient=True)
-    assert ok and why is None
+    assert ok
+    assert "unverified" in why and "(lenient)" in why
 
 
 def test_gate_surveillance_still_fails_on_a_known_restriction():
@@ -231,12 +234,21 @@ def test_gate_holdings_source_failed_fails_closed():
 
 
 def test_gate_holdings_source_failed_lenient_passes():
+    """The data present is fine, but the SOURCE failed — so the row passed
+    without the gate being verified, and now says so."""
     ok, why = gate_holdings({"conviction_pct": 80.0}, "source_failed", lenient=True)
-    assert ok and why is None
+    assert ok
+    assert "holdings_conviction_unverified" in why
 
 
 def test_gate_holdings_missing_lenient_passes():
     ok, why = gate_holdings(None, "missing", lenient=True)
+    assert ok
+    assert "holdings_conviction_unverified" in why
+
+
+def test_gate_holdings_real_conviction_pass_has_no_marker():
+    ok, why = gate_holdings({"conviction_pct": 80.0}, "ok", lenient=True)
     assert ok and why is None
 
 
@@ -377,3 +389,16 @@ def test_lenient_pass_is_labelled_and_not_counted_as_critical():
     assert "corporate_actions" in health["degraded_gates"]
     # Rows still pass, so this is a labelled degradation, not an incident.
     assert health["critical_source_failed"] is False
+
+
+def test_lenient_pass_marker_survives_into_gate_results():
+    """Regression: `reason` was only stored for FAILING gates, so a lenient
+    PASS lost its marker and the UI showed a clean, fully-checked PASS."""
+    import scanner
+
+    assert scanner._gate_reason(True, "corporate_actions_unverified (lenient)") == \
+        "corporate_actions_unverified (lenient)"
+    assert scanner._gate_reason(True, "gate_disabled") == "gate_disabled"
+    assert scanner._gate_reason(True, None) is None
+    # A real failure keeps its reason untouched.
+    assert scanner._gate_reason(False, "rsi 50 outside") == "rsi 50 outside"
