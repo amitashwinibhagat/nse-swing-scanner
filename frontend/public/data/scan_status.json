@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-06T17:24:11.092424+00:00",
-  "triggered_at": "2026-11-06T17:24:11.381948+00:00",
-  "commit_sha": "31d4835b72cdd8b7bcc473376f2b344ec87dc29d",
-  "run_id": "42260469554",
+  "generated_at": "2026-11-06T17:29:55.812820+00:00",
+  "triggered_at": "2026-11-06T17:29:56.214247+00:00",
+  "commit_sha": "dd02961a6c835cf38382c530fdb0800b17a5adef",
+  "run_id": "42261740321",
   "trigger": "workflow_dispatch",
   "scheduled_window_utc": null,
   "scheduled_cron": "30 3 * * 1-5, 30 10 * * 1-5",
@@ -13,9 +13,7 @@
   "schedule_source": "manual",
   "source_health": {
     "critical_source_failed": false,
-    "degraded_gates": [
-      "corporate_actions"
-    ]
+    "degraded_gates": []
   },
   "gate_pass_count": 14,
   "universe_size": 501
