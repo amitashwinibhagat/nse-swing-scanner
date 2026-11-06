@@ -161,3 +161,45 @@ class TestMainExitCodes(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_unknown_run_state_refuses_to_trigger():
+    """`gh run list` failing must not be read as "nothing is running" — that is
+    exactly what queued 3-4 duplicate scans per drifted tick pre-1.3.3."""
+    now = dt(2026, 11, 5, 12, 0)
+    trigger, reason = watchdog_check.should_trigger(
+        run_state=watchdog_check.RUN_UNKNOWN,
+        latest={"generated_at": "2026-11-04T18:12:00+00:00"},
+        status={"next_expected_utc": "2026-11-05T03:30:00+00:00"},
+        marker_dt=None,
+        now=now,
+    )
+    assert trigger is False
+    assert "unknown" in reason
+
+
+def test_grace_is_taken_from_the_recorded_status():
+    """The scanner records an adaptive grace; the watchdog must honour it or it
+    will re-trigger a healthy punctual scan."""
+    grace = watchdog_check._resolve_grace(
+        None, {"stale_after_minutes": 480, "schedule_source": "github-cron"}
+    )
+    assert grace == 480
+
+
+def test_punctual_runs_get_a_tighter_recovery_grace():
+    """90 minutes is the dashboard's display threshold; recovery should not wait
+    that long for a scheduler that is normally on time."""
+    grace = watchdog_check._resolve_grace(
+        None, {"stale_after_minutes": 90, "schedule_source": "external-scheduler"}
+    )
+    assert grace == 45
+
+
+def test_explicit_grace_wins_over_the_recorded_value():
+    assert watchdog_check._resolve_grace(10, {"stale_after_minutes": 480}) == 10
+
+
+def test_grace_falls_back_when_status_is_missing_or_legacy():
+    assert watchdog_check._resolve_grace(None, None) == watchdog_check.DEFAULT_GRACE_MIN
+    assert watchdog_check._resolve_grace(None, {}) == watchdog_check.DEFAULT_GRACE_MIN

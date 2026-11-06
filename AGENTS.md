@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-10-27 (post-refactor).
+> Last updated: 2026-11-06 (1.7.0 correctness pass).
 
 ## Project Overview
 
@@ -31,7 +31,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ GitHub Actions  (ubuntu-latest, Python 3.11)                            │
 │                                                                          │
-│  scan.yml (cron 03:30 + 10:30 UTC, Mon–Fri)                              │
+│  scan.yml (punctual: Netlify scheduler 03:30 + 10:30 UTC, Mon–Fri;      │
+│            GitHub cron 03:30 + 10:30 UTC as fallback)                    │
 │    │                                                                     │
 │    ├── fetch_universe(NIFTY500)             # backend/universe.py       │
 │    ├── fetch_surveillance_list()            # backend/surveillance.py    │
@@ -50,8 +51,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │    ├── Validate JSON contract                                              │
 │    ├── Write scan_status.json               (drift calc, best-effort)      │
 │    ├── Commit + push latest_scan.json + scan_status.json                 │
-│    └── Trigger Netlify deploy (NETLIFY_AUTH_TOKEN / NETLIFY_SITE_ID)      │
-│                                                                          ││  watchdog.yml (cron */15 1-13 UTC, Mon–Fri)                              │
+│    ├── Deploy + verify the live site (title + generated_at match)         │
+│                                                                          ││  watchdog.yml (cron */15 1-20 UTC, Mon–Fri; fires ~2x/day in practice)   │
 │    ├── Check latest_scan.json age on main                                │
 │    ├── watchdog_check.py: trigger ONLY if late AND no run queued/       │
 │    │   in-flight AND cooldown expired (dedup — see 1.3.3)                 │
@@ -69,6 +70,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │                                                                          │
 │  Functions:                                                             │
 │    - /netlify/functions/trigger-scan.cjs (POST, owner-only manual scan)  │
+│    - scheduled-scan-{morning,evening}.mjs (PUNCTUAL scan trigger)        │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -80,7 +82,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 | HTTP | `requests` + custom session | Simple, no extra deps |
 | Frontend | React 18 + Vite 8 | Smallest bundle, no SSR needed for static data |
 | Hosting | Netlify free tier | $0, auto-deploys on GH push |
-| CI/CD | GitHub Actions | Free for public repos, used for both scan + watchdog |
+| CI/CD | GitHub Actions + Netlify Scheduled Functions | GH runs the scan; Netlify is the punctual trigger (GH cron drifts hours) |
 | Monitoring | healthchecks.io free tier | Cron-drift alerting |
 | Secrets | GH repo secrets + Netlify env vars | Standard |
 
@@ -89,7 +91,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 ```
 .
 ├── .github/workflows/
-│   ├── ci.yml             # push/PR: cron guard + pytest + frontend build
+│   ├── ci.yml             # push/PR: workflow-lint + guards + pytest + smoke + frontend
 │   ├── scan.yml           # 2x daily: full scan + snapshot + digest + commit + Netlify deploy
 │   ├── watchdog.yml       # 15min: freshness check + auto-trigger + ping
 │   └── outcome-tracker.yml # weekly (Sat 04:00 UTC): forward-return attribution
@@ -113,16 +115,20 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── requirements.txt   # runtime: yfinance, pandas, numpy, requests, bs4, lxml
 │   ├── requirements-dev.txt # runtime requirements + pytest
 │   ├── scripts/
-│   │   ├── check_cron_consistency.py  # CI guard (cron windows)
+│   │   ├── check_cron_consistency.py  # CI guard (cron windows + labels)
 │   │   ├── check_workflow_scripts.py  # CI guard (script import path)
+│   │   ├── check_workflows_parse.py   # CI guard (workflow YAML validity)
+│   │   ├── resolve_schedule_context.py # window attribution + duplicate suppression
+│   │   ├── smoke_scan.py              # network-free end-to-end smoke
+│   │   ├── write_scan_status.py       # scan_status.json writer
 │   │   ├── watchdog_check.py          # Watchdog trigger decision (dedup logic)
 │   │   ├── snapshot_writer.py         # B1: dated snapshots + history_index + 90d prune
 │   │   ├── compute_performance.py     # C1: outcome tracker CLI (weekly workflow)
 │   │   ├── evaluate_feedback.py       # 1.5.0: sub-score ICs + shadow re-scoring (report-only)
 │   │   ├── generate_digest.py         # 1.4.3: public weekly accuracy digest (markdown)
 │   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
-│   ├── cache/             # On-disk JSON cache (gitignored, restored via actions/cache@v6)
-│   └── tests/             # 209 tests, all run in ~2s
+│   ├── cache/             # On-disk JSON cache (gitignored, restored/saved via actions/cache)
+│   └── tests/             # 314 tests, all run in ~2s
 ├── frontend/
 │   ├── public/data/
 │   │   ├── latest_scan.json    # Committed by scan.yml after each run
@@ -141,7 +147,9 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   │   ├── trades.js       # Trade-journal status/aggregate math (pure)
 ││   │   ├── delta.js           # Snapshot diffing (new PASS / dropped / watchlist)
 │   │   ├── recentPicks.js     # Prior-cohort scorecard join (pure; feeds RecentPicksStrip)
-│   │   │   └── useWatchlist.js  # localStorage watchlist hook
+│   │   │   ├── scanData.js    # payload validation, freshness, evidence gate (pure)
+│   │   │   ├── usePriorPlans.js # prior-snapshot levels for entry-state
+│   │   │   ├── useWatchlist.js  # localStorage watchlist hook
 │   │   │   └── useTradeJournal.js # localStorage trade journal hook
 │   │   └── components/
 │   │       ├── Kpi.jsx          # KPI tile with delta + accent
@@ -156,9 +164,13 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │       ├── DeltaStrip.jsx   # "Since last scan" banner (B2)
 │       ├── RecentPicksStrip.jsx # Receipts banner (63+ evidence) + last-cohort scorecard (C2-adjacent)
 │   │       ├── PerformanceSection.jsx # Score-bucket hit-rate view (C2)
-│   │       ├── SegmentedControl.jsx, Skeleton.jsx
-│   ├── netlify/functions/
-│   │   └── trigger-scan.cjs     # Owner-only POST trigger (?admin=1)
+│   │       ├── SegmentedControl.jsx, Skeleton.jsx, ErrorBoundary.jsx
+│   ├── netlify/
+│   │   ├── functions/
+│   │   │   ├── trigger-scan.cjs          # Owner-only POST trigger (?admin=1)
+│   │   │   ├── scheduled-scan-morning.mjs # punctual 03:30 UTC dispatch
+│   │   │   └── scheduled-scan-evening.mjs # punctual 10:30 UTC dispatch
+│   │   └── lib/dispatch-scan.mjs          # shared repository_dispatch client
 │   ├── package.json             # React 18.3, Vite 8.2
 │   └── dist/                    # Build output (gitignored, deployed by Netlify)
 ├── plans/                        # Older planning docs (kept for context)
@@ -167,7 +179,8 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   └── analytics.md          # North-star metric definition + analytics decision log
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.5.0)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.7.0)
+├── PROJECT_REVIEW.md             # full review that drove the 1.7.0 pass
 └── AGENTS.md                     # ← you are here
 ```
 
@@ -179,7 +192,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
-pytest -q                                            # 209 tests, ~2s
+pytest -q                                            # 314 tests, ~2s
 python scanner.py --top-n 500 --workers 8 --sleep 0.3 \
     --lenient-external-gates \
     --output ../frontend/public/data/latest_scan.json
@@ -189,9 +202,10 @@ cd frontend
 npm install
 npm run dev               # vite dev server on :5173
 npm run build             # production build to dist/
+npm run test:unit         # node --test on the pure utils (no deps)
 ```
 
-**Hot-reloading during development:** the frontend reads `/data/latest_scan.json` from the public dir, so refreshing the dev server picks up backend changes. `cache: "no-store"` on the fetch bypasses HTTP cache.
+**Hot-reloading during development:** the frontend reads `/data/latest_scan.json` from the public dir, so refreshing the dev server picks up backend changes. Fetches use `cache: "no-cache"` (revalidate), which bypasses the HTTP cache for a changed file without forfeiting caching entirely.
 
 ## Commands
 
@@ -200,9 +214,12 @@ npm run build             # production build to dist/
 ```bash
 cd backend
 .venv/bin/python scripts/check_cron_consistency.py   # CI guard (cron windows)
+.venv/bin/python scripts/check_workflows_parse.py    # CI guard (workflow YAML)
 .venv/bin/python scripts/check_workflow_scripts.py   # CI guard (script imports)
+.venv/bin/python -m pyflakes *.py scripts/*.py       # lint
+.venv/bin/python scripts/smoke_scan.py               # offline end-to-end smoke
 .venv/bin/python -m pytest -q                        # full suite
-cd ../frontend && npm run build                      # typecheck + bundle
+cd ../frontend && npm run test:unit && npm run build  # unit tests + bundle
 ```
 
 ### Trigger a fresh scan
@@ -271,7 +288,8 @@ gh run watch $RUN_ID --repo amitashwinibhagat/nse-swing-scanner --exit-status
 
 | Variable | Used by | Purpose |
 |---|---|---|
-| `SCAN_TRIGGER_SECRET` | trigger-scan.js | Owner-only auth token for `?admin=1` POST endpoint |
+| `SCAN_TRIGGER_SECRET` | trigger-scan.cjs | Owner-only auth token for `?admin=1` POST endpoint |
+| `GITHUB_REPO` | scheduled functions | Optional; `owner/repo` override for forks. Defaults to this repo. |
 | `VITE_FATHOM_SITE_ID` | ~~frontend build~~ | Removed in 1.5.1 — analytics skipped by owner decision; see docs/analytics.md decision log |
 | `GITHUB_DISPATCH_TOKEN` | trigger-scan.js | PAT with `repo` scope to call `repos/{owner}/{repo}/dispatches` |
 
@@ -360,9 +378,13 @@ When NSE returns, `delivery_kind: "actual"` and the label reverts.
   - Calls `fn` on miss
   - Writes result to disk
   - Single bypass flag (one read site)
-- GitHub `actions/cache@v6` with `key: nse-swing-cache-${{ github.run_id }}`
-  and `restore-keys: nse-swing-cache-` restores the most recent prior
-  cache on each run
+- GitHub `actions/cache/restore@v6` + `actions/cache/save@v6` with a
+  **versioned per-run key** (`nse-swing-cache-v1-${{ github.run_id }}`) and
+  `restore-keys: nse-swing-cache-v1-` so each run restores the newest entry and
+  writes its own. GitHub cache entries are immutable — a fixed key can be
+  written once and then never updated, which would freeze the cache after the
+  first eviction. Untouched entries are evicted after 7 days, which bounds
+  growth. The save step runs only after a successful scan.
 
 ### Important: cache file naming
 
@@ -376,8 +398,19 @@ a new cached call with a long key, hash it.
 
 ### `scan.yml` (the main scan)
 
-- Triggers: `schedule` (cron) + `workflow_dispatch`
-- Crons: `30 3 * * 1-5` and `30 10 * * 1-5` (UTC)
+- Triggers: `schedule` (fallback cron), `workflow_dispatch`, and
+  `repository_dispatch` (`scheduled-scan`) from the **punctual Netlify
+  scheduler**
+- Crons: `30 3 * * 1-5` and `30 10 * * 1-5` (UTC). **The GitHub ones fire hours
+  late** (median 5.4 h measured; a cron cannot fire early, so an 11:16 UTC run
+  is the 03:30 cron) — that is why the primary trigger is
+  `frontend/netlify/functions/scheduled-scan-{morning,evening}.mjs`, which runs
+  on Netlify's scheduler and dispatches this workflow with
+  `client_payload.window`. The GitHub crons remain as a fallback.
+- **Duplicate suppression**: `scripts/resolve_schedule_context.py` emits
+  `skip=true` when the last committed scan is already newer than the window
+  occurrence, so a late GitHub cron does not re-scan a window the punctual
+  trigger already covered. A missing/unreadable scan never skips.
 - Concurrency: `group: nse-swing-scan, cancel-in-progress: false`
   (queue duplicate runs, don't cancel)
 - Timeout: 60 minutes (cold-cache + recovery-pass headroom)
@@ -385,28 +418,38 @@ a new cached call with a long key, hash it.
   1. Checkout + Python 3.11
   2. `actions/cache@v6` (backend/cache/)
   3. `pip install -r backend/requirements.txt` (runtime-only dependencies)
-  4. Ping the scheduled healthcheck `/start` endpoint
-  5. `Run full scan` (scanner.py with --top-n 500 --workers 4 --sleep 0.5
-     --lenient-external-gates; exits 2 below 85% coverage)
-  6. **3× healthchecks.io pings** (start, fail, success — gated by secrets)
-     plus a 4th cancellation ping (`HEALTHCHECK_PING_URL_CANCELLED`)
-  7. Validate JSON contract (asserts `generated_at` + `stocks` non-empty)
+  4. `Resolve schedule context` — `scripts/resolve_schedule_context.py` maps the
+     trigger to (window label, healthcheck URL, snapshot slot) and decides
+     whether to skip an already-covered window. This replaced four duplicated
+     `case` blocks.
+  5. Ping the scheduled healthcheck `/start` endpoint
+  6. `Run full scan` (scanner.py with --top-n 500 --workers 4 --sleep 0.5
+     --lenient-external-gates; exits 2 below 85% coverage, **3 when a
+     fail-closed gate could not verify**)
+  7. Validate JSON contract (asserts `generated_at` + `stocks` non-empty and
+     warns when `source_health.critical_source_failed` is set)
   8. **Write dated compact snapshot** (`snapshot_writer.py`: minified
      tracker/delta fields in `data/snapshots/YYYY-MM-DD-{am|pm}.json` + `history_index.json` +
      rolling 90-day prune)
-  9. Write `scan_status.json` (drift calc via `scan_schedule.py`, best-effort)
+  9. Write `scan_status.json` via `scripts/write_scan_status.py`, attributing
+     the run to the cron that fired (`github.event.schedule`)
   10. Commit + push latest_scan.json + scan_status.json + snapshots/
   11. **Telegram digest** (`send_digest.py`, secrets-gated, soft-fails)
-  12. Frontend build + Netlify deploy (gated by `if: success()`, env-gated
-      by NETLIFY_AUTH_TOKEN)
+  12. Frontend build + Netlify deploy (gated by `if: success()`)
+  13. Verify the deployed site: title is `NSE Swing Scanner` and the served
+      `generated_at` matches the committed one
+  14. **Success ping last** — it used to fire before validation/commit/deploy,
+      so those failures reported green to healthchecks.io
 
 ### `watchdog.yml` (cron drift detector)
 
-- Triggers: `schedule` (cron `*/15 1-13 * * 1-5` UTC, Mon-Fri) + `workflow_dispatch`
-- Window covers 06:30–19:00 IST; the 1–13 hour range (extended from 1–11
-  in 1.1.7) gives an automated recovery path for the evening slot when
-  the 10:30 UTC cron gets cancelled during the GH Actions free-tier
-  runner peak (11:30–13:30 UTC).
+- Triggers: `schedule` (cron `*/15 1-20 * * 1-5` UTC, Mon-Fri) + `workflow_dispatch`
+- Window covers 06:30–01:30 IST. The 1–20 range is needed because the evening
+  scan now completes ~18:10 UTC; a 13:00 cutoff left the whole evening slot
+  unmonitored. **In practice GitHub fires this ~2x/day, not 52x/day.**
+- `gh run list` needs `GH_TOKEN`; the state step now sets it. Without it the
+  check failed silently (`|| echo none`), so `run_state` was always `none` and
+  the duplicate-suppression guard never ran.
 - Permissions: `contents: write, actions: write` (marker commit push + `gh workflow run`)
 - Dedup logic (1.3.3): the decision lives in `scripts/watchdog_check.py`
   (unit-tested). A scan is "late" only past `next_expected_utc` + 30 min
@@ -416,16 +459,21 @@ a new cached call with a long key, hash it.
   every stale tick, queueing 3-4 duplicate runs per drifted scan.
 - Steps:
   1. Check freshness of `latest_scan.json` on `main` + scan run state
-  2. `watchdog_check.py` decides; on TRIGGER (exit 2): commit the marker,
-     then `gh workflow run scan.yml`
+  2. `watchdog_check.py` decides; on TRIGGER (exit 10): commit the marker,
+     then `gh workflow run scan.yml`. `run_state=unknown` (gh failed) now
+     suppresses the trigger instead of authorising it.
   3. Ping `HEALTHCHECK_WATCHDOG_URL` with
      `?stale=...&age_min=...&run_state=...` query
 
 ### `ci.yml` (push/PR gate)
 
 - Runs on every push and PR to `main`
-- Backend job: cron guard + pytest + 5-stock smoke scan
-- Frontend job: npm ci + build
+- `lint-workflows` job: `check_workflows_parse.py` validates every workflow's
+  YAML **and** structure. A workflow cannot lint itself — `ci.yml` was invalid
+  YAML from 2026-10-27 to 2026-11-05 and created zero jobs, so nothing else ran.
+- Backend job: cron guard + workflow-script guard + pyflakes + pytest +
+  `smoke_scan.py` (offline; stubs every external source)
+- Frontend job: `npm ci` (no fallback) + `npm run test:unit` + build
 - Both jobs green = merge-eligible
 
 ### `outcome-tracker.yml` (weekly attribution)
@@ -436,7 +484,8 @@ a new cached call with a long key, hash it.
   `data/performance.json`, commits + pushes
 - Statistical discipline is enforced in `backend/performance.py`: per-scan
   cohorts (never pooled), median + IQR + N, untrackable symbols counted
-  separately. Frontend `PerformanceSection.jsx` renders the per-bucket
+  separately, **one cohort per trading date** (am+pm describe the same close),
+  and `--scan-phase` so a pre-open snapshot's T+0 is the prior session. Frontend `PerformanceSection.jsx` renders the per-bucket
   table and hides gracefully until the first payload lands.
 - First useful score-bucket cohorts appear after ~3-4 weeks of accumulated
   snapshots (T+20 needs 20 trading days to close).
@@ -453,7 +502,9 @@ observed 3h+ late runs and missed slots in 2026-07.
 | Morning | `30 3 * * 1-5` (UTC) | 4 h | `d31b1ec5-…085f` | `https://hc-ping.com/d31b1ec5-04a3-4401-a7b6-2ac9d162085f` |
 | Evening | `30 10 * * 1-5` (UTC) | 4 h | `1e6082f1-…77db` | `https://hc-ping.com/1e6082f1-d26d-46fe-96c8-b914f4aa77db` |
 
-scan.yml picks the right URL via `case "${{ github.event.schedule }}" in …`.
+scan.yml resolves the URL from the cron that fired in one place
+("Resolve schedule context" step, backed by `scan_schedule.WINDOW_LABELS`),
+instead of four duplicated `case` blocks.
 
 ### Three-check setup (recommended, third pending)
 
@@ -477,6 +528,10 @@ URL goes into `HEALTHCHECK_WATCHDOG_URL` repo secret.
 `continue-on-error: true` on all three so a curl failure can't fail the
 workflow.
 
+A run cancelled *while queued* never starts a job, so no step (including
+`if: cancelled()`) can run. That case is caught only by healthchecks.io's own
+Period+Grace alert.
+
 ### Alert wiring
 
 healthchecks.io → Integrations → add Email (on by default) +
@@ -493,17 +548,27 @@ independently when the ping doesn't arrive within Period+Grace.
 3. Wire it into the per-stock evaluation block
 4. Add a test in `backend/tests/`
 5. Update README "Hard gates" + Rationale.jsx if user-facing
+6. If the gate depends on an external source, add it to
+   `CRITICAL_GATE_SOURCES` in `scanner.py` so a universe-wide outage surfaces
+   in `source_health` instead of looking like a quiet market
 
 ### Add a new scheduled window
 
-Two places, kept in sync by `backend/scripts/check_cron_consistency.py`
-(which also sanity-checks the watchdog cron):
+Three places, kept in sync by `backend/scripts/check_cron_consistency.py`:
 
-1. Add `- cron: "M H * * 1-5"` to `.github/workflows/scan.yml`
+1. Add `- cron: "M H * * 1-5"` to `.github/workflows/scan.yml` (the fallback)
 2. Update `SCAN_WINDOWS_UTC` in `backend/settings.py` — the single source
    of truth consumed by `scan_schedule.py` (scan_status attribution +
    watchdog staleness) and by the CI guard
-3. Add a new healthchecks.io check + secret if you want independent alerts
+3. Add the window's display label + snapshot slot to `WINDOW_LABELS` /
+   `WINDOW_SLOTS` in `backend/scan_schedule.py`. The CI guard fails if a
+   window has no label (a new window without one silently loses its pings and
+   its `--slot`).
+4. Add a Netlify scheduled function `scheduled-scan-<name>.mjs` calling
+   `runScheduledWindow("HH:MM")`, and its `[functions."..."] schedule` entry in
+   `netlify.toml`. The CI guard validates all three copies against
+   `SCAN_WINDOWS_UTC`.
+5. Add a new healthchecks.io check + secret if you want independent alerts
 
 ### Add a new data source
 
@@ -533,9 +598,11 @@ Two places, kept in sync by `backend/scripts/check_cron_consistency.py`
   `status` is from `SOURCE_STATUSES = {"ok", "missing", "source_failed",
   "fallback_used", "flag_only", "not_applicable"}`. See `source_status.py`.
 - **Hard gates fail closed by default** — if a source is `source_failed`
-  and the gate depends on that source, the gate fails. `--lenient-external-gates`
-  override passes them (used when external sources are persistently
-  blocked — e.g., NSE bhavcopy behind Akamai).
+  **or `flag_only`** and the gate depends on it, the gate fails.
+  `--lenient-external-gates` is the explicit override. Every fail-closed source
+  gate is listed in `CRITICAL_GATE_SOURCES`; a universe-wide failure there is
+  published as `source_health.critical_source_failed` and exits 3, so an outage
+  can never masquerade as "no candidates today".
 - **Numeric values**: `delivery_value_inr` is in INR (not lakhs, not cr).
   Frontend converts to crores for display (`fmtCr()`).
 - **Numpy**: scanner uses pandas DataFrames. Code paths avoid global
@@ -553,9 +620,13 @@ Two places, kept in sync by `backend/scripts/check_cron_consistency.py`
 
 ## Known Issues & Limitations
 
-1. **GH Actions cron drift** (1.1.6 mitigation: healthchecks.io + watchdog).
+1. **GH Actions cron drift is structural, not a bug to fix.** Measured median
+   5.4 h late. The punctual trigger is now Netlify Scheduled Functions
+   (`scheduled-scan-{morning,evening}.mjs`); the GitHub crons are a fallback and
+   the workflow skips an already-covered window. If Netlify is down AND the
+   fallback drifts, scans are late rather than lost — the watchdog still fires.
 2. **GH Actions free-tier runner scarcity** (1.1.7 mitigation: extended
-   watchdog window 1–13 UTC + cancellation healthchecks ping). During the
+   watchdog window + cancellation healthchecks ping). During the
    11:30–13:30 UTC peak the scheduler can fail to provision a runner for
    scheduled runs; the job sits in the queue for 15 min and is then
    auto-cancelled. Operationally, the operator gets a cancellation alert
@@ -565,17 +636,19 @@ Two places, kept in sync by `backend/scripts/check_cron_consistency.py`
 4. **12 h price-field TTL unsafe across splits** — would show stale price
    for up to 12 h after a 2-for-1 split. Documented in CHANGELOG.
 5. **GitHub Actions secrets require manual setup** — `NETLIFY_AUTH_TOKEN`
-   + `NETLIFY_SITE_ID` are unset in the repo (visible as `::warning::` in
-   the workflow log). Netlify auto-deploys via the GitHub Integration
-   webhook, so this is non-critical but the manual-deploy step in the
-   workflow is currently a no-op.
-6. **Multi-hour cron delays misattribute `scheduled_window_utc`** in
-   `scan_status.json`. Closest-clock-time heuristic handles small/medium
-   drift; very-large drifts (rare) show the wrong window. Documented
-   in CHANGELOG 1.1.6.
-7. **No backtest / paper-trade validation** — the soft score weights
-   are hand-tuned, not backtested. Treat the score as a ranking, not
-   an edge.
+   + `NETLIFY_SITE_ID`, `HEALTHCHECK_PING_URL_CANCELLED` and
+   `HEALTHCHECK_WATCHDOG_URL` are still unset. The deploy step now reports
+   `deployed=false` (a notice, not a false success) and the workflow verifies
+   the live site after every run, so a broken GitHub-Integration auto-deploy
+   is caught instead of silently freezing the dashboard.
+6. **Schedule attribution is exact, drift is not eliminated.** Each run is
+   attributed to the window that actually fired it (`github.event.schedule` or
+   `client_payload.window`), so `scan_status.json` reports the true delay. The
+   Netlify scheduler is what makes the delay small; GitHub's is the fallback.
+7. **No backtest / paper-trade validation**, and the committed tracker shows
+   **no established edge for any score band** (63+ T+5 mean −0.26%, CI
+   −0.54..+0.02). The dashboard derives its copy from the tracker instead of
+   asserting an edge.
 8. **yfinance rate-limits on GHA egress** (1.3.1 mitigation: yf_retry,
    coverage gate at 85%, rate-limit results not cached; 1.3.2 mitigation:
    workers=4/sleep=0.5 + poison-cache eviction on read + serial recovery
@@ -587,7 +660,7 @@ Two places, kept in sync by `backend/scripts/check_cron_consistency.py`
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 209 tests in ~2s
+.venv/bin/python -m pytest -q          # 314 tests in ~2s
 ```
 
 Coverage (manual map):
@@ -596,12 +669,17 @@ Coverage (manual map):
 |---|---|---|
 | `test_cache.py` | 10 | JSON read/write/expire/clear; `_safe_key` sanitisation; **cache-wrapper regression tests** (4 functions × read + write + replay) |
 | `test_bhavcopy.py` | 10 | CSV parser; multi-provider chain (NSE ok, NSE→yf proxy, all-fail); per-symbol lookup; yfinance_fetch_one edge cases |
-| `test_technicals_math.py` | ? | RSI, ATR, EMA, etc. math correctness |
-| `test_technicals_nan_rows.py` | 2 | Trailing NaN handling; mock yfinance |
+| `test_technicals_math.py` | 4 | RSI, ATR, EMA, etc. math correctness |
+| `test_technicals_nan_rows.py` | 5 | Trailing NaN handling; mock yfinance |
 | `test_universe_and_parallel.py` | 6 | Universe top_n fallback; run_scan ThreadPool usage; worker exception handling |
-| `test_nse_client.py` | ? | Akamai session helpers |
 | `test_scan_schedule.py` | 11 | Window attribution, next-window/weekend math, cron-vs-settings sync |
-| `test_watchdog_check.py` | 16 | Watchdog dedup decision (run-state, cooldown, staleness), marker I/O, CLI exit codes |
+| `test_watchdog_check.py` | 21 | Watchdog dedup decision (run-state incl. unknown, cooldown, staleness), marker I/O, CLI exit codes |
+| `test_corporate_actions.py` | 28 | NSE date formats, excluded-action window, request params, failure not cached |
+| `test_surveillance.py` | 11 | reportASM + sec_list parsing, restriction severity, status policy |
+| `test_write_scan_status.py` | 7 | Cron-based window attribution, drift, staleness grace |
+| `test_resolve_schedule_context.py` | 12 | Trigger→window mapping, duplicate suppression, weekend window math |
+| `test_workflow_guards.py` | 17 | The guards catch the failures they exist for; plus workflow-step assertions (GH_TOKEN, ping ordering, absolute deploy paths, single-path `git add`, dispatch trigger) |
+| `test_performance.py` | 45 | Cohort dedupe, T+0 phase, bootstrap CI, bucketing |
 
 The `test_cache.py` regression suite was added in 1.1.6 after the
 `YF_CACHE_TTL_SECONDS` import-bug incident. They exercise the cache
@@ -612,7 +690,7 @@ list.
 ## See also
 
 - `README.md` — user-facing docs (setup, methodology, operational risks)
-- `CHANGELOG.md` — versioned release notes (current: 1.4.1)
+- `CHANGELOG.md` — versioned release notes (current: 1.7.0)
 - `netlify.toml` — build config + cache-control headers
 - `backend/scripts/check_cron_consistency.py` — CI guard (cron windows)
 - `backend/scripts/check_workflow_scripts.py` — CI guard (script import path)

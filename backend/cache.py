@@ -30,6 +30,18 @@ NO_CACHE_ENV_VAR = "NSE_SWING_NO_CACHE"
 T = TypeVar("T")
 
 
+def cache_disabled() -> bool:
+    """
+    True when the cache bypass flag is set (tests, or a forced cold scan).
+
+    Modules that manage their own `read_cache`/`write_cache` pairs (holdings,
+    surveillance, bhavcopy, corporate actions) must call this too — otherwise
+    `NSE_SWING_NO_CACHE` silently only affects `cached_call` users and a test
+    can pass while reading another test's on-disk payload.
+    """
+    return bool(os.environ.get(NO_CACHE_ENV_VAR))
+
+
 def _safe_key(key: str) -> str:
     return "".join(c if c.isalnum() or c in "._-" else "_" for c in key)
 

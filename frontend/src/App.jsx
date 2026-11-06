@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Kpi from "./components/Kpi.jsx";
 import SegmentedControl from "./components/SegmentedControl.jsx";
 import SubscoreBars from "./components/SubscoreBars.jsx";
@@ -11,10 +11,19 @@ import DeltaStrip from "./components/DeltaStrip.jsx";
 import RecentPicksStrip, { ReceiptsBanner } from "./components/RecentPicksStrip.jsx";
 import MyTrades from "./components/MyTrades.jsx";
 import PerformanceSection from "./components/PerformanceSection.jsx";
+import { computeStale as computeStaleImpl } from "./utils/scanData.js";
+import usePriorPlans from "./utils/usePriorPlans.js";
 import useWatchlist from "./utils/useWatchlist.js";
 import useTradeJournal from "./utils/useTradeJournal.js";
-import { computeEntryState, confirmationChip, earningsChip, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
+import { confirmationChip, earningsChip, evaluatePlanState, regimeFromMarketIndex, relativeStrengthFactor } from "./utils/scanPlan.js";
 import { splitShortlist, regimeKeyOf, TOP_PICK_MIN_SCORE } from "./utils/picks.js";
+import {
+  formatScanTimestamp,
+  joinLabels,
+  normalizeScan,
+  sourceHealthOf,
+  topBandClaim,
+} from "./utils/scanData.js";
 
 function IconSearch() {
   return (
@@ -72,6 +81,41 @@ function IconMoon() {
   );
 }
 
+/**
+ * localStorage access that cannot throw during render.
+ *
+ * Four state initialisers read localStorage directly. In a browser that
+ * blocks storage (Safari private mode, hardened privacy settings, an iframe
+ * without storage access) the getter throws, and because it ran inside the
+ * component body the app never mounted at all — a blank page with no message.
+ */
+function readLocal(key) {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeLocal(key, value) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    /* storage unavailable — settings simply do not persist */
+  }
+}
+
+function removeLocal(key) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
 const THEME_LS_KEY = "nseSwingTheme";
 const VIEW_LS_KEY = "nseSwingViewMode";
 const FILTER_LS_KEY = "nseSwingFilter";
@@ -94,8 +138,10 @@ const COLUMNS = [
   { key: "trailing_pe", label: "P/E (T / 5Y)" },
 ];
 
-const STALE_HOURS = 18;
-const STALE_GRACE_MS = 30 * 60 * 1000;
+// Staleness grace now comes from scan_status.json (`stale_after_minutes`),
+// derived from measured GitHub scheduler drift (median ~5.4 h). The old 30-min
+// grace showed "the next scan did not arrive" on every trading day.
+const STALE_HOURS = 24;
 const ADMIN_COOLDOWN_MS = 10 * 60 * 1000;
 const ADMIN_SECRET_LS_KEY = "nseSwingAdminSecret";
 const ADMIN_LAST_TRIGGER_LS_KEY = "nseSwingLastTriggerAt";
@@ -159,11 +205,7 @@ function freshnessAccent(iso) {
 }
 
 function computeStale(generatedAt, scanStatus) {
-  const next = scanStatus && scanStatus.next_expected_utc;
-  if (next) {
-    return Date.now() > new Date(next).getTime() + STALE_GRACE_MS;
-  }
-  return hoursSince(generatedAt) > STALE_HOURS;
+  return computeStaleImpl(generatedAt, scanStatus, Date.now());
 }
 
 function exportCsv(rows, filename = "nse_swing_scan.csv") {
@@ -185,7 +227,18 @@ function exportCsv(rows, filename = "nse_swing_scan.csv") {
   ];
   const esc = (v) => {
     if (v === null || v === undefined) return "";
-    const s = String(v);
+    // Structured fields (gate_results) used to export as "[object Object]".
+    if (typeof v === "object") {
+      try {
+        v = JSON.stringify(v);
+      } catch {
+        v = String(v);
+      }
+    }
+    let s = String(v);
+    // CSV formula injection: a cell starting with = + - @ is executed by
+    // Excel/Sheets. Our strings come from an external NSE CSV.
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
     if (s.includes(",") || s.includes('"') || s.includes("\n")) {
       return `"${s.replace(/"/g, '""')}"`;
     }
@@ -216,7 +269,7 @@ export default function App() {
   const [filter, setFilter] = useState(() => {
     if (typeof window === "undefined") return DEFAULT_FILTER;
     try {
-      const v = localStorage.getItem(FILTER_LS_KEY);
+      const v = readLocal(FILTER_LS_KEY);
       return VALID_FILTERS.includes(v) ? v : DEFAULT_FILTER;
     } catch {
       return DEFAULT_FILTER;
@@ -240,15 +293,12 @@ export default function App() {
     return path === "/admin" || path.endsWith("/admin");
   })();
 
-  const [adminSecret, setAdminSecret] = useState(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(ADMIN_SECRET_LS_KEY) || null;
-  });
+  const [adminSecret, setAdminSecret] = useState(() => readLocal(ADMIN_SECRET_LS_KEY));
 
   // Theme: dark default; respects localStorage, falls back to system pref
   const [theme, setTheme] = useState(() => {
     if (typeof window === "undefined") return "dark";
-    const stored = localStorage.getItem(THEME_LS_KEY);
+    const stored = readLocal(THEME_LS_KEY);
     if (stored === "dark" || stored === "light") return stored;
     return window.matchMedia("(prefers-color-scheme: light)").matches
       ? "light"
@@ -258,42 +308,82 @@ export default function App() {
   // View mode: cards default; persisted
   const [viewMode, setViewMode] = useState(() => {
     if (typeof window === "undefined") return "cards";
-    const stored = localStorage.getItem(VIEW_LS_KEY);
+    const stored = readLocal(VIEW_LS_KEY);
     return stored === "cards" || stored === "table" ? stored : "cards";
   });
   const [lastTriggerAt, setLastTriggerAt] = useState(() => {
-    if (typeof window === "undefined") return null;
-    const v = localStorage.getItem(ADMIN_LAST_TRIGGER_LS_KEY);
-    return v ? Number(v) : null;
+    const v = readLocal(ADMIN_LAST_TRIGGER_LS_KEY);
+    const n = v ? Number(v) : null;
+    return Number.isFinite(n) ? n : null;
   });
   const [triggerBusy, setTriggerBusy] = useState(false);
   const [triggerStatus, setTriggerStatus] = useState(null);
   const [triggerError, setTriggerError] = useState(null);
+  // Re-render once a minute while a cooldown is active. `cooldownRemainingMs()`
+  // calls Date.now() during render, so without a ticker the button stayed
+  // disabled and the "X min remaining" label never counted down.
+  const [, setClockTick] = useState(0);
+  useEffect(() => {
+    if (!lastTriggerAt) return undefined;
+    if (Date.now() - lastTriggerAt >= ADMIN_COOLDOWN_MS) return undefined;
+    const id = setInterval(() => setClockTick((n) => n + 1), 15000);
+    return () => clearInterval(id);
+  }, [lastTriggerAt, triggerStatus]);
 
   useEffect(() => {
     let cancelled = false;
     const optionalJson = (url) =>
-      fetch(url, { cache: "no-store" })
+      fetch(url, { cache: "no-cache" })
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null);
-    Promise.all([
-      fetch("/data/latest_scan.json", { cache: "no-store" }),
-      optionalJson("/data/snapshots/history_index.json"),
-      optionalJson("/data/performance.json"),
-    ])
-      .then(async ([scanRes, historyRes, performanceRes]) => {
-        if (!scanRes.ok) throw new Error(`HTTP ${scanRes.status}`);
-        const scan = await scanRes.json();
+
+    // Render on the scan alone. performance.json is ~6 MB and only feeds the
+    // collapsed "track record" panel and the drawer, so loading it eagerly in
+    // the same Promise.all blocked first paint on the largest payload.
+    // `no-cache` (revalidate) instead of `no-store`: the /data/* edge TTL is
+    // 60 s, and no-store made every visit re-download ~8 MB.
+    fetch("/data/latest_scan.json", { cache: "no-cache" })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((raw) => {
         if (cancelled) return;
-        setData(scan);
-        setHistory(Array.isArray(historyRes) ? historyRes : []);
-        setPerformance(performanceRes);
+        const normalised = normalizeScan(raw);
+        if (!normalised.ok) {
+          // A malformed payload must produce an explanation, not a blank page
+          // from iterating a non-array. `stocks` used to be assumed.
+          throw new Error(`unexpected scan format: ${normalised.reason}`);
+        }
+        setData(normalised.scan);
       })
       .catch((e) => {
         if (!cancelled) setError(e.message);
       });
+
+    optionalJson("/data/snapshots/history_index.json").then((res) => {
+      if (!cancelled) setHistory(Array.isArray(res) ? res : []);
+    });
+
     return () => { cancelled = true; };
   }, []);
+
+  // Performance payload is fetched on demand (first time a surface that needs
+  // it opens) rather than on every page load.
+  const [performanceRequested, setPerformanceRequested] = useState(false);
+  useEffect(() => {
+    if (!performanceRequested || performance) return;
+    let cancelled = false;
+    fetch("/data/performance.json", { cache: "no-cache" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        if (!cancelled && payload) setPerformance(payload);
+      })
+      .catch(() => {
+        /* the track-record panel degrades to "not yet available" */
+      });
+    return () => { cancelled = true; };
+  }, [performanceRequested, performance]);
 
   useEffect(() => {
     fetch(SCAN_STATUS_URL, { cache: "no-store" })
@@ -312,19 +402,22 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    try { localStorage.setItem(THEME_LS_KEY, theme); } catch {}
+    writeLocal(THEME_LS_KEY, theme);
   }, [theme]);
 
   useEffect(() => {
-    try { localStorage.setItem(VIEW_LS_KEY, viewMode); } catch {}
+    writeLocal(VIEW_LS_KEY, viewMode);
   }, [viewMode]);
 
   useEffect(() => {
-    try { localStorage.setItem(FILTER_LS_KEY, filter); } catch {}
+    writeLocal(FILTER_LS_KEY, filter);
   }, [filter]);
 
   const watchlist = useWatchlist();
   const journal = useTradeJournal();
+  // Prior snapshot's levels, so the entry-state chips describe today's price
+  // against yesterday's plan instead of evaluating a plan against itself.
+  const { plans: priorPlans } = usePriorPlans(history, data?.generated_at);
 
   const priceBySymbol = useMemo(() => {
     if (!data) return {};
@@ -396,6 +489,14 @@ export default function App() {
     setExpanded(expanded === symbol ? null : symbol);
   }
 
+  // Stable per-symbol open/close callbacks. Inline arrows created a new
+  // function for every card on every render, which defeats React.memo.
+  const openDrawer = useCallback(
+    (symbol) => () => setExpanded((cur) => (cur === symbol ? null : symbol)),
+    [],
+  );
+  const closeDrawer = useCallback(() => setExpanded(null), []);
+
   function onRowKey(e, symbol) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -429,7 +530,9 @@ export default function App() {
       const entered = window.prompt("Admin scan secret");
       if (!entered) return;
       secret = entered.trim();
-      localStorage.setItem(ADMIN_SECRET_LS_KEY, secret);
+      // Only persist it when the user asked for it; a bare prompt result is
+      // kept in memory for this session.
+      writeLocal(ADMIN_SECRET_LS_KEY, secret);
       setAdminSecret(secret);
     }
 
@@ -440,7 +543,7 @@ export default function App() {
         headers: { Authorization: `Bearer ${secret}` },
       });
       if (res.status === 401) {
-        localStorage.removeItem(ADMIN_SECRET_LS_KEY);
+        removeLocal(ADMIN_SECRET_LS_KEY);
         setAdminSecret(null);
         setTriggerError(
           "Invalid admin secret. Recover it from Netlify env var SCAN_TRIGGER_SECRET, or trigger directly with: gh workflow run scan.yml --repo amitashwinibhagat/nse-swing-scanner"
@@ -449,7 +552,7 @@ export default function App() {
       }
       if (res.status === 202) {
         const now = Date.now();
-        localStorage.setItem(ADMIN_LAST_TRIGGER_LS_KEY, String(now));
+        writeLocal(ADMIN_LAST_TRIGGER_LS_KEY, String(now));
         setLastTriggerAt(now);
         setTriggerStatus("queued");
         return;
@@ -468,7 +571,7 @@ export default function App() {
   }
 
   function forgetAdminSecret() {
-    localStorage.removeItem(ADMIN_SECRET_LS_KEY);
+    removeLocal(ADMIN_SECRET_LS_KEY);
     setAdminSecret(null);
     setTriggerError(null);
     setTriggerStatus(null);
@@ -484,31 +587,6 @@ export default function App() {
             this is a fresh deploy, the first GitHub Actions run hasn't
             completed yet — trigger it manually from the Actions tab, or wait
             for the next scheduled run.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (data && data._placeholder) {
-    return (
-      <div className="app">
-        <header className="ticker-header">
-          <h1>NSE Swing Scanner</h1>
-        </header>
-        <div className="empty-state" role="status" aria-live="polite">
-          <h2>First scan in progress…</h2>
-          <p>
-            The scheduled GitHub Actions scan is still running. The dashboard
-            will populate with results automatically once the scan finishes and
-            commits <code>latest_scan.json</code>. Initial runs take
-            ~20-35 minutes (Screener.in shareholding scraping is the slow
-            part); subsequent scheduled runs are faster thanks to the on-disk
-            cache.
-          </p>
-          <p>
-            You can watch progress on the
-            {" "}<a href="https://github.com/amitashwinibhagat/nse-swing-scanner/actions/workflows/scan.yml">Actions tab</a>.
           </p>
         </div>
       </div>
@@ -531,8 +609,8 @@ export default function App() {
     );
   }
 
-  const generatedAt = new Date(data.generated_at);
   const stale = computeStale(data.generated_at, scanStatus);
+  const health = sourceHealthOf(data, scanStatus);
 
   const relativeAge = fmtRelativeAge(data.generated_at);
   const driftNote = fmtDrift(scanStatus);
@@ -559,7 +637,7 @@ export default function App() {
             <Kpi
               label="Top picks"
               value={shortlist.counts.topPicks}
-              delta={`score ${TOP_PICK_MIN_SCORE}+ · only evidenced band`}
+              delta={`score ${TOP_PICK_MIN_SCORE}+ · ${topBandClaim(performance)}`}
               accent={shortlist.counts.topPicks > 0 ? "success" : "warning"}
             />
             {regime && (
@@ -573,7 +651,7 @@ export default function App() {
             )}
             <Kpi
               label="Last scan"
-              value={`${generatedAt.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })} · ${generatedAt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })} IST`}
+              value={formatScanTimestamp(data.generated_at)}
               delta={freshnessDelta || undefined}
               accent={freshnessAccent(data.generated_at)}
             />
@@ -658,6 +736,23 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {health.critical && (
+        <div className="stale-banner stale-banner--danger" role="alert">
+          <strong>Source outage, not a quiet market.</strong>{" "}
+          {joinLabels(health.degraded)} could not be verified, and those gates
+          fail closed — so every name is failing them rather than being
+          filtered on its merits.{" "}
+          {data.gate_pass_count === 0
+            ? "The zero-PASS list below reflects this outage, not what the scan found."
+            : "The PASS list below is incomplete."}{" "}
+          Check the{" "}
+          <a href={ACTIONS_URL} target="_blank" rel="noreferrer">
+            Actions tab
+          </a>{" "}
+          for the failing source.
+        </div>
+      )}
 
       {data.coverage && data.coverage.pct < 0.95 && (
         <div
@@ -747,7 +842,12 @@ export default function App() {
         onUpdate={journal.update}
       />
 
-      <details className="more-panel">
+      <details
+        className="more-panel"
+        onToggle={(e) => {
+          if (e.currentTarget.open) setPerformanceRequested(true);
+        }}
+      >
         <summary>What changed since the last scan</summary>
         <div className="more-panel-body">
           <DeltaStrip
@@ -769,8 +869,18 @@ export default function App() {
           <div className="empty-state">
             <h2>No top picks today</h2>
             <p>
-              Nothing in the {TOP_PICK_MIN_SCORE}+ band passed all seven gates.
-              That is a valid signal. Patience beats forcing a trade.
+              {health.critical ? (
+                <>
+                  Nothing passed because {joinLabels(health.degraded)} could not
+                  be verified — this is a data outage, not a verdict on the
+                  market. The list will repopulate when the source recovers.
+                </>
+              ) : (
+                <>
+                  Nothing in the {TOP_PICK_MIN_SCORE}+ band passed all seven
+                  gates. That is a valid signal. Patience beats forcing a trade.
+                </>
+              )}
               {scanStatus && scanStatus.next_expected_utc && (
                 <>
                   {" "}The next scan is due{" "}
@@ -808,9 +918,8 @@ export default function App() {
               <span className="pick-count" aria-hidden="true">{rows.length}</span>
             </h2>
             <p className="pick-section-sub">
-              Gate-passed names scoring {TOP_PICK_MIN_SCORE}+. The only band
-              with a measured edge vs the Nifty. Click a card for the full plan
-              and the gate checklist.
+              Gate-passed names scoring {TOP_PICK_MIN_SCORE}+. {topBandClaim(performance)}.
+              Click a card for the full plan and the gate checklist.
               {regimeKey === "risk_off" && (
                 <span className="pick-regime-warn">
                   {" "}Risk-off tape: the tracker&apos;s risk-off cohorts
@@ -824,10 +933,11 @@ export default function App() {
               <TopPickCard
                 key={s.symbol}
                 stock={s}
-                onOpen={() => toggleDrawer(s.symbol)}
+                onOpen={openDrawer(s.symbol)}
                 watchlist={watchlist}
                 journal={journal}
                 scanDate={data.generated_at}
+                priorPlan={priorPlans[s.symbol] || null}
               />
             ))}
           </div>
@@ -836,10 +946,11 @@ export default function App() {
             return s ? (
               <DetailDrawer
                 stock={s}
-                onClose={() => setExpanded(null)}
+                onClose={closeDrawer}
                 watchlist={watchlist}
                 scanDate={data.generated_at}
                 performance={performance}
+                priorPlan={priorPlans[s.symbol] || null}
               />
             ) : null;
           })()}
@@ -854,9 +965,10 @@ export default function App() {
                 key={s.symbol}
                 stock={s}
                 expanded={expanded === s.symbol}
-                onToggle={() => toggleDrawer(s.symbol)}
+                onToggle={openDrawer(s.symbol)}
                 watchlist={watchlist}
                 performance={performance}
+                priorPlan={priorPlans[s.symbol] || null}
               />
             ))}
           </div>
@@ -865,15 +977,17 @@ export default function App() {
             return s ? (
               <DetailDrawer
                 stock={s}
-                onClose={() => setExpanded(null)}
+                onClose={closeDrawer}
                 watchlist={watchlist}
                 scanDate={data.generated_at}
                 performance={performance}
+                priorPlan={priorPlans[s.symbol] || null}
               />
             ) : null;
           })()}
         </>
       ) : (
+        <div className="table-scroll">
         <table className="scan-table">
           <thead>
             <tr>
@@ -881,7 +995,6 @@ export default function App() {
                 <th
                   key={c.key}
                   className={sortKey === c.key ? "sorted" : ""}
-                  onClick={() => toggleSort(c.key)}
                   scope="col"
                   aria-sort={
                     sortKey === c.key
@@ -889,8 +1002,17 @@ export default function App() {
                       : "none"
                   }
                 >
-                  {c.label}
-                  {sortKey === c.key ? (sortDir === "desc" ? " ↓" : " ↑") : ""}
+                  <button
+                    type="button"
+                    className="th-sort"
+                    onClick={() => toggleSort(c.key)}
+                    title={`Sort by ${c.label}`}
+                  >
+                    {c.label}
+                    <span aria-hidden="true">
+                      {sortKey === c.key ? (sortDir === "desc" ? " ↓" : " ↑") : ""}
+                    </span>
+                  </button>
                 </th>
               ))}
             </tr>
@@ -913,6 +1035,11 @@ export default function App() {
                         type="button"
                         className={`watch-star sm ${watchlist.has(s.symbol) ? "on" : ""}`}
                         onClick={(e) => { e.stopPropagation(); watchlist.toggle(s.symbol); }}
+                        // The row is role="button" and its onKeyDown calls
+                        // preventDefault on Space/Enter. Without this, pressing
+                        // Space on the focused star opened the drawer instead
+                        // of toggling the watchlist.
+                        onKeyDown={(e) => e.stopPropagation()}
                         aria-pressed={watchlist.has(s.symbol)}
                         aria-label={
                           watchlist.has(s.symbol)
@@ -934,7 +1061,13 @@ export default function App() {
                     </span>
                     <span className="company">{s.company_name}</span>
                     {(() => {
-                      const es = computeEntryState(s);
+                      // Evaluate the PRIOR plan against today's close. The row's
+                      // own plan is anchored to its own close, so it can only
+                      // ever read "in zone".
+                      const prior = priorPlans[s.symbol];
+                      const es = prior
+                        ? evaluatePlanState(prior, s.current_price)
+                        : null;
                       if (!es) return null;
                       return (
                         <span
@@ -1052,11 +1185,18 @@ export default function App() {
             ))}
           </tbody>
         </table>
+        </div>
           )}
         </>
       )}
 
-      <details className="more-panel" id="track-record">
+      <details
+        className="more-panel"
+        id="track-record"
+        onToggle={(e) => {
+          if (e.currentTarget.open) setPerformanceRequested(true);
+        }}
+      >
         <summary>Methodology &amp; track record</summary>
         <div className="more-panel-body">
           <Rationale />

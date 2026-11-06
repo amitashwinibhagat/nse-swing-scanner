@@ -1,4 +1,4 @@
-import { tradeStatus, summarizeTrades } from "../utils/trades.js";
+import { summarizeLabel, summarizeTrades, tradeStatus } from "../utils/trades.js";
 
 const fmtINR = (v) =>
   v == null ? "—" : `₹${v.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
@@ -21,7 +21,7 @@ export default function MyTrades({ trades, priceBySymbol, onRemove, onUpdate }) 
         <h2 id="my-trades-heading">
           My trades <span className="my-trades-count">{trades.length}</span>
         </h2>
-        {summary.pnlAbs != null && (
+        {summary.pnlAbs != null && summary.pnlPct != null ? (
           <span
             className={`my-trades-total ${summary.pnlAbs >= 0 ? "positive" : "negative"}`}
             title={`Across ${summary.priced} priced trade${summary.priced === 1 ? "" : "s"}${summary.unpriced ? `; ${summary.unpriced} without a fresh price` : ""}.`}
@@ -31,6 +31,12 @@ export default function MyTrades({ trades, priceBySymbol, onRemove, onUpdate }) 
               ({summary.pnlPct >= 0 ? "+" : ""}
               {summary.pnlPct.toFixed(1)}%)
             </span>
+          </span>
+        ) : (
+          // No invested capital to measure against (no shares set, or no
+          // prices). Show the reason rather than crashing on a null pnlPct.
+          <span className="my-trades-total my-trades-total--muted" role="status">
+            {summarizeLabel(summary)}
           </span>
         )}
       </div>
@@ -53,6 +59,8 @@ export default function MyTrades({ trades, priceBySymbol, onRemove, onUpdate }) 
                 <input
                   type="number"
                   step="0.05"
+                  min="0"
+                  aria-label={`Entry price for ${t.symbol} in rupees`}
                   defaultValue={t.entry}
                   onBlur={(e) => {
                     const v = +e.target.value;
@@ -68,6 +76,7 @@ export default function MyTrades({ trades, priceBySymbol, onRemove, onUpdate }) 
                   type="number"
                   step="1"
                   min="0"
+                  aria-label={`Shares held for ${t.symbol}`}
                   defaultValue={t.shares}
                   onBlur={(e) => {
                     const v = +e.target.value;

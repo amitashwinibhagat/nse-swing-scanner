@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import random
 import time
-from typing import Callable, Optional, Sequence, TypeVar
+from typing import Callable, Optional, TypeVar
 
 T = TypeVar("T")
 

@@ -13,7 +13,12 @@ export default function ScoreRing({ score, size = 56, strokeWidth = 4 }) {
 
   if (score == null || Number.isNaN(score)) {
     return (
-      <div className="score-ring-empty" style={{ width: size, height: size }} aria-label="No score">
+      <div
+        className="score-ring-empty"
+        style={{ width: size, height: size }}
+        role="img"
+        aria-label="No score"
+      >
         —
       </div>
     );

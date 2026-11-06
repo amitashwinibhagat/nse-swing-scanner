@@ -3,8 +3,35 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # Pin the toolchain: CI builds on Node 20, and a different Netlify default
+  # meant a green CI build did not prove the deploy build works.
+  NODE_VERSION = "20"
+
 [functions]
+  # `directory` is where functions are PUBLISHED; with `base = "frontend"` the
+  # source tree is frontend/netlify/functions. Declaring the source explicitly
+  # keeps `netlify functions:build` / `netlify deploy --functions` from guessing
+  # (they otherwise build an empty manifest).
   directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Punctual scan triggers.
+#
+# GitHub's `schedule` on this repo is hours late (measured median 5.4 h, worst
+# 10 h), so the "09:00 IST" scan completed after the close. These two Netlify
+# scheduled functions run on Netlify's own UTC scheduler and dispatch scan.yml
+# via repository_dispatch, naming the window. The GitHub crons remain as a
+# fallback and the workflow skips itself when the window is already covered.
+#
+# The cron expressions are also declared in the function modules
+# (`export const config`); they are repeated here so the schedule is visible in
+# one file and is checked by backend/scripts/check_cron_consistency.py.
+[functions."scheduled-scan-morning"]
+  schedule = "30 3 * * 1-5"
+
+[functions."scheduled-scan-evening"]
+  schedule = "30 10 * * 1-5"
 
 [[redirects]]
   # SPA fallback - any path that doesn't resolve to a real file (e.g. a
@@ -23,7 +50,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; script-src 'self'; frame-ancestors 'none'"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
 
 [[headers]]
   for = "/data/*"

@@ -164,9 +164,20 @@ def gate_f_score(f_score, components_available: Optional[int] = None) -> tuple[b
     return True, None
 
 
-def gate_drawdown(pct_off_high) -> tuple[bool, Optional[str]]:
+def gate_drawdown(pct_off_high, partial_52wk_window: bool = False) -> tuple[bool, Optional[str]]:
+    """
+    Hard gate: drawdown must sit inside [DRAWDOWN_LOWER_PCT, DRAWDOWN_UPPER_PCT].
+
+    `partial_52wk_window` marks a name whose 52-week high came from a shorter
+    history than a full 252 sessions (recent IPO / relisting). The drawdown is
+    then measured against an artificially shallow high, so the gate fails
+    closed rather than letting a newly listed name through on a 100-session
+    "52-week" peak.
+    """
     if pct_off_high is None or np.isnan(pct_off_high):
         return False, "pct_off_high_missing"
+    if partial_52wk_window:
+        return False, "pct_off_high_partial_window (<252 sessions of history)"
     if not (DRAWDOWN_LOWER_PCT <= pct_off_high <= DRAWDOWN_UPPER_PCT):
         return False, f"pct_off_high {pct_off_high} outside [{DRAWDOWN_LOWER_PCT},{DRAWDOWN_UPPER_PCT}]"
     return True, None
@@ -228,12 +239,29 @@ def gate_liquidity_adequacy(
     return False, f"adv {int(adv_value_inr)} < {int(MIN_ADV_VALUE_INR)}"
 
 
-def gate_surveillance(is_restricted: bool, source_status: str) -> tuple[bool, Optional[str]]:
-    if source_status == "flag_only":
-        # Don't fail, but warn; the UI shows the source status.
-        return True, None
+def gate_surveillance(
+    is_restricted: bool,
+    source_status: str,
+    lenient: bool = False,
+) -> tuple[bool, Optional[str]]:
+    """
+    Hard gate for T-group / ASM / GSM / suspension.
+
+    Fails closed: if we could not verify the surveillance list, the row fails
+    rather than being treated as clean. `flag_only` is exactly the "could not
+    verify" state (BSE codes with no NSE mapping, or every source down).
+
+    History: this gate used to PASS on `flag_only`, which — combined with
+    endpoints that all 404'd — meant the gate had never excluded anything in
+    production. Lenient mode (--lenient-external-gates) is the explicit,
+    documented opt-out when NSE blocks the runner.
+    """
     if is_restricted:
         return False, "t_group_or_suspended"
+    if source_status in ("flag_only", "source_failed"):
+        if lenient:
+            return True, None
+        return False, f"surveillance_unverified ({source_status})"
     return True, None
 
 
@@ -405,7 +433,10 @@ def evaluate_stock(
         fail_reasons.append(why)
 
     pct_off_high = tech.get("pct_off_52wk_high")
-    ok, why = gate_drawdown(pct_off_high)
+    ok, why = gate_drawdown(
+        pct_off_high,
+        partial_52wk_window=bool(tech.get("fifty_two_wk_high_partial")),
+    )
     gate_results.append({"gate": "drawdown", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
@@ -447,7 +478,11 @@ def evaluate_stock(
     if not ok:
         fail_reasons.append(why)
 
-    ok, why = gate_surveillance(surv["is_restricted"], surv["source_status"])
+    ok, why = gate_surveillance(
+        surv["is_restricted"],
+        surv["source_status"],
+        lenient=lenient_external_gates,
+    )
     gate_results.append({"gate": "surveillance", "passed": bool(ok), "reason": why if not ok else None})
     if not ok:
         fail_reasons.append(why)
@@ -493,14 +528,19 @@ def evaluate_stock(
     result["earnings_status"] = earnings_status
     result["earnings_data"] = earnings_data
 
-    # Valuation is score-only, not a hard gate. Defer the expensive 6-year
-    # history/info fetch until after all safety gates pass.
-    pe5y = approx_5y_avg_pe(yf_ticker)
-    result.update({f"pe5y_{k}": v for k, v in pe5y.items() if k != "yf_ticker"})
+    # Valuation is score-only, not a hard gate, and it is the most expensive
+    # per-stock fetch (6 years of history + a `.info` call). Only gate-passed
+    # names get scored, so only they need it. This used to run for all 501 rows
+    # — one extra yfinance request per stock per scan, against the project's
+    # dominant failure mode (429 throttling).
+    if result["gate_pass"]:
+        pe5y = approx_5y_avg_pe(yf_ticker)
+        result.update({f"pe5y_{k}": v for k, v in pe5y.items() if k != "yf_ticker"})
+    else:
+        pe5y = {}
 
     # --- soft score ---
     pe_now = pe5y.get("trailing_pe_check")
-    conviction = (holdings_data or {}).get("conviction_pct") if holdings_data else None
 
     sub_scores = {
         "valuation_compression": _score_valuation(pe_now, pe5y.get("avg_pe_5y")),
@@ -642,7 +682,7 @@ def run_scan(
 
     # Shared external data: fetched once for the whole scan (these don't depend
     # on the worker pool — they're not per-stock).
-    print(f"Fetching shared data: surveillance, bhavcopy, corporate actions, nifty50…")
+    print("Fetching shared data: surveillance, bhavcopy, corporate actions, nifty50…")
     surveillance_payload = fetch_surveillance_list()
     print(f"  surveillance: status={surveillance_payload['status']}")
     universe_symbols = universe["symbol"].tolist()
@@ -983,6 +1023,54 @@ def to_json_records(df: pd.DataFrame) -> list:
     return records
 
 
+# Sources whose failure makes the PASS list meaningless rather than merely
+# narrower. A gate that fails closed on `source_failed` turns one unreachable
+# endpoint into a zero-PASS scan that still looks like a healthy run; the
+# payload records that separately so the workflow can alert on it.
+CRITICAL_GATE_SOURCES = {
+    "corporate_actions": "corporate_actions_status",
+    "surveillance": "surveillance_source_status",
+    "holdings_conviction": "holdings_source_status",
+}
+
+
+def compute_source_health(records: list) -> dict:
+    """
+    Roll up per-source statuses across the universe.
+
+    Returns a dict:
+      {
+        "corporate_actions": {"ok": 490, "source_failed": 11, "dominant": "source_failed"},
+        ...
+        "degraded_gates": ["corporate_actions"],
+        "critical_source_failed": True,
+      }
+
+    `critical_source_failed` is true when a fail-closed gate was unable to
+    verify for **every** row — i.e. the gate is not filtering, it is blocking.
+    The workflow treats that as an incident, not as "no candidates today".
+    """
+    health: dict = {}
+    for gate, field in CRITICAL_GATE_SOURCES.items():
+        counts: dict = {}
+        for r in records:
+            status = r.get(field) or "missing"
+            counts[status] = counts.get(status, 0) + 1
+        dominant = max(counts.items(), key=lambda kv: kv[1])[0] if counts else "missing"
+        health[gate] = {**counts, "dominant": dominant}
+
+    degraded = [
+        gate
+        for gate, info in health.items()
+        if info["dominant"] in ("source_failed", "flag_only") and info.get(info["dominant"], 0) > 0
+    ]
+    return {
+        **health,
+        "degraded_gates": degraded,
+        "critical_source_failed": bool(degraded),
+    }
+
+
 def compute_coverage(records: list) -> dict:
     """
     Universe coverage stats for the JSON root. A row is "priced" when
@@ -1017,11 +1105,13 @@ def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
     records = to_json_records(df)
     gate_pass_count = sum(1 for r in records if r["gate_pass"])
     coverage = compute_coverage(records)
+    source_health = compute_source_health(records)
     payload = {
         "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "universe_size": len(records),
         "gate_pass_count": gate_pass_count,
         "coverage": coverage,
+        "source_health": source_health,
         "config": {
             "min_f_score": MIN_F_SCORE,
             "min_f_score_components": MIN_F_SCORE_COMPONENTS,
@@ -1047,7 +1137,10 @@ def write_scan_output(df: pd.DataFrame, output_path: str) -> dict:
     fd, tmp_path = tempfile.mkstemp(prefix=".latest_scan.", suffix=".tmp", dir=outdir)
     try:
         with os.fdopen(fd, "w") as f:
-            json.dump(payload, f, indent=2, allow_nan=False)
+            # Minified: this file is rewritten twice a day and is fetched by
+            # every visitor. `indent=2` roughly doubled it (1.7 MB vs ~0.9 MB)
+            # for zero runtime benefit — the payload is machine-read.
+            json.dump(payload, f, separators=(",", ":"), allow_nan=False)
             f.flush()
             os.fsync(f.fileno())
         os.replace(tmp_path, output_path)
@@ -1111,3 +1204,21 @@ if __name__ == "__main__":
             file=sys.stderr,
         )
         sys.exit(2)
+
+    # A fail-closed gate that could not verify for the *whole* universe is an
+    # incident, not a market signal: the scan will publish gate_pass_count=0
+    # and the dashboard will say "no candidates today". Exit 3 so the workflow
+    # can alert and (optionally) deploy a degraded-but-labelled payload.
+    health = payload.get("source_health") or {}
+    degraded = health.get("degraded_gates") or []
+    if degraded:
+        detail = ", ".join(
+            f"{g}={health.get(g, {}).get('dominant')}" for g in degraded
+        )
+        print(
+            f"::warning::degraded source gate(s): {detail}. Every row fails "
+            f"closed on them, so gate_pass_count={payload.get('gate_pass_count')} "
+            f"reflects the outage, not the market.",
+            file=sys.stderr,
+        )
+        sys.exit(3)

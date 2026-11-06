@@ -32,3 +32,22 @@ def test_worst_status_ordering():
     assert worst_status("flag_only", "source_failed") == "source_failed"
     assert worst_status("ok", "missing") == "missing"
     assert worst_status() == "ok"
+
+
+def test_make_status_flattens_extra_dict():
+    """Regression: extra={...} used to nest under a literal "extra" key, so
+    payload["delivery_kind"] was silently None."""
+    s = make_status("nse", "ok", extra={"delivery_kind": "actual", "n": 3})
+    assert s["delivery_kind"] == "actual"
+    assert s["n"] == 3
+    assert "extra" not in s
+
+
+def test_make_status_accepts_kwargs():
+    s = make_status("nse", "ok", delivery_kind="traded_value_proxy")
+    assert s["delivery_kind"] == "traded_value_proxy"
+
+
+def test_make_status_rejects_non_dict_extra():
+    with pytest.raises(TypeError):
+        make_status("nse", "ok", extra="nope")

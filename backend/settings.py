@@ -73,7 +73,10 @@ SCAN_WINDOWS_UTC = [(3, 30), (10, 30)]   # (hour_utc, minute_utc), Mon-Fri
 # Source-cache TTLs (seconds)
 HOLDINGS_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30 * 3   # ~90 days (quarterly-ish)
 BHAVCOPY_CACHE_TTL_SECONDS = 60 * 60 * 12            # half a day
-SURVEILLANCE_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7    # weekly
+SURVEILLANCE_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7    # weekly (successful fetch only)
+# A failed/provisional surveillance fetch must NOT be pinned for a week: a
+# single outage used to disable the gate until the next weekly refresh.
+SURVEILLANCE_FAILURE_TTL_SECONDS = 60 * 30           # 30 minutes
 CORPORATE_ACTIONS_CACHE_TTL_SECONDS = 60 * 60 * 12   # half a day
 YF_CACHE_TTL_SECONDS = 60 * 60 * 12                 # 12 h for yfinance-derived fields (price-dependent)
 YF_FUNDAMENTAL_CACHE_TTL_SECONDS = 60 * 60 * 24     # 24 h for F-score (balance-sheet-quarterly)

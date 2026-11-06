@@ -196,6 +196,87 @@ def _window_label(window: int) -> str:
     return f"T+{window}"
 
 
+# NSE cash market opens at 09:15 IST = 03:45 UTC. A snapshot generated before
+# that on a trading day is describing the PREVIOUS close.
+MARKET_OPEN_UTC_HOUR, MARKET_OPEN_UTC_MINUTE = 3, 45
+
+
+def infer_scan_phase(scan: dict) -> str:
+    """
+    "pre_open" or "post_close" for a snapshot, from its own timestamp.
+
+    Why this is not a constant: the two daily runs are 03:30 UTC (pre-open) and
+    10:30 UTC (post-close). While GitHub's cron drifted by hours both landed
+    after the close, so `post_close` was universally right by accident. Now
+    that the schedule is punctual, the morning snapshot genuinely precedes the
+    open and its stored price is the *previous* close — so its T+0 must be the
+    prior session or every cohort shifts by a day.
+
+    An explicit `--scan-phase` still overrides this (see compute_performance).
+    """
+    generated_at = (scan.get("generated_at") or "").strip()
+    if not generated_at:
+        return "post_close"
+    try:
+        dt = datetime.datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+    except ValueError:
+        return "post_close"
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    dt = dt.astimezone(datetime.timezone.utc)
+    # Weekend scans are re-runs of Friday's close; never "pre-open".
+    if dt.weekday() >= 5:
+        return "post_close"
+    before_open = (dt.hour, dt.minute) < (MARKET_OPEN_UTC_HOUR, MARKET_OPEN_UTC_MINUTE)
+    return "pre_open" if before_open else "post_close"
+
+
+def snapshot_slot(label: str, scan: Optional[dict] = None) -> str:
+    """'am' / 'pm' for a snapshot label like '2026-11-04-pm'."""
+    tail = str(label).rsplit("-", 1)[-1]
+    if tail in ("am", "pm"):
+        return tail
+    return "am"
+
+
+def scan_date_of(scan: dict) -> Optional[datetime.date]:
+    """Trading date a snapshot belongs to (UTC date of `generated_at`)."""
+    generated_at = (scan.get("generated_at") or "")[:10]
+    try:
+        return datetime.date.fromisoformat(generated_at)
+    except ValueError:
+        return None
+
+
+def dedupe_snapshots_by_date(
+    snapshots: List[Tuple[str, dict]],
+) -> List[Tuple[str, dict]]:
+    """
+    Keep one snapshot per trading date, preferring the later (pm) slot.
+
+    Both daily scans currently land after the close, so the am and pm snapshots
+    describe the same session. Treating them as two independent cohorts roughly
+    doubles N and makes every confidence interval look tighter than the data
+    supports — they are not two observations, they are the same one twice.
+    Snapshots without a parseable date are passed through untouched.
+    """
+    by_date: Dict[datetime.date, Tuple[str, dict]] = {}
+    passthrough: List[Tuple[str, dict]] = []
+    out: List[Tuple[str, dict]] = []
+    for label, scan in snapshots:
+        d = scan_date_of(scan)
+        if d is None:
+            passthrough.append((label, scan))
+            continue
+        prior = by_date.get(d)
+        if prior is None or snapshot_slot(label) == "pm":
+            by_date[d] = (label, scan)
+    out.extend(by_date[d] for d in sorted(by_date))
+    out.extend(passthrough)
+    out.sort(key=lambda item: (scan_date_of(item[1]) or datetime.date.min, snapshot_slot(item[0])))
+    return out
+
+
 def _empty_bucket_map() -> Dict[str, List[float]]:
     return {b: [] for b in BUCKET_ORDER}
 
@@ -205,6 +286,7 @@ def build_performance_payload(
     forward_returns: Dict[Tuple[str, str], Dict[int, dict]],
     *,
     retention_days: int = 90,
+    dedupe_by_date: bool = True,
 ) -> dict:
     """
     Combine snapshot metadata with pre-computed forward returns into the
@@ -229,6 +311,9 @@ def build_performance_payload(
                     regime, confirmation, windows) — calibration raw material
       - meta:       config + trackable / untrackable / window_not_closed counts
     """
+    if dedupe_by_date:
+        snapshots = dedupe_snapshots_by_date(snapshots)
+
     per_window_buckets: Dict[int, Dict[str, List[float]]] = {
         w: _empty_bucket_map() for w in WINDOWS
     }
@@ -385,6 +470,14 @@ def build_performance_payload(
             # stored scores (lossless: score is the immutable source of
             # truth; score_bucket_pass_v2 is retained for old-scheme views).
             "bucket_scheme_history": ["pass_v2", "pass_v3"],
+            "scan_phases": sorted(
+                {infer_scan_phase(scan) for _, scan in snapshots}
+            ),
+            "cohort_policy": (
+                "one cohort per trading date (pm snapshot wins)"
+                if dedupe_by_date
+                else "one cohort per snapshot (am and pm counted separately)"
+            ),
             "buckets": [b for b in BUCKET_ORDER if b != "unknown"],
             "trackable_count": { _window_label(w): per_window_trackable[w] for w in WINDOWS },
             "untrackable_count": { _window_label(w): per_window_untrackable[w] for w in WINDOWS },
@@ -414,23 +507,43 @@ def t_plus_session(
     sessions: Sequence[datetime.date],
     scan_date: datetime.date,
     window: int,
+    *,
+    scan_phase: str = "post_close",
 ) -> Optional[datetime.date]:
     """
     Map scan_date + T+window trading sessions using an ordered session calendar.
-    scan_date is snapped to the first session on or after it (evening scans
-    after the close still use that session as T+0).
+
+    `scan_phase` decides what T+0 means, which is the difference between a
+    correct and a systematically-shifted forward return:
+
+      - `post_close` (default): the scan ran after that session's close, so the
+        stored price *is* the T+0 close. Snap to the first session on or after
+        scan_date (a Saturday snapshot still uses Monday).
+      - `pre_open`: the scan ran before the open, so its prices are the
+        *previous* close. T+0 must be the last session strictly *before*
+        scan_date, otherwise day one is silently dropped and every cohort is
+        shifted by one session.
+
+    A correctly-timed 09:00 IST scan is pre-open, which is why this matters.
     """
     if not sessions or window < 0:
         return None
     sess = list(sessions)
-    # First session on or after scan_date
-    start_i = None
-    for i, d in enumerate(sess):
-        if d >= scan_date:
-            start_i = i
-            break
-    if start_i is None:
-        return None
+
+    if scan_phase == "pre_open":
+        prior = [d for d in sess if d < scan_date]
+        if not prior:
+            return None
+        start_i = sess.index(prior[-1])
+    else:
+        start_i = None
+        for i, d in enumerate(sess):
+            if d >= scan_date:
+                start_i = i
+                break
+        if start_i is None:
+            return None
+
     target_i = start_i + window
     if target_i >= len(sess):
         return None
@@ -602,6 +715,8 @@ def fetch_forward_returns(
     today: Optional[datetime.date] = None,
     download_fn: Optional[Callable[[List[str], str, str], object]] = None,
     max_attempts: int = 3,
+    dedupe_by_date: bool = True,
+    scan_phase: Optional[str] = None,
 ) -> Dict[Tuple[str, str], Dict[int, dict]]:
     """
     For each (snapshot_label, symbol) where the stock gate-passed, fetch
@@ -609,6 +724,11 @@ def fetch_forward_returns(
 
     download_fn: injectable (tickers, start, end) -> DataFrame for tests.
     today: injectable "as of" date for window_not_closed (default: UTC today).
+    dedupe_by_date: keep one cohort per trading date (the pm snapshot wins).
+        Both daily runs currently land after the close, so counting am and pm
+        as independent cohorts double-counts the same session.
+    scan_phase: "post_close" / "pre_open", or None (default) to infer it per
+        snapshot from its `generated_at` — see infer_scan_phase.
     """
     from yf_retry import call_with_retry, is_rate_limit_error
 
@@ -623,6 +743,9 @@ def fetch_forward_returns(
                 prices_cache = json.load(f)
         except (OSError, json.JSONDecodeError):
             prices_cache = {}
+
+    if dedupe_by_date:
+        snapshots = dedupe_snapshots_by_date(snapshots)
 
     # Global date range covering all snapshots + T+20 buffer
     scan_dates: List[datetime.date] = []
@@ -750,7 +873,10 @@ def fetch_forward_returns(
     out: Dict[Tuple[str, str], Dict[int, dict]] = {}
 
     for label, scan, scan_date, passed in work:
-        index_start_sess = t_plus_session(sessions, scan_date, 0)
+        # Phase is per snapshot, not per run: a pre-open morning scan and a
+        # post-close evening scan need different T+0 anchoring.
+        phase = scan_phase or infer_scan_phase(scan)
+        index_start_sess = t_plus_session(sessions, scan_date, 0, scan_phase=phase)
         index_start = _close_on("^NSEI", index_start_sess)
 
         for s in passed:
@@ -760,7 +886,7 @@ def fetch_forward_returns(
             per_window: Dict[int, dict] = {}
 
             for w in WINDOWS:
-                end_sess = t_plus_session(sessions, scan_date, w)
+                end_sess = t_plus_session(sessions, scan_date, w, scan_phase=phase)
                 if end_sess is None or end_sess > as_of:
                     per_window[w] = {
                         "stock_return_pct": None,

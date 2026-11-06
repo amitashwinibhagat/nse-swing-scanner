@@ -39,8 +39,10 @@ SCRIPT_INVOKE_RE = re.compile(
 )
 
 # Always exercise every file under scripts/ that workflows could grow into.
-# Skip this guard itself to avoid recursion.
-SKIP = {"check_workflow_scripts.py"}
+# Skip this guard itself (it has no argparse, so `--help` would re-enter main()
+# and recurse) and the smoke test (it runs a real scan, which the CI step
+# already does on purpose — `--help` there would prove nothing).
+SKIP = {"check_workflow_scripts.py", "smoke_scan.py"}
 
 
 def discover_workflow_scripts() -> list[str]:

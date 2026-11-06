@@ -1,17 +1,31 @@
 name: NSE Swing Scan
 
+# Scheduling reality (read before changing the crons)
+# ---------------------------------------------------
+# GitHub's `schedule` is best-effort and, on this repo's free-tier runners, it
+# fires HOURS late: measured over 45 scheduled runs the median delay was 5.4 h
+# and 37/45 started more than 4 h after their window (a cron cannot fire
+# *early*, so a 11:16 UTC run is the 03:30 cron arriving 7.8 h late). The
+# documented "09:00 IST scan" therefore completes around 16:46 IST — after the
+# 15:30 close — and the "16:00 IST" scan around 23:40 IST.
+#
+# Consequences that are handled deliberately here:
+#   * both daily runs land AFTER the close, so they describe the same session.
+#     `performance.py` keeps one cohort per trading date (dedupe_snapshots_by_date)
+#     instead of double-counting N.
+#   * `scan_status.json` must attribute the run to the cron that *fired* it,
+#     not the nearest wall clock. GitHub exposes `github.event.schedule`, so we
+#     pass it through and stop guessing (see backend/scan_schedule.py).
+#   * an external scheduler can drive this workflow punctually through
+#     `repository_dispatch` (PUNCTUAL_SCHEDULER not required — any cron service
+#     with a GitHub token works). See README "Scheduling".
 on:
-  # The live scan schedule. The windows below MUST match SCAN_WINDOWS_UTC in
-  # backend/settings.py (single source of truth) — CI guard
-  # scripts/check_cron_consistency.py fails if they drift. The .circleci
-  # port was removed in 1.3.3: its `triggers:` are ignored on GitHub App
-  # projects and maintaining two pipelines duplicated every failure mode.
-  # Do NOT re-add CircleCI UI schedule triggers while these crons are live
-  # (double-scan).
   schedule:
     - cron: "30 3 * * 1-5"
     - cron: "30 10 * * 1-5"
   workflow_dispatch: {}
+  repository_dispatch:
+    types: [scheduled-scan]
 
 permissions:
   contents: write   # needed to commit the scan output back to the repo
@@ -26,6 +40,9 @@ jobs:
     # Recovery pass for rate-limited symbols can add 10–20 min on cold/partial
     # cache; 60 min leaves headroom without burning free-tier budget on hangs.
     timeout-minutes: 60
+    outputs:
+      # Surfaced so a failed run is legible in the UI without reading logs.
+      outcome: ${{ steps.scan.outcome }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -35,136 +52,175 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Cache backend cache
-        uses: actions/cache@v6
+      - name: Restore backend cache
+        id: cache
+        uses: actions/cache/restore@v6
         with:
           path: backend/cache
-          key: nse-swing-cache-${{ github.run_id }}
+          # GitHub caches are IMMUTABLE: a fixed key can be written once and
+          # never updated, so the cache would freeze at whatever the first run
+          # after eviction produced. A versioned, per-run key + a prefix
+          # restore-keys always restores the newest entry and always writes a
+          # fresh one; GitHub evicts untouched entries after 7 days, which
+          # bounds the growth.
+          key: nse-swing-cache-v1-${{ github.run_id }}
           restore-keys: |
+            nse-swing-cache-v1-
             nse-swing-cache-
 
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
 
-      - name: Ping healthchecks.io (scan started)
-        if: ${{ github.event_name == 'schedule' }}
+      - name: Resolve schedule context
+        id: ctx
+        # One place that maps "which trigger fired this run" to (window label,
+        # healthcheck URL, snapshot slot, skip decision). Three triggers
+        # converge here: `schedule` (GitHub cron, hours late), `repository_dispatch`
+        # (the punctual Netlify scheduler, which names the window in
+        # client_payload) and `workflow_dispatch` (a human; no window, no pings).
+        #
+        # The `skip` output suppresses a late duplicate: if the punctual
+        # scheduler already covered this window, GitHub's own cron — which can
+        # fire 7-8 h later for the same window — must not scan and commit again.
+        # Logic lives in scripts/resolve_schedule_context.py (unit-tested, and
+        # covered by check_workflow_scripts.py).
+        working-directory: backend
         env:
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          GH_PAYLOAD_WINDOW: ${{ github.event.client_payload.window }}
           MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
           EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
+        run: python scripts/resolve_schedule_context.py
+
+      - name: Ping healthchecks.io (scan started)
+        if: steps.ctx.outputs.scheduled == 'true' && steps.ctx.outputs.skip != 'true'
+        env:
+          URL: ${{ steps.ctx.outputs.healthcheck_url }}
         continue-on-error: true
         run: |
-          case "${{ github.event.schedule }}" in
-            "30 3 * * 1-5") url="$MORNING_URL"; label="morning";;
-            "30 10 * * 1-5") url="$EVENING_URL"; label="evening";;
-            *) echo "::notice::unrecognized cron '${{ github.event.schedule }}'; skipping start ping."; exit 0;;
-          esac
-          if [ -z "$url" ]; then
-            echo "::notice::HEALTHCHECK_PING_URL_${label^^} secret not set; skipping start ping."
+          if [ -z "$URL" ]; then
+            echo "::notice::healthchecks.io URL for this window is not configured; skipping start ping."
             exit 0
           fi
-          curl -fsS -m 10 --retry 3 "${url}/start" \
+          curl -fsS -m 10 --retry 3 "${URL}/start" \
             || echo "::warning::healthchecks.io start ping failed"
 
       - name: Run full scan
+        id: scan
+        # Skipped when an earlier trigger already covered this window.
+        if: steps.ctx.outputs.skip != 'true'
         working-directory: backend
-        run: python scanner.py --top-n 500 --workers 4 --sleep 0.5 --lenient-external-gates --output ../frontend/public/data/latest_scan.json
-        # Nifty 500: 4 workers + 0.5s sleep + 429 retry + serial recovery pass
-        # for rate-limited symbols. Poisoned rate-limit cache entries are
-        # rejected on read (1.3.2). scanner exits 2 when coverage.pct < 0.85.
-        #   - Warm cache + recovery: ~10-25 min typical on GHA egress.
-        #   - Cold cache worst case can approach timeout; 45 min headroom.
-        # --lenient-external-gates: holdings gate passes on source_failed
-        # (Screener captcha). Liquidity uses 20d ADV when bhavcopy is down.
+        # Exit codes are meaningful and handled below:
+        #   0 = good scan (file written)
+        #   2 = coverage below the 85% floor (file NOT written, last-good kept)
+        #   3 = a fail-closed gate could not verify for the whole universe
+        #       (file written, but gate_pass_count reflects the outage)
+        run: |
+          set +e
+          python scanner.py --top-n 500 --workers 4 --sleep 0.5 \
+            --lenient-external-gates \
+            --output ../frontend/public/data/latest_scan.json
+          code=$?
+          echo "scanner_exit=$code" >> "$GITHUB_OUTPUT"
+          # 0 = good scan; 3 = published with a degraded-gate warning (the
+          # payload already carries source_health, and the contract step
+          # surfaces it). Anything else (2 = coverage floor, 1 = crash) fails
+          # the job so the failure ping fires.
+          if [ "$code" -eq 0 ] || [ "$code" -eq 3 ]; then
+            exit 0
+          fi
+          echo "::error::scanner exited $code"
+          exit "$code"
 
       - name: Ping healthchecks.io (scan failed)
-        # If any prior step failed, ping /fail so healthchecks.io marks
-        # this slot as red (email/Slack alert).
-        if: failure() && github.event_name == 'schedule'
+        # Runs for ANY earlier failure, including the scan itself. The success
+        # ping is deliberately the LAST step, not this one.
+        if: failure() && steps.ctx.outputs.scheduled == 'true'
         env:
-          MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
-          EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
+          URL: ${{ steps.ctx.outputs.healthcheck_url }}
         continue-on-error: true
         run: |
-          case "${{ github.event.schedule }}" in
-            "30 3 * * 1-5")  url="$MORNING_URL";;
-            "30 10 * * 1-5") url="$EVENING_URL";;
-            *) exit 0;;
-          esac
-          if [ -n "$url" ]; then
-            curl -fsS -m 10 --retry 3 "${url}/fail" \
+          if [ -n "$URL" ]; then
+            curl -fsS -m 10 --retry 3 "${URL}/fail" \
               || echo "::warning::healthchecks.io fail ping failed"
           fi
 
       - name: Ping healthchecks.io (scan cancelled)
-        # When the scheduled run is cancelled (typical: GH Actions free-tier
-        # queue timeout — no runner provisioned in 15 min, observed during
-        # the 11:30–13:30 UTC peak), ping the dedicated cancelled URL so the
-        # operator gets an early alert. Gates on schedule only so ad-hoc
-        # workflow_dispatch cancellations stay silent.
-        if: cancelled() && github.event_name == 'schedule'
+        # NOTE: a scheduled run cancelled while still queued never starts a job,
+        # so no step (including this one) can execute. That case is caught by
+        # healthchecks.io's own Period+Grace alert, which is the only mechanism
+        # that can observe a run that never began. This step covers the case
+        # where a run was started and then cancelled.
+        if: cancelled() && steps.ctx.outputs.scheduled == 'true'
         env:
-          CANCELLED_URL: ${{ secrets.HEALTHCHECK_PING_URL_CANCELLED }}
+          URL: ${{ secrets.HEALTHCHECK_PING_URL_CANCELLED }}
         continue-on-error: true
         run: |
-          if [ -z "$CANCELLED_URL" ]; then
-            echo "::notice::HEALTHCHECK_PING_URL_CANCELLED secret not set; skipping cancellation ping."
+          if [ -z "$URL" ]; then
+            echo "::notice::HEALTHCHECK_PING_URL_CANCELLED not set; skipping cancellation ping."
             exit 0
           fi
-          curl -fsS -m 10 --retry 3 "${CANCELLED_URL}/fail" \
+          curl -fsS -m 10 --retry 3 "${URL}/fail" \
             || echo "::warning::healthchecks.io cancelled ping failed"
 
-      - name: Ping healthchecks.io (scan succeeded)
-        if: success() && github.event_name == 'schedule'
-        # Resets the period so the next scheduled slot starts fresh.
-        env:
-          MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
-          EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
-        continue-on-error: true
-        run: |
-          case "${{ github.event.schedule }}" in
-            "30 3 * * 1-5")  url="$MORNING_URL";;
-            "30 10 * * 1-5") url="$EVENING_URL";;
-            *) exit 0;;
-          esac
-          if [ -n "$url" ]; then
-            curl -fsS -m 10 --retry 3 "${url}" \
-              || echo "::warning::healthchecks.io success ping failed"
-          fi
-
       - name: Validate JSON contract
+        if: steps.ctx.outputs.skip != 'true'
         working-directory: backend
         run: |
-          python -c "
+          python - <<'PY'
           import json, sys
-          p=json.load(open('../frontend/public/data/latest_scan.json'))
-          assert 'generated_at' in p and 'stocks' in p and p['stocks'], 'invalid scan contract'
-          cov=p.get('coverage') or {}
-          assert 'priced' in cov and 'pct' in cov, 'missing coverage block'
-          if cov.get('pct', 0) < 0.85:
-              print(f\"::error::coverage {cov.get('pct')} < 0.85\", file=sys.stderr)
+
+          path = "../frontend/public/data/latest_scan.json"
+          with open(path) as fh:
+              payload = json.load(fh)
+
+          errors = []
+          if not payload.get("generated_at"):
+              errors.append("missing generated_at")
+          stocks = payload.get("stocks")
+          if not stocks:
+              errors.append("stocks is empty")
+          cov = payload.get("coverage") or {}
+          if "priced" not in cov or "pct" not in cov:
+              errors.append("missing coverage block")
+          elif cov.get("pct", 0) < 0.85:
+              errors.append(f"coverage {cov.get('pct')} < 0.85")
+
+          health = payload.get("source_health") or {}
+          if health.get("critical_source_failed"):
+              # Not a hard failure: a degraded scan is published with its flag
+              # so the dashboard can say "source outage" instead of "no picks".
+              print(
+                  f"::warning::degraded source gate(s): {health.get('degraded_gates')} "
+                  f"— gate_pass_count={payload.get('gate_pass_count')} reflects the "
+                  f"outage, not the market."
+              )
+
+          if errors:
+              for e in errors:
+                  print(f"::error::contract: {e}", file=sys.stderr)
               sys.exit(1)
-          print('contract ok:', len(p['stocks']), 'stocks; coverage', cov)
-          "
+
+          print(
+              f"contract ok: {len(stocks)} stocks; "
+              f"gate_pass_count={payload.get('gate_pass_count')}; coverage={cov}"
+          )
+          PY
 
       - name: Write dated snapshot + history index (B1)
         # Persists the current run as YYYY-MM-DD-{am|pm}.json (minified) and
         # updates frontend/public/data/snapshots/history_index.json. Rolling
         # 90-day prune runs in the same step. Cheap (~1-2 s), no network.
         # Scheduled runs pass their cron-derived slot explicitly so a delayed
-        # morning run cannot be mislabeled as an evening snapshot. Manual runs
-        # still fall back to generated_at-based derivation.
-        if: success()
+        # morning run cannot be mislabeled as an evening snapshot.
+        if: success() && steps.ctx.outputs.skip != 'true'
         working-directory: backend
         env:
-          GH_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          SLOT: ${{ steps.ctx.outputs.slot }}
         run: |
-          slot=""
-          case "$GH_EVENT_SCHEDULE" in
-            "30 3 * * 1-5") slot="am" ;;
-            "30 10 * * 1-5") slot="pm" ;;
-          esac
           slot_arg=""
-          if [ -n "$slot" ]; then slot_arg="--slot $slot"; fi
+          if [ -n "$SLOT" ]; then slot_arg="--slot $SLOT"; fi
           python scripts/snapshot_writer.py \
             --latest ../frontend/public/data/latest_scan.json \
             --snapshots ../frontend/public/data/snapshots \
@@ -175,75 +231,24 @@ jobs:
         # Always run after a successful scan (skip on scan failure). Internal
         # errors are caught and surfaced as warnings — the file is best-effort
         # metadata and the frontend gracefully degrades if it's missing.
-        if: success()
+        if: success() && steps.ctx.outputs.skip != 'true'
         working-directory: backend
         env:
           GH_EVENT_NAME: ${{ github.event_name }}
+          GH_EVENT_SCHEDULE: ${{ steps.ctx.outputs.window_utc }}
+          GH_SCHEDULE_SOURCE: ${{ steps.ctx.outputs.source }}
           GH_SHA: ${{ github.sha }}
           GH_RUN_ID: ${{ github.run_id }}
-        run: |
-          python - <<'PY'
-          import datetime, json, os, sys, traceback
-
-          # Schedule math (window attribution, next expected window, cron
-          # string) lives in backend/scan_schedule.py — the single source of
-          # truth alongside SCAN_WINDOWS_UTC in settings.py. The CI guard
-          # check_cron_consistency.py fails if the crons in `on.schedule`
-          # above drift from that list.
-          try:
-              # Import INSIDE the try: this step is best-effort metadata, so an
-              # import error (e.g. scan_schedule.py renamed without updating
-              # this heredoc) must warn, not fail the whole scan job.
-              sys.path.insert(0, os.getcwd())   # ensure backend/ is importable
-              from scan_schedule import WINDOWS, attribute_window, next_scheduled_window, scheduled_cron_string
-              event = os.environ["GH_EVENT_NAME"]
-              scan = json.load(open("../frontend/public/data/latest_scan.json"))
-              now = datetime.datetime.now(datetime.timezone.utc)
-              triggered_at = now.isoformat()
-
-              scheduled_window_utc = None
-              drift_minutes = None
-              if event == "schedule":
-                  scheduled_window_utc, drift_minutes = attribute_window(now)
-
-              next_expected_utc = next_scheduled_window(now)
-
-              scheduled_cron = scheduled_cron_string()
-              status = {
-                  "generated_at": scan["generated_at"],
-                  "triggered_at": triggered_at,
-                  "commit_sha": os.environ["GH_SHA"],
-                  "run_id": os.environ["GH_RUN_ID"],
-                  "trigger": event,
-                  "scheduled_window_utc": scheduled_window_utc,
-                  "scheduled_cron": scheduled_cron,
-                  "next_expected_utc": (
-                      next_expected_utc.isoformat() if next_expected_utc else None
-                  ),
-                  "drift_minutes": drift_minutes,
-              }
-              with open("../frontend/public/data/scan_status.json", "w") as f:
-                  json.dump(status, f, indent=2)
-              print("scan_status.json:", status)
-          except Exception as e:
-              # Don't fail the workflow over a status-metadata write — the
-              # scan itself succeeded and latest_scan.json is the load-bearing
-              # artifact. Frontend gracefully degrades when scan_status.json
-              # is absent or stale.
-              print(f"::warning::scan_status.json write failed: {e}")
-              traceback.print_exc()
-              sys.exit(0)
-          PY
+        run: python scripts/write_scan_status.py
 
       - name: Commit and push updated scan
-        if: success()   # require scan step to succeed; Write scan_status.json is best-effort and won't block this
+        if: success() && steps.ctx.outputs.skip != 'true'   # require scan step to succeed; Write scan_status.json is best-effort and won't block this
         run: |
           git config user.name "nse-swing-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
-          # Add whatever files exist. scan_status.json is best-effort; if it
-          # wasn't written, `git add` skips that path with a non-fatal warning.
-          # Snapshots + history_index are added recursively; the snapshot_writer
-          # is idempotent and prunes to a 90-day rolling window.
+          # Separate `git add` calls: `git add A B C` validates every pathspec
+          # before staging anything, so one missing path would silently stage
+          # nothing and the commit step would exit 0 having done nothing.
           git add frontend/public/data/latest_scan.json
           git add frontend/public/data/scan_status.json || true
           git add frontend/public/data/snapshots/ || true
@@ -270,8 +275,18 @@ jobs:
           echo "::error::failed to push scan commit after retries"
           exit 1
 
+      - name: Save backend cache
+        # Save only after a successful scan, and only the key this run restored
+        # into — a failed scan can leave partial entries (rate-limit payloads
+        # are already excluded by should_cache_yf_payload).
+        if: success() && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: backend/cache
+          key: nse-swing-cache-v1-${{ github.run_id }}
+
       - name: Send Telegram digest (C3)
-        if: success()
+        if: success() && steps.ctx.outputs.skip != 'true'
         # Soft-fails: the script exits 0 even on Telegram error. The scan
         # itself is the load-bearing artifact; a missing alert must never
         # roll back a successful deploy.
@@ -288,21 +303,100 @@ jobs:
         # dist/ is gitignored and nothing above builds it. Run AFTER the scan
         # wrote frontend/public/data/latest_scan.json so the fresh data is
         # copied into dist by Vite.
-        if: success()
+        if: success() && steps.ctx.outputs.skip != 'true'
         working-directory: frontend
         run: |
-          npm ci || npm install
+          npm ci
           npm run build
 
-      - name: Trigger Netlify production deploy
-        if: success()
+      - name: Deploy to Netlify
+        id: deploy
+        if: success() && steps.ctx.outputs.skip != 'true'
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          SITE_URL: ${{ vars.SITE_URL }}
         run: |
           if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
-            echo "::warning::NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID not set; skipping Netlify deploy. Set them in repo settings to auto-deploy after each scan."
+            # Not an error: Netlify's GitHub integration auto-deploys on push.
+            # But this step must NOT report a deploy when it did not deploy —
+            # the old code exited 0 with a warning, so a broken integration
+            # would freeze the site while every run stayed green.
+            echo "deployed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Netlify CLI secrets are not set; relying on the Netlify GitHub integration (auto-deploy on push)."
             exit 0
           fi
-          npm install --no-save netlify-cli@latest
-          npx netlify deploy --prod --dir=frontend/dist --auth="$NETLIFY_AUTH_TOKEN" --site="$NETLIFY_SITE_ID" --message="scan-$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          npm install --no-save netlify-cli@27
+          # Absolute paths on purpose: netlify.toml sets `base = "frontend"`,
+          # and the CLI resolves relative --dir/--functions paths against that
+          # base, so `--dir=frontend/dist` would look for
+          # `frontend/frontend/dist`. Absolute paths sidestep the ambiguity.
+          # --no-build: the frontend was already built above; letting the CLI
+          # re-run `npm run build` would rebuild in a possibly different cwd.
+          # --functions must be the PARENT of the function files
+          # (netlify/functions), and the shared helper lives in netlify/lib —
+          # Netlify bundles relative imports, but only files inside the
+          # functions directory are deployed as functions.
+          npx netlify deploy --prod --no-build \
+            --dir="$PWD/frontend/dist" \
+            --functions="$PWD/frontend/netlify/functions" \
+            --auth="$NETLIFY_AUTH_TOKEN" \
+            --site="$NETLIFY_SITE_ID" \
+            --message="scan-$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "deployed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Verify the deployed site serves this scan
+        # The only check that proves the product actually updated. Closes the
+        # class of failure that let a scanner build ship to klinote.one for
+        # nine days: a deploy step can "succeed" while the wrong site (or no
+        # site) is serving users.
+        if: success() && steps.ctx.outputs.skip != 'true'
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          url="${SITE_URL:-https://nse-swing-scanner.netlify.app}"
+          echo "Verifying $url …"
+
+          title=$(curl -fsS -m 20 --retry 3 "$url/" | grep -o '<title>[^<]*</title>' | head -1 || true)
+          if [ "$title" != "<title>NSE Swing Scanner</title>" ]; then
+            echo "::error::deployed site title is '$title', expected '<title>NSE Swing Scanner</title>' — wrong site or broken deploy"
+            exit 1
+          fi
+
+          python - <<'PY'
+          import datetime, json, os, subprocess, sys, urllib.request
+
+          url = os.environ.get("SITE_URL") or "https://nse-swing-scanner.netlify.app"
+          local = "frontend/public/data/latest_scan.json"
+          with open(local) as fh:
+              expected = json.load(fh)["generated_at"]
+
+          with urllib.request.urlopen(f"{url}/data/latest_scan.json?t={datetime.datetime.now().timestamp()}", timeout=30) as r:
+              served = json.load(r)["generated_at"]
+
+          if served != expected:
+              print(
+                  f"::error::served generated_at {served} != committed {expected}. "
+                  f"The CDN is serving a stale build (cache TTL on /data/* is 60 s; "
+                  f"retry once before assuming the deploy failed).",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+          print(f"deploy verified: served generated_at {served}")
+          PY
+
+      - name: Ping healthchecks.io (scan succeeded)
+        # LAST step, deliberately: it used to fire right after the scanner, so a
+        # failure in validation / snapshot / commit / deploy still reported
+        # green and no alert was ever raised.
+        # Not sent when the run was skipped: the trigger that did the work
+        # already reset this window's timer.
+        if: success() && steps.ctx.outputs.scheduled == 'true' && steps.ctx.outputs.skip != 'true'
+        env:
+          URL: ${{ steps.ctx.outputs.healthcheck_url }}
+        continue-on-error: true
+        run: |
+          if [ -n "$URL" ]; then
+            curl -fsS -m 10 --retry 3 "${URL}" \
+              || echo "::warning::healthchecks.io success ping failed"
+          fi

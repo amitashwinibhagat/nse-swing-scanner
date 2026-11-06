@@ -74,6 +74,23 @@ def main(argv=None) -> int:
         action="store_true",
         help="Do not fail when T+5 trackable_count is 0 despite untrackable rows",
     )
+    p.add_argument(
+        "--scan-phase",
+        choices=["post_close", "pre_open", "auto"],
+        default="auto",
+        help="When snapshot prices were taken relative to the session. "
+             "pre_open (generated before 09:15 IST) means the stored price is the "
+             "previous close, so T+0 must be the prior session. 'auto' (default) "
+             "infers this per snapshot from its generated_at, which is correct now "
+             "that the morning run is genuinely pre-open.",
+    )
+    p.add_argument(
+        "--no-dedupe-cohorts",
+        action="store_true",
+        help="Count am and pm snapshots of the same date as separate cohorts. "
+             "Off by default: both daily runs land after the close, so they "
+             "describe the same session and double-count N.",
+    )
     args = p.parse_args(argv)
 
     # Default anchors to this script's backend dir, NOT the snapshots path:
@@ -97,12 +114,16 @@ def main(argv=None) -> int:
             snapshots,
             cache_dir=cache_dir,
             no_cache=args.no_cache,
+            dedupe_by_date=not args.no_dedupe_cohorts,
+            scan_phase=None if args.scan_phase == "auto" else args.scan_phase,
         )
     except Exception as e:
         print(f"::error::compute_performance: forward-return fetch failed: {e}", file=sys.stderr)
         return 1
 
-    payload = build_performance_payload(snapshots, forward)
+    payload = build_performance_payload(
+        snapshots, forward, dedupe_by_date=not args.no_dedupe_cohorts
+    )
     write_performance_payload(payload, args.output)
     n = payload["meta"]["snapshots_used"]
     t5 = (payload["meta"].get("trackable_count") or {}).get("T+5", 0)

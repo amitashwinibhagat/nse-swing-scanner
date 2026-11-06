@@ -1,5 +1,153 @@
 # Changelog
 
+## 1.7.0 — Correctness pass: the zero-PASS outage, dead CI, and the missing edge
+
+### Why
+
+Three defects shipped to production at once and none of them announced itself:
+
+1. **The product published zero picks for 16 consecutive scans** (2026-10-27 →
+   2026-11-05). The corporate-actions adapter called NSE's endpoint without the
+   `index`/`from_date`/`to_date` parameters it requires (NSE answers `200` with
+   the body `Missing index`), and its date parser only accepted ISO while NSE
+   publishes `06-Nov-2026`. Fail-closed made an outage indistinguishable from a
+   quiet market.
+2. **CI had created zero jobs since 2026-10-27** — one stray space in `ci.yml`
+   made the file invalid YAML, so no test, guard or build ever ran.
+3. **The dashboard claimed an edge its own tracker refutes.** The 1.6.0 copy was
+   true on 2026-09-08 (n=96, T+5 +3.76%). The committed payload now shows 63+ at
+   **−0.26% (CI −0.54..+0.02)** at T+5 and **−0.96%** at T+20.
+
+### Fixed — the schedule (this is the part that needed a new trigger)
+
+GitHub Actions `schedule` on this repo is not "approximately on time": measured
+over 45 scheduled runs the median delay was **5.4 h**, 37/45 started more than
+4 h late, worst 10 h. A cron cannot fire *early*, so the run that landed at
+11:16 UTC was the 03:30 cron. Net effect: the "09:00 IST" scan completed around
+16:45 IST — **after the 15:30 close** — and the dashboard served the previous
+close for the whole session.
+
+- **The punctual trigger is now Netlify Scheduled Functions**
+  (`frontend/netlify/functions/scheduled-scan-{morning,evening}.mjs`), which run
+  on Netlify's own UTC scheduler and dispatch `scan.yml` via
+  `repository_dispatch`, naming the window in `client_payload`. They fail loudly
+  when `GITHUB_DISPATCH_TOKEN` is missing rather than silently no-opping.
+- **The GitHub crons stay as a fallback**, so a Netlify outage still produces a
+  (late) scan.
+- **Duplicate suppression** (`backend/scripts/resolve_schedule_context.py`):
+  both triggers can fire for the same window, so the workflow skips itself when
+  the last committed scan is already newer than the window occurrence. It never
+  skips when the last scan is missing or unreadable.
+- **Adaptive staleness**: 90 minutes for a punctual run, 8 h for the cron
+  fallback, carried in `scan_status.json` as `stale_after_minutes` +
+  `schedule_source`. The watchdog reads the same value (capped at 45 min on the
+  punctual path) instead of a fixed 30.
+- **Pre-open T+0**: now that the morning run really is pre-open, its stored
+  price is the *previous* close. `performance.infer_scan_phase()` derives this
+  per snapshot from `generated_at`, so morning cohorts anchor T+0 to the prior
+  session instead of silently shifting a day.
+- `check_cron_consistency.py` now also validates `netlify.toml`'s function
+  schedules and each module's inline `config.schedule` against
+  `SCAN_WINDOWS_UTC` — the schedule now lives in three files and would otherwise
+  drift silently.
+- The inline Python heredoc for schedule resolution was extracted into
+  `scripts/resolve_schedule_context.py` so `check_workflow_scripts.py` covers it
+  and it can be unit-tested.
+
+### Fixed — data integrity
+
+- **Corporate actions**: correct endpoint parameters, a `DD-Mon-YYYY` parser
+  (plus ISO fallbacks), IST-based "today", excluded action types widened to
+  buybacks/capital reduction/scheme of arrangement, undateable excluded actions
+  now fail closed, and failures are no longer cached for 12 h.
+- **Surveillance**: replaced four invented endpoints (all 404) with the real NSE
+  `reportASM` list plus the `sec_list.csv` master (trade-for-trade series and
+  GSM remarks). `flag_only` now **fails closed**; it used to pass, which meant
+  the gate had never excluded anything. Failed fetches are cached for 30 min,
+  not 7 days.
+- **`source_health`** block in the scan payload: per-gate source rollup with
+  `critical_source_failed`. The scanner exits 3 (warning) instead of silently
+  publishing a zero-PASS list, and the dashboard renders a "Source outage, not
+  a quiet market" banner.
+- **52-week drawdown**: measured on intraday highs over a **full 252-session
+  window** (was closes with `min_periods=100`), fetched over 2y so the window can
+  be complete; partial-window names fail closed with an explicit reason.
+- **Entry state**: the plan anchors `entry_zone_high` to the scan close, so
+  evaluating a fresh row always returned "in zone" and every card said "consider
+  entering now". Chips now evaluate the **prior** snapshot's levels against
+  today's price, and label the plan-only fallback.
+- **Outcome tracker**: `--scan-phase` (`pre_open` snaps T+0 to the prior
+  session) and **one cohort per trading date** — both daily runs land after the
+  same close, so counting am+pm doubled N.
+- **`approx_5y_avg_pe`** now actually runs for gate-passed names only (it was
+  running for all 501 rows, contradicting its own comment).
+- **`make_status(extra={...})`** flattened its dict instead of nesting it under a
+  literal `"extra"` key.
+
+### Fixed — operations
+
+- **`ci.yml`** repaired and restructured: a dedicated `lint-workflows` job runs
+  `check_workflows_parse.py`, which validates every workflow's YAML *and* its
+  structure (jobs, steps, `uses`/`run`).
+- **Smoke scan is offline**: `scripts/smoke_scan.py` drives the real pipeline
+  with stubbed sources. The old test made 5 live yfinance calls, so one 429
+  dropped coverage to 80% and CI failed for reasons unrelated to our code.
+- **Healthchecks ordering**: the success ping is now the **last** step, so a
+  failure in validation/commit/deploy is reported. A run cancelled while queued
+  can only be caught by healthchecks' Period+Grace alert — documented.
+- **Watchdog**: `GH_TOKEN` is now set for `gh run list` (it never was, so the
+  duplicate-suppression check was dead and `run_state` was always `none`); an
+  unknown state now suppresses instead of authorising; the window is 01–20 UTC
+  so the evening slot is monitored.
+- **Schedule attribution**: `github.event.schedule` is passed through, so a
+  7.7-hour-late morning run reports 469 minutes of drift instead of being
+  misattributed to the 10:30 window as "49 min late".
+- **Deploy verification**: after deploying, the workflow asserts the site title
+  and that the served `generated_at` matches the committed one.
+- **Cache**: stable key + explicit `actions/cache/save` (keying on `run_id` meant
+  the exact key never hit and every run wrote a fresh ~8 MB entry).
+- **`git add`** split per path in the outcome tracker (a multi-path add stages
+  nothing if any path is missing) and the digest's exit 2 is no longer a failure.
+
+### Fixed — frontend
+
+- **Zero-share trade crash**: `summarizeTrades` returned `{pnlAbs: 0, pnlPct:
+  null}` and the journal header called `.toFixed` on the null — a white screen
+  on every reload. Fixed, plus an `ErrorBoundary` and payload validation.
+- **Header time**: date and time are now formatted in the same zone (they
+  disagreed for every non-IST visitor).
+- **Staleness**: grace comes from `scan_status.json` (`stale_after_minutes`,
+  derived from measured drift) instead of a 30-minute guess that fired every
+  trading day.
+- **Performance payload** is loaded on demand (6.2 MB no longer blocks first
+  paint); `/data/*` fetches revalidate instead of `no-store`.
+- **Deploy size**: a Vite plugin prunes `dist/data/snapshots` to the newest 12
+  (was 134 MB of history the app never requests).
+- **Accessibility**: focus trap + focus restore in the drawer, keyboard-sortable
+  table headers, the star button no longer swallows Space/Enter, visible focus
+  rings restored, light-theme contrast fixed (2.43:1 → 5.1:1).
+- **Seven sub-scores**: `conviction_holding` is rendered again (it was counted by
+  "scored on N/7" but never drawn).
+- CSV export serialises objects and escapes formula injection; 501 cards are
+  memoised; `localStorage` reads cannot throw during render.
+
+### Added
+
+- `backend/scripts/check_workflows_parse.py`, `backend/scripts/write_scan_status.py`,
+  `backend/scripts/smoke_scan.py`.
+- `frontend/src/utils/scanData.js` + `usePriorPlans.js`, and 27 `node --test`
+  frontend unit tests (`npm run test:unit`).
+- Backend tests for the corporate-action date format, surveillance parsing,
+  cohort dedupe, T+0 phase, source health, workflow guards, and the status writer
+  (**280 total**).
+
+### Known limitations (unchanged)
+
+- GitHub `schedule` still drifts hours; use an external `repository_dispatch`
+  trigger if intraday freshness matters. The workflow now accepts
+  `repository_dispatch: scheduled-scan` for that.
+- No score band has an established edge; the UI says so instead of asserting one.
+
 ## 1.6.0 — Shortlist-first dashboard
 
 ### Why

@@ -11,8 +11,22 @@ import PerSymbolAccuracy from "./PerSymbolAccuracy.jsx";
  *  - Empty trackable state surfaces reason breakdown (P0 integrity)
  */
 export default function PerformanceSection({ data }) {
-  if (!data) return null;
-  if (data.meta && data.meta.snapshots_used === 0) {
+  if (!data) {
+    return (
+      <section className="performance">
+        <h3>Forward-return attribution</h3>
+        <p className="na">
+          Loading the outcome tracker… It is a ~6 MB payload fetched only when
+          this panel is opened, so that it never blocks the dashboard.
+        </p>
+      </section>
+    );
+  }
+  // Older/partial payloads may omit `meta` entirely; the old code optional-
+  // chained it here and then dereferenced `data.meta.snapshots_used` below,
+  // throwing a TypeError inside a collapsed panel with no error boundary.
+  const meta = data.meta || {};
+  if (meta.snapshots_used === 0) {
     return (
       <section className="performance">
         <h3>Forward-return attribution</h3>
@@ -26,9 +40,12 @@ export default function PerformanceSection({ data }) {
   }
 
   const windows = Object.keys(data.windows || {});
-  const buckets =
-    (data.meta && data.meta.buckets) ||
-    ["63+", "60-63", "55-60", "45-55", "<45"];
+  const buckets = [
+    ...(meta.buckets || ["63+", "60-63", "55-60", "45-55", "<45"]),
+    // `unknown` holds rows with no score. It exists in the payload and was
+    // silently omitted from the table.
+    ...(data.windows?.["T+5"]?.buckets?.unknown?.n ? ["unknown"] : []),
+  ];
   const regimes = ["risk_on", "neutral", "risk_off", "unknown"];
   const regimeLabels = {
     risk_on: "Risk-on (Nifty > +2% vs 200EMA)",
@@ -40,9 +57,9 @@ export default function PerformanceSection({ data }) {
   const REGIME_N_FLOOR = 5;
   const HIT_RATE_N_FLOOR = 20;
 
-  const t5Track = data.meta?.trackable_count?.["T+5"] ?? data.windows?.["T+5"]?.trackable_count ?? 0;
-  const t5Untrack = data.meta?.untrackable_count?.["T+5"] ?? data.windows?.["T+5"]?.untrackable_count ?? 0;
-  const t5Open = data.meta?.window_not_closed_count?.["T+5"] ?? data.windows?.["T+5"]?.window_not_closed_count ?? 0;
+  const t5Track = meta.trackable_count?.["T+5"] ?? data.windows?.["T+5"]?.trackable_count ?? 0;
+  const t5Untrack = meta.untrackable_count?.["T+5"] ?? data.windows?.["T+5"]?.untrackable_count ?? 0;
+  const t5Open = meta.window_not_closed_count?.["T+5"] ?? data.windows?.["T+5"]?.window_not_closed_count ?? 0;
   const anyTrackable = windows.some(
     (w) => (data.windows[w]?.trackable_count ?? 0) > 0,
   );
@@ -57,11 +74,16 @@ export default function PerformanceSection({ data }) {
         descriptive cohort statistics, not an edge.
       </p>
       <div className="perf-meta">
-        <span>Snapshots: <b>{data.meta.snapshots_used}</b></span>
-        <span>Total passed: <b>{data.meta.total_passed}</b></span>
+        <span>Snapshots: <b>{meta.snapshots_used ?? "—"}</b></span>
+        <span>Total passed: <b>{meta.total_passed ?? "—"}</b></span>
         <span>Retention: <b>{data.retention_days}d</b></span>
-        {data.meta.bucket_scheme && (
-          <span>Buckets: <b>{data.meta.bucket_scheme}</b></span>
+        {meta.bucket_scheme && (
+          <span>Buckets: <b>{meta.bucket_scheme}</b></span>
+        )}
+        {meta.cohort_policy && (
+          <span title="Both daily scans run after the close, so am/pm snapshots describe the same session.">
+            Cohorts: <b>{meta.cohort_policy}</b>
+          </span>
         )}
         {data.generated_at && (() => {
           const d = new Date(data.generated_at);

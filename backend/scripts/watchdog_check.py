@@ -59,13 +59,21 @@ from scan_schedule import next_scheduled_window  # noqa: E402
 RUN_NONE = "none"
 RUN_QUEUED = "queued"
 RUN_IN_PROGRESS = "in_progress"
+# The workflow emits this when `gh run list` itself failed. An unknown state
+# must suppress the trigger: the pre-1.3.3 fallback treated "cannot tell" as
+# "nothing is running" and queued duplicate scans.
+RUN_UNKNOWN = "unknown"
 
 # Default: how long after the next scheduled window we call the scan late,
 # and how long the trigger-marker cooldown lasts. The cooldown must cover
 # the worst-case gap between "trigger fired" and the run becoming visible
 # in `gh run list` (queue latency during runner-scarcity peaks), plus the
 # scan runtime we do not want to stack on top of.
-DEFAULT_GRACE_MIN = 30
+# Grace is usually taken from scan_status.json (`stale_after_minutes`, adaptive
+# to whether the punctual scheduler or the GitHub cron produced the last run).
+# This constant is the fallback for a legacy/absent status file. 45 minutes
+# keeps a recovery trigger prompt without re-triggering a healthy punctual scan.
+DEFAULT_GRACE_MIN = 45
 DEFAULT_COOLDOWN_MIN = 45
 
 
@@ -156,6 +164,9 @@ def should_trigger(
     Order matters: the cheap "already covered" checks come first so an
     in-flight scan always wins over staleness.
     """
+    if run_state == RUN_UNKNOWN:
+        return False, "scan run state unknown (gh run list failed) — refusing to trigger"
+
     if run_state in (RUN_QUEUED, RUN_IN_PROGRESS):
         return False, f"scan already {run_state} — not triggering a duplicate"
 
@@ -171,15 +182,46 @@ def should_trigger(
     return True, "scan late past next window + grace, no run queued/in-progress, cooldown expired"
 
 
+# A punctual (external-scheduler) run should be re-triggered quickly if it never
+# lands; the 90-minute display threshold in scan_schedule is too slow for
+# recovery. Never wait longer than this on the punctual path.
+PUNCTUAL_GRACE_CAP_MIN = 45
+
+
+def _resolve_grace(explicit: Optional[int], status: Optional[dict]) -> int:
+    """
+    Effective grace in minutes.
+
+    Explicit CLI wins (used by tests and manual runs). Otherwise trust the
+    scanner's own record: it knows whether the last run came from the punctual
+    scheduler or the drifting GitHub cron, and those two must not share a
+    threshold.
+    """
+    if explicit is not None:
+        return explicit
+    recorded = (status or {}).get("stale_after_minutes")
+    if isinstance(recorded, (int, float)) and recorded > 0:
+        if (status or {}).get("schedule_source") == "external-scheduler":
+            return min(int(recorded), PUNCTUAL_GRACE_CAP_MIN)
+        return int(recorded)
+    return DEFAULT_GRACE_MIN
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     p = argparse.ArgumentParser(description="Watchdog: decide whether to trigger a recovery scan.")
     p.add_argument("--latest", required=True, help="Path to latest_scan.json")
     p.add_argument("--status", default=None, help="Path to scan_status.json (best-effort)")
     p.add_argument("--marker", required=True, help="Path to the last-trigger marker file")
     p.add_argument("--run-state", default=RUN_NONE,
-                   choices=[RUN_NONE, RUN_QUEUED, RUN_IN_PROGRESS, "unknown"],
+                   choices=[RUN_NONE, RUN_QUEUED, RUN_IN_PROGRESS, RUN_UNKNOWN],
                    help="Current scan.yml run state (from `gh run list` in the workflow)")
-    p.add_argument("--grace-min", type=int, default=DEFAULT_GRACE_MIN)
+    p.add_argument(
+        "--grace-min",
+        type=int,
+        default=None,
+        help="Minutes after the window before a scan counts as late. Default: "
+             "the adaptive value recorded in scan_status.json, else 45.",
+    )
     p.add_argument("--cooldown-min", type=int, default=DEFAULT_COOLDOWN_MIN)
     p.add_argument("--now", default=None, help="Override 'now' (ISO); for tests.")
     p.add_argument("--age-min", type=int, default=None,
@@ -198,13 +240,15 @@ def main(argv: Optional[List[str]] = None) -> int:
     status = load_json(args.status) if args.status else None
     marker_dt = read_marker(args.marker)
 
+    grace_min = _resolve_grace(args.grace_min, status)
+
     trigger, reason = should_trigger(
         run_state=args.run_state,
         latest=latest,
         status=status,
         marker_dt=marker_dt,
         now=now,
-        grace_min=args.grace_min,
+        grace_min=grace_min,
         cooldown_min=args.cooldown_min,
     )
 

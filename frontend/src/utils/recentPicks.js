@@ -24,11 +24,17 @@ export function resolveIndexEntry(history, currentGeneratedAt) {
   }
   const match = history.find((e) => e.generated_at === currentGeneratedAt);
   if (match) return match;
+  // Fallback only: derive the (date, slot) from the timestamp. The slot is the
+  // one the workflow *passed* (cron-derived), not the one the clock implies —
+  // a delayed morning run completes at 09:15-11:22 UTC but is still "am".
+  // Without the cron we cannot know, so match the date and prefer pm (the
+  // later snapshot), which is what a same-day re-render will be.
   const d = new Date(currentGeneratedAt);
   if (Number.isNaN(d.getTime())) return null;
   const dateStr = d.toISOString().slice(0, 10);
-  const slot = d.getUTCHours() >= 8 ? "pm" : "am";
-  return history.find((e) => e.date === dateStr && e.slot === slot) || null;
+  const sameDate = history.filter((e) => e.date === dateStr);
+  if (sameDate.length === 0) return null;
+  return sameDate.find((e) => e.slot === "pm") || sameDate[0];
 }
 
 /** Display order: actionable states first, outcomes (T1/T2) next, dead last. */

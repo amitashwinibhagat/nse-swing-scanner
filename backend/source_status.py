@@ -28,13 +28,20 @@ def make_status(
     as_of: Optional[str] = None,
     error: Optional[str] = None,
     data: Any = None,
-    **extra,
+    extra: Optional[dict] = None,
+    **kwargs,
 ) -> dict:
     """
     Build a standardized status dict.
 
     `data` is the actual payload (numbers, list, dict, etc).
-    `**extra` is for module-specific fields (e.g. `quarter`, `delivery_value_inr`).
+    `extra` (and any **kwargs) is for module-specific fields, e.g.
+    `delivery_kind="actual"`. Both spellings are accepted so callers can pass
+    a prebuilt dict; they are flattened into the top level.
+
+    Historical bug this guards against: `make_status(..., extra={...})` used to
+    land the dict under a literal `"extra"` key, so `payload["delivery_kind"]`
+    silently returned None through ~1,000 call sites.
     """
     if status not in SOURCE_STATUSES:
         raise ValueError(f"Unknown source status: {status!r}; expected one of {sorted(SOURCE_STATUSES)}")
@@ -48,7 +55,11 @@ def make_status(
         out["error"] = error
     if data is not None:
         out["data"] = data
-    out.update(extra)
+    if extra:
+        if not isinstance(extra, dict):
+            raise TypeError(f"extra must be a dict, got {type(extra).__name__}")
+        out.update(extra)
+    out.update(kwargs)
     return out
 
 

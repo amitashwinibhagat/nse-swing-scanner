@@ -1,3 +1,36 @@
+const crypto = require("node:crypto");
+
+/**
+ * Constant-time comparison of two strings.
+ *
+ * `provided !== expected` short-circuits on the first differing byte, which
+ * leaks the shared secret's prefix to anyone willing to time the endpoint.
+ * Both values are hashed first so `timingSafeEqual` gets equal-length buffers
+ * regardless of what the caller sent.
+ */
+function secretsMatch(provided, expected) {
+  if (typeof provided !== "string" || typeof expected !== "string") return false;
+  const a = crypto.createHash("sha256").update(provided).digest();
+  const b = crypto.createHash("sha256").update(expected).digest();
+  return crypto.timingSafeEqual(a, b);
+}
+
+// Best-effort in-process throttle. Netlify functions are ephemeral, so this is
+// not a hard guarantee — but it turns "unlimited queued 60-minute scans from a
+// leaked token" into "one per minute per instance", and the cap below bounds
+// the damage either way. The workflow's concurrency group queues rather than
+// cancels, so an unthrottled endpoint is a free denial-of-service on the
+// runner budget.
+const WINDOW_MS = 60 * 1000;
+const lastTriggerByKey = new Map();
+
+function rateLimited(key, now = Date.now()) {
+  const last = lastTriggerByKey.get(key) || 0;
+  if (now - last < WINDOW_MS) return true;
+  lastTriggerByKey.set(key, now);
+  return false;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
@@ -9,27 +42,40 @@ exports.handler = async (event) => {
 
   const expected = process.env.SCAN_TRIGGER_SECRET;
   if (!expected) {
+    // Do NOT describe the misconfiguration to an unauthenticated caller: the
+    // old response ("server_misconfigured") confirmed which env var to attack.
+    console.error("trigger-scan: SCAN_TRIGGER_SECRET is not set");
     return {
-      statusCode: 500,
-      body: JSON.stringify({ ok: false, error: "server_misconfigured" }),
+      statusCode: 503,
+      body: JSON.stringify({ ok: false, error: "unavailable" }),
     };
   }
 
   const auth = event.headers.authorization || event.headers.Authorization || "";
   const match = auth.match(/^Bearer\s+(.+)$/);
   const provided = match ? match[1].trim() : "";
-  if (!provided || provided !== expected) {
+  if (!secretsMatch(provided, expected)) {
     return {
       statusCode: 401,
       body: JSON.stringify({ ok: false, error: "invalid_secret" }),
     };
   }
 
+  const throttleKey = `${event.headers["x-nf-client-connection-ip"] || event.headers["client-ip"] || "unknown"}`;
+  if (rateLimited(throttleKey)) {
+    return {
+      statusCode: 429,
+      headers: { "Content-Type": "application/json", "Retry-After": "60" },
+      body: JSON.stringify({ ok: false, error: "rate_limited" }),
+    };
+  }
+
   const token = process.env.GITHUB_DISPATCH_TOKEN;
   if (!token) {
+    console.error("trigger-scan: GITHUB_DISPATCH_TOKEN is not set");
     return {
-      statusCode: 500,
-      body: JSON.stringify({ ok: false, error: "github_token_missing" }),
+      statusCode: 503,
+      body: JSON.stringify({ ok: false, error: "unavailable" }),
     };
   }
 
@@ -75,10 +121,12 @@ exports.handler = async (event) => {
       const j = await ghRes.json();
       if (j && j.message) detail = j.message;
     } catch {}
+    // Log the detail; do not hand GitHub's internals to the caller.
     console.error("trigger-scan: GitHub rejected dispatch", ghRes.status, detail);
     return {
       statusCode: 502,
-      body: JSON.stringify({ ok: false, error: "github_dispatch_failed", detail }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: false, error: "github_dispatch_failed" }),
     };
   }
 
@@ -91,7 +139,8 @@ exports.handler = async (event) => {
     console.error("trigger-scan: GitHub 404 on dispatch", detail);
     return {
       statusCode: 502,
-      body: JSON.stringify({ ok: false, error: "github_dispatch_failed", detail }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: false, error: "github_dispatch_failed" }),
     };
   }
 
@@ -103,6 +152,7 @@ exports.handler = async (event) => {
   console.error("trigger-scan: GitHub dispatch unexpected status", ghRes.status, detail);
   return {
     statusCode: 502,
-    body: JSON.stringify({ ok: false, error: "github_dispatch_failed", detail }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ok: false, error: "github_dispatch_failed" }),
   };
 };

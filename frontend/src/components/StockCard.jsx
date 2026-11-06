@@ -1,5 +1,6 @@
+import { memo } from "react";
 import ScoreRing from "./ScoreRing.jsx";
-import { computeEntryState, confirmationChip, earningsChip, scoreBandChip } from "../utils/scanPlan.js";
+import { confirmationChip, earningsChip, evaluatePlanState, scoreBandChip } from "../utils/scanPlan.js";
 
 const fmtINR = (v) =>
   v == null ? "—" : `₹${v.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
@@ -35,7 +36,7 @@ function StarButton({ on, onToggle, symbol, stop }) {
   );
 }
 
-export default function StockCard({ stock, expanded, onToggle, watchlist, performance }) {
+function StockCard({ stock, expanded, onToggle, watchlist, performance, priorPlan }) {
   const {
     symbol,
     company_name,
@@ -52,7 +53,11 @@ export default function StockCard({ stock, expanded, onToggle, watchlist, perfor
     gate_fail_reason,
   } = stock;
 
-  const entryState = computeEntryState(stock);
+  // Evaluate the prior snapshot's levels against today's close. Falls back to
+  // the row's own plan (labelled) when there is no prior snapshot yet.
+  const entryState = priorPlan
+    ? evaluatePlanState(priorPlan, stock.current_price)
+    : null;
   const conf = confirmationChip(stock);
   const ea = earningsChip(stock);
   const band = scoreBandChip(swing_score, performance);
@@ -207,3 +212,7 @@ function Metric({ label, value, tone }) {
     </div>
   );
 }
+
+// 501 cards re-rendered on every keystroke without this: the sort/filter
+// pipeline produces new row objects on each search input.
+export default memo(StockCard);

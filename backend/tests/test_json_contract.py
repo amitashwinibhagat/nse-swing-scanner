@@ -284,3 +284,25 @@ def test_write_scan_output_keeps_existing_file_below_coverage_floor(tmp_path):
 
     assert payload["coverage"]["pct"] == 0.0
     assert out.read_text() == '{"generated_at":"previous-good"}'
+
+
+def test_write_scan_output_includes_source_health(tmp_path):
+    """The root payload must carry the per-gate source rollup so the workflow
+    and the dashboard can tell a source outage from a quiet market."""
+    row = _make_df().iloc[0].to_dict()
+    row["corporate_actions_status"] = "source_failed"
+    out = tmp_path / "scan.json"
+
+    payload = write_scan_output(pd.DataFrame([row]), str(out))
+
+    health = payload["source_health"]
+    assert health["corporate_actions"]["dominant"] == "source_failed"
+    assert health["critical_source_failed"] is True
+    assert "corporate_actions" in health["degraded_gates"]
+    assert json.loads(out.read_text())["source_health"]["critical_source_failed"] is True
+
+
+def test_write_scan_output_reports_clean_source_health(tmp_path):
+    out = tmp_path / "scan.json"
+    payload = write_scan_output(_make_df(), str(out))
+    assert payload["source_health"]["critical_source_failed"] is False

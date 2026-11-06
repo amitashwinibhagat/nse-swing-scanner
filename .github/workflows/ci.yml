@@ -6,7 +6,33 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  lint-workflows:
+    # This job exists because ci.yml itself was invalid YAML from 2026-10-27 to
+    # 2026-11-05: a single stray space under `working-directory:` made GitHub
+    # reject the whole file at parse time, so EVERY job in this workflow
+    # silently stopped existing (runs reported `jobs: []`). A workflow cannot
+    # lint itself, so validation lives in its own job that only needs a
+    # checkout and PyYAML.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install PyYAML
+        run: pip install "pyyaml>=6.0"
+      - name: Validate every workflow parses
+        run: python backend/scripts/check_workflows_parse.py
+
   backend:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -17,7 +43,7 @@ jobs:
           python-version: "3.11"
       - name: Install backend deps
         working-directory: backend
-         run: pip install -r requirements-dev.txt
+        run: pip install -r requirements-dev.txt
       - name: Check cron consistency (scan.yml vs WINDOWS)
         working-directory: backend
         # Fails fast if the YAML cron entries drift from the WINDOWS list
@@ -29,14 +55,24 @@ jobs:
         # cwd=backend and no PYTHONPATH — the same path production workflows
         # use. Catches ModuleNotFoundError that pytest path-hacks hide.
         run: python scripts/check_workflow_scripts.py
+      - name: Lint (pyflakes)
+        working-directory: backend
+        # Production code only. Test files carry historical unused imports
+        # (fixtures, deliberate monkeypatch helpers); cleaning those is
+        # separate from keeping shipped code tidy.
+        run: python -m pyflakes *.py scripts/*.py
       - name: Run pytest
         working-directory: backend
         run: pytest -q
-      - name: Smoke scan (5 stocks, no holdings, no corp actions)
+      - name: Smoke scan (offline, deterministic)
         working-directory: backend
-        run: |
-          python scanner.py --sample 5 --sleep 0 --skip-holdings --skip-corporate-actions --output /tmp/scan.json
-          python -c "import json; d=json.load(open('/tmp/scan.json')); assert d['universe_size']==5; assert 'config' in d; print('smoke ok')"
+        # Deliberately network-free. The previous smoke test ran 5 live
+        # yfinance fetches: on GHA egress a single 429 dropped coverage to 80%,
+        # the scanner refused to write the file (exit 2), and the next line
+        # died with a misleading FileNotFoundError. It now drives the real
+        # pipeline with fake upstreams, so it tests OUR code, not Yahoo's
+        # uptime.
+        run: python scripts/smoke_scan.py
 
   frontend:
     runs-on: ubuntu-latest
@@ -50,7 +86,10 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci || npm install
+        run: npm ci
+      - name: Lint pure utils (node --test)
+        working-directory: frontend
+        run: npm run test:unit
       - name: Build
         working-directory: frontend
         run: npm run build

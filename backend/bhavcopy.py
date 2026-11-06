@@ -26,18 +26,17 @@ with a top-level `source_status` ("ok" | "fallback_used" | "source_failed")
 and a `provider_chain` list describing what was tried.
 """
 import io
-import json
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import date, datetime, timedelta
+from collections import Counter
+from datetime import date, timedelta
 from typing import Dict, List, Optional
 
 import pandas as pd
 import requests
 import yfinance as yf
 
-from nse_client import nse_get, NSE_ARCHIVES_BASE
-from source_status import make_status, worst_status
+from nse_client import NSE_ARCHIVES_BASE
+from source_status import make_status
 from cache import read_cache, write_cache
 from settings import BHAVCOPY_CACHE_TTL_SECONDS
 
@@ -78,7 +77,7 @@ BSE_PROVIDER = "bse:bhavcopy"
 def _bhavcopy_url_for(d: date) -> List[str]:
     d_str = d.strftime("%Y%m%d")
     return [
-        f"{NSE_ARCHIVES_BASE}/content/equities/" + fn.format(date=d_str)
+        f"{NSE_ARCHIVES_BASE}/content/equities/{fn.format(date=d_str)}"
         for fn in BHAVCOPY_FILENAMES
     ]
 
@@ -88,7 +87,7 @@ def _bse_bhavcopy_url_for(d: date) -> List[str]:
     rotates; we try a small set on each lookback day."""
     d_str = d.strftime("%d%m%y")
     return [
-        f"https://www.bseindia.com/download/BhavCopy/Equity/" + fn.format(date=d_str)
+        f"https://www.bseindia.com/download/BhavCopy/Equity/{fn.format(date=d_str)}"
         for fn in BSE_BHAVCOPY_FILENAMES
     ]
 
@@ -142,7 +141,13 @@ def _try_nse_archives(timeout: int, max_lookback_days: int) -> dict:
 # ---------------------------------------------------------------------------
 
 def _yfinance_fetch_one(yf_ticker: str, timeout: int = 10) -> Optional[dict]:
-    """Fetch the latest day's OHLCV for one ticker. Returns None on any error."""
+    """
+    Fetch the latest completed day's OHLCV for one ticker. None on any error.
+
+    Returns the session date alongside the numbers so the caller can report a
+    real `as_of` instead of "today" (the data is the PREVIOUS close whenever
+    the scan runs before the market opens).
+    """
     try:
         t = yf.Ticker(yf_ticker)
         hist = t.history(period="5d", auto_adjust=True, timeout=timeout)
@@ -193,6 +198,7 @@ def _try_yfinance_traded_value(
 
     by_symbol: Dict[str, dict] = {}
     errors: List[str] = []
+    observed_dates: List[str] = []
     workers = max(1, min(workers, len(yf_tickers)))
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {
@@ -210,6 +216,8 @@ def _try_yfinance_traded_value(
                 continue
             close = rec["close"]
             volume = rec["volume"]
+            if rec.get("as_of"):
+                observed_dates.append(rec["as_of"])
             by_symbol[sym] = {
                 # NOTE: these fields are TRADED value / volume, NOT delivery.
                 # The "delivery_" prefix is preserved for downstream contract
@@ -228,16 +236,18 @@ def _try_yfinance_traded_value(
             error="; ".join(errors[:3]) or "no yfinance rows returned",
         )
 
-    # Find the most common as_of date across successful fetches.
-    as_of_dates = [
-        _yfinance_fetch_one.cache_info().currsize if False else None  # placeholder
-    ]
-    # We don't carry as_of per-row from the parallel fetch; use today's date
-    # as a coarse "as_of" — the row's date is also exposed via the cached payload.
+    # Real session date: the most common per-row date across successful
+    # fetches. It used to be `date.today()`, which is wrong on every pre-open
+    # run (the session the data describes is the previous one), and would have
+    # drifted further under the multi-hour schedule delays.
+    as_of = date.today().isoformat()
+    if observed_dates:
+        as_of = Counter(observed_dates).most_common(1)[0][0]
+
     result = make_status(
         source=YFINANCE_PROVIDER,
         status="ok",
-        as_of=date.today().isoformat(),
+        as_of=as_of,
         data=by_symbol,
         extra={
             "delivery_kind": "traded_value_proxy",

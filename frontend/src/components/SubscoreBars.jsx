@@ -8,8 +8,13 @@ const LABELS = {
   drawdown_sweetspot: "Drawdown zone",
   volume_capitulation: "Volume capitulation",
   quality_composite: "Quality (F-Score etc)",
+  conviction_holding: "Holdings conviction",
 };
 
+// Must list every key in WEIGHTS (backend/settings.py). It used to omit
+// conviction_holding, so a weighted 10% of the composite was never rendered
+// while "Scored on N/7" counted it — the drawer showed six bars and claimed
+// seven components.
 const ORDER = [
   "valuation_compression",
   "oversold_positioning",
@@ -17,6 +22,7 @@ const ORDER = [
   "drawdown_sweetspot",
   "volume_capitulation",
   "quality_composite",
+  "conviction_holding",
 ];
 
 export default function SubscoreBars({ subScores, marketCorrectionFactor }) {

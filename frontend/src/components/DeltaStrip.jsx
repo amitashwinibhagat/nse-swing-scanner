@@ -37,9 +37,12 @@ export default function DeltaStrip({ currentGeneratedAt, stocks, watchlist, hist
       setLatestMeta(null);
       return;
     }
+    // Slot is cron-derived in the workflow, not clock-derived: a delayed
+    // morning run completes 09:15-11:22 UTC but is still "am". Without the cron
+    // we only match on date and prefer the later (pm) snapshot.
     const dateStr = d.toISOString().slice(0, 10);
-    const slot = d.getUTCHours() >= 8 ? "pm" : "am";
-    const fallback = history.find((e) => e.date === dateStr && e.slot === slot);
+    const sameDate = history.filter((e) => e.date === dateStr);
+    const fallback = sameDate.find((e) => e.slot === "pm") || sameDate[0];
     setLatestMeta(fallback || null);
   }, [history, currentGeneratedAt]);
 
@@ -83,7 +86,7 @@ export default function DeltaStrip({ currentGeneratedAt, stocks, watchlist, hist
     <div className="delta-strip" role="status">
       <div className="delta-head">
         <span>
-          Changes since <b>{previousMeta.date}-{previousMeta.slot}</b> ({previousMeta.date}):
+          Changes since <b>{previousMeta.date} {previousMeta.slot === "pm" ? "evening" : "morning"}</b> scan:
         </span>
         <button
           type="button"

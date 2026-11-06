@@ -813,7 +813,13 @@ body {
   border-color: var(--border-strong);
   transform: translateY(-2px);
   box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.5);
-  outline: none;
+}
+
+/* WCAG 2.4.7: focus must be visible. These cards are the primary interactive
+   surface and previously suppressed the ring entirely. */
+.stock-card:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
 }
 
 .stock-card:hover::before,
@@ -1112,7 +1118,8 @@ body {
   color: var(--text);
 }
 .sizer-field input:focus {
-  outline: none;
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 1px;
   border-color: var(--accent);
 }
 .sizer-results {
@@ -1379,7 +1386,8 @@ body {
   font-size: var(--t-meta);
 }
 .per-symbol-search:focus {
-  outline: none;
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 1px;
   border-color: var(--accent, #6366f1);
 }
 .per-symbol-accuracy .perf-table tr[style] td {
@@ -1728,7 +1736,7 @@ body {
 
   --text:       #1a1a1f;
   --text-dim:   #4b5563;
-  --text-faint: #9ca3af;
+  --text-faint: #5b6472;   /* 5.1:1 on --surface-0 (was #9ca3af at 2.43:1) */
 
   --accent:        #7c3aed;
   --accent-bright: #6d28d9;
@@ -1990,7 +1998,11 @@ body {
   border-color: var(--border-strong);
   transform: translateY(-2px);
   box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.5);
-  outline: none;
+}
+
+.pick-card:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
 }
 
 .pick-head {
@@ -2414,7 +2426,8 @@ body {
 }
 
 .my-trade-field input:focus {
-  outline: none;
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 1px;
   border-color: var(--accent);
 }
 
@@ -2518,4 +2531,81 @@ body {
   .pick-take {
     min-height: 44px;
   }
+}
+
+/* ---- Classes referenced by components but previously undefined ---- */
+/* Without these, several surfaces silently rendered unstyled: the performance
+   grid had no layout, the per-symbol row selection gave no feedback, and the
+   loading skeleton was not a card. */
+.ticker-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--sp-3);
+}
+
+.skeleton-card { pointer-events: none; }
+
+.perf-grid {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: 1fr;
+}
+
+.score-ring { display: block; }
+
+.donut { flex: none; }
+
+.perf-table tbody tr[tabindex] {
+  cursor: pointer;
+}
+
+.perf-table tbody tr.selected td {
+  background: var(--accent-dim);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.per-symbol-detail {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-0);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+}
+
+/* The main table has 12 nowrap columns; without a scroll container it forced
+   page-level horizontal scrolling between 900px and ~1200px. */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Sortable header: a real button so it is keyboard reachable. */
+.th-sort {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.th-sort:hover { color: var(--text); }
+.th-sort:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; border-radius: 3px; }
+
+.my-trades-total--muted {
+  font-family: var(--font-body);
+  font-size: var(--t-meta);
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* Disclosure for actions derived from a plan with no prior scan to compare
+   against. Also used to keep the entry-state copy honest. */
+.pick-action-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-faint);
+  font-size: var(--t-micro);
 }

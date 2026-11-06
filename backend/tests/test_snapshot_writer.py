@@ -163,3 +163,35 @@ class TestCLI(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+def test_corrupt_history_index_is_rebuilt_not_truncated(tmp_path):
+    """A corrupt index used to be replaced with just the new entry, silently
+    orphaning every older snapshot (and blanking the frontend's diff strips)."""
+    from snapshot_writer import rebuild_index_from_disk, write_snapshot
+
+    latest = tmp_path / "latest_scan.json"
+    latest.write_text(json.dumps({
+        "generated_at": "2026-11-05T10:31:00+00:00",
+        "universe_size": 3,
+        "gate_pass_count": 1,
+        "stocks": [{"symbol": "A", "gate_pass": True},
+                   {"symbol": "B", "gate_pass": False},
+                   {"symbol": "C", "gate_pass": False}],
+    }))
+
+    snaps = tmp_path / "snapshots"
+    snaps.mkdir()
+    write_snapshot(str(latest), str(snaps), slot="am",
+                   generated_at_iso="2026-11-04T03:31:00+00:00", retention_days=90)
+    write_snapshot(str(latest), str(snaps), slot="pm",
+                   generated_at_iso="2026-11-04T10:31:00+00:00", retention_days=90)
+
+    # Corrupt the index, then take a new snapshot.
+    (snaps / "history_index.json").write_text("{not json")
+    write_snapshot(str(latest), str(snaps), slot="am",
+                   generated_at_iso="2026-11-05T03:31:00+00:00", retention_days=90)
+
+    index = json.loads((snaps / "history_index.json").read_text())
+    files = sorted(entry["file"] for entry in index)
+    assert files == ["2026-11-04-am.json", "2026-11-04-pm.json", "2026-11-05-am.json"]
+    assert len(rebuild_index_from_disk(str(snaps))) == 3

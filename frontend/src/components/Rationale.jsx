@@ -1,19 +1,19 @@
 const RATIONALE = [
   "Twice a day, the GitHub Actions scan runs the universe through seven hard gates and a 0–100 soft score, then commits the result as frontend/public/data/latest_scan.json. This dashboard renders that JSON. It never calls a live API, never touches your data, and never blocks on a backend.",
   "Two free data sources feed every always-on signal: yfinance (price, volume, ADV, F-Score, 5y P/E) and Screener.in (promoter/FII/DII holdings). NSE bhavcopy for real delivery and NSE corporate filings for pending-actions remain best-effort and only ever tighten the gate; they cannot, by themselves, inflate PASSes. When any source changes its URL or rate-limits, the affected gate fails closed and the source-status pill surfaces it row by row.",
-  "The CSV export captures every field the scanner emits, including sub-scores, ATR(14), entry zone, both R-multiples, holdings breakdown, source status, and the gate-fail reason. Useful for re-scoring in a notebook without re-running the scan.",
+  "The CSV export captures the decision fields for the rows currently on screen: the trade plan, ATR(14), ADV, holdings breakdown, every source status, the per-gate checklist, and the gate-fail reason. It is a working subset, not a dump of every field the scanner emits — sub-scores and delivery details stay in the JSON.",
 ];
 
 const TERMS = [
   {
     term: "GATE",
     body:
-      "PASS / FAIL on the seven hard gates (F-Score ≥ 6, drawdown in [-40%, -15%], 25 ≤ RSI ≤ 40, liquidity adequacy ≥ ₹10 cr ADV OR actual delivery ≥ ₹5 cr, no T-group / suspension / GSM flag, holdings conviction > 50%, no pending corporate action in the next 30 days). Hard gates fail closed. If a source is unreachable, that gate fails rather than silently passing. The detail drawer reveals which gate blocked a FAIL.",
+      "PASS / FAIL on the seven hard gates (F-Score ≥ 6, drawdown in [-40%, -15%], 25 ≤ RSI ≤ 40, liquidity adequacy ≥ ₹10 cr ADV OR actual delivery ≥ ₹5 cr, not in T-group / ASM / GSM / suspension, holdings conviction > 50%, no pending corporate action in the next 30 days). Hard gates fail closed: if a source is unreachable, that gate fails rather than silently passing, and the dashboard says so in a banner instead of calling an outage a quiet market. The detail drawer reveals which gate blocked a FAIL, and why.",
   },
   {
     term: "SCORE",
     body:
-      "0–100 soft ranking: weighted blend of valuation compression (current P/E vs 5Y mean), RSI positioning, 200-EMA proximity, drawdown sweet-spot, volume capitulation, F-Score, and holdings conviction, multiplied by the Nifty 50's distance from its 200-EMA as a regime filter. Weights are hand-tuned, not backtested; treat the score as a degree-of-match ranking, not an edge.",
+      "0–100 soft ranking: weighted blend of valuation compression (current P/E vs 5Y mean), RSI positioning, 200-EMA proximity, drawdown sweet-spot, volume capitulation, F-Score, and holdings conviction, multiplied by the Nifty 50's distance from its 200-EMA as a regime filter. Weights are hand-tuned and the forward-return tracker currently shows no established edge for any score band; treat the score as a degree-of-match ranking, not a signal.",
   },
   {
     term: "PRICE",
@@ -23,7 +23,7 @@ const TERMS = [
   {
     term: "% OFF 52W",
     body:
-      "Distance from the 52-week high: (price / 52w_high − 1) × 100. The gate window is −40% to −15%, far enough below the high that the swing has had time to consolidate, not so far that the thesis is broken.",
+      "Distance from the 52-week high: (price / 52w_high − 1) × 100, using intraday highs over a full 252-session window. Names with less than a year of history are rejected rather than measured against a partial-window high. The gate window is −40% to −15%, far enough below the high that the swing has had time to consolidate, not so far that the thesis is broken.",
   },
   {
     term: "RSI-14",
@@ -33,7 +33,7 @@ const TERMS = [
   {
     term: "T1",
     body:
-      "First profit target at +1.5R above the entry zone, derived from ATR(14). T2 is at +2.5R. If the stock doesn't reach T1, the trade is a scratch; if it does, a trailing stop is not signalled; that's deliberate for v1.",
+      "First profit target at +1.5R above the entry midpoint, derived from ATR(14). T2 is at +2.5R. The R:R is computed at the mid-fill; filling at the top of the zone lowers it (the position sizer uses the conservative zone-top fill). If the stock doesn't reach T1, the trade is a scratch; a trailing stop is not signalled — that's deliberate for v1.",
   },
   {
     term: "STOP",

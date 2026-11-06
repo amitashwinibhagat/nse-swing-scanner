@@ -43,6 +43,10 @@ export function computeEntryState(stock) {
   const t1 = stock.target_1;
   const t2 = stock.target_2;
   if (![p, zl, zh, stop, t1].every(num)) return null;
+  // Degenerate plan: the scanner sets entry_zone_high = current_price, so a
+  // *fresh* row always sits exactly on the zone boundary. Evaluating the plan
+  // against its own close therefore always yields "in zone" — see
+  // evaluatePlanState below for the honest version.
 
   let state = ENTRY_STATES.IN_ZONE;
   let label = "in zone";
@@ -87,53 +91,107 @@ export function computeEntryState(stock) {
 }
 
 /**
- * Customer-facing action for a pick, derived from where price sits relative
- * to the stored plan. Turns the mechanical entry-state label into a verb the
- * customer can act on tonight. Levels themselves live in the plan grid.
+ * Where a *stored plan* sits relative to a *later* price.
+ *
+ * The scanner's plan is anchored to the scan close: `entry_zone_high` **is**
+ * `current_price` (`technicals.py`). So calling `computeEntryState` on a fresh
+ * row always returns `in_zone`, and the card's action banner therefore told
+ * every pick "In the buy zone — consider entering now", every day, forever.
+ * That is not a signal, it is a tautology dressed as advice.
+ *
+ * This function takes the plan (from a previous snapshot) and today's price,
+ * which is the only combination that can actually be in, above or below the
+ * zone. `delta.js` and `recentPicks.js` already do this; the cards now use the
+ * same primitive.
+ *
+ * @param {{entry_zone_low:number, entry_zone_high:number, stop_loss:number,
+ *          target_1:number, target_2?:number}} plan
+ * @param {number} price  a price observed after the plan was written
  */
-export function entryAction(stock) {
-  const es = computeEntryState(stock);
-  if (!es) return null;
-  switch (es.state) {
+export function evaluatePlanState(plan, price) {
+  if (!plan || !num(price)) return null;
+  const zl = plan.entry_zone_low;
+  const zh = plan.entry_zone_high;
+  const stop = plan.stop_loss;
+  const t1 = plan.target_1;
+  const t2 = plan.target_2;
+  if (![zl, zh, stop, t1].every(num)) return null;
+
+  if (num(t2) && price >= t2) {
+    return { state: ENTRY_STATES.AT_T2, label: "at T2", tone: "accent" };
+  }
+  if (price >= t1) {
+    return { state: ENTRY_STATES.AT_T1, label: "at T1", tone: "accent" };
+  }
+  if (price <= stop) {
+    return { state: ENTRY_STATES.STOPPED, label: "stopped", tone: "danger" };
+  }
+  if (price > zh) {
+    const over = ((price - zh) / zh) * 100;
+    return { state: ENTRY_STATES.EXTENDED, label: `extended +${over.toFixed(1)}%`, tone: "warning" };
+  }
+  if (price < zl) {
+    return { state: ENTRY_STATES.BELOW_ZONE, label: "below zone", tone: "warning" };
+  }
+  return { state: ENTRY_STATES.IN_ZONE, label: "in zone", tone: "success" };
+}
+
+/**
+ * Customer-facing action for a pick.
+ *
+ * When a *prior* plan is available the state is computed against the current
+ * price (honest). When it is not (first scan ever, or a name that is new to
+ * the shortlist), the action is derived from the plan's own geometry and says
+ * so — rather than claiming the price is "in the zone" by construction.
+ *
+ * @param {object} stock current scan row
+ * @param {object|null} priorPlan entry/stop/target levels from a prior snapshot
+ */
+export function planAction(stock, priorPlan) {
+  if (!stock) return null;
+  if (priorPlan) {
+    const state = evaluatePlanState(priorPlan, stock.current_price);
+    if (!state) return null;
+    const mapped = actionForState(state.state);
+    return mapped ? { ...mapped, basis: "prior_plan" } : null;
+  }
+  const own = computeEntryState(stock);
+  if (!own) return null;
+  const mapped = actionForState(own.state);
+  return mapped ? { ...mapped, basis: "plan_only" } : null;
+}
+
+/** Map an entry state to the verb shown on the card. */
+export function actionForState(state) {
+  switch (state) {
     case ENTRY_STATES.IN_ZONE:
-      return {
-        tone: "success",
-        label: "In the buy zone",
-        detail: "Consider entering now — levels are below.",
-      };
+      return { tone: "success", label: "In the buy zone", detail: "Consider entering now — levels are below." };
     case ENTRY_STATES.BELOW_ZONE:
-      return {
-        tone: "warning",
-        label: "Below the buy zone",
-        detail: "Wait for a close back above the zone before entering.",
-      };
+      return { tone: "warning", label: "Below the buy zone", detail: "Wait for a close back above the zone before entering." };
     case ENTRY_STATES.EXTENDED:
-      return {
-        tone: "warning",
-        label: "Above the buy zone",
-        detail: "Do not chase — wait for a pullback into the zone.",
-      };
+      return { tone: "warning", label: "Above the buy zone", detail: "Do not chase — wait for a pullback into the zone." };
     case ENTRY_STATES.AT_T1:
-      return {
-        tone: "accent",
-        label: "At target 1",
-        detail: "Book part of the position or trail the stop.",
-      };
+      return { tone: "accent", label: "At target 1", detail: "Book part of the position or trail the stop." };
     case ENTRY_STATES.AT_T2:
-      return {
-        tone: "accent",
-        label: "At target 2",
-        detail: "The plan has largely played out — book or trail.",
-      };
+      return { tone: "accent", label: "At target 2", detail: "The plan has largely played out — book or trail." };
     case ENTRY_STATES.STOPPED:
-      return {
-        tone: "danger",
-        label: "Stop breached",
-        detail: "The setup is invalidated — stand aside.",
-      };
+      return { tone: "danger", label: "Stop breached", detail: "The setup is invalidated — stand aside." };
     default:
       return null;
   }
+}
+
+/**
+ * Customer-facing action for a pick, derived from where price sits relative
+ * to the stored plan. Turns the mechanical entry-state label into a verb the
+ * customer can act on tonight. Levels themselves live in the plan grid.
+ *
+ * Thin wrapper over `actionForState`: `planAction` is the preferred entry
+ * point because this one can only ever see the plan at its own scan close.
+ */
+export function entryAction(stock) {
+  const es = computeEntryState(stock);
+  return es ? actionForState(es.state) : null;
 }
 
 /**

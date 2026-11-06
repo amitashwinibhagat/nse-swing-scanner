@@ -131,9 +131,9 @@ def write_snapshot(
         scan = json.load(f)
 
     if not isinstance(scan, dict) or "stocks" not in scan:
-        raise ValueError(f"latest_scan.json is not a valid scan payload (missing 'stocks')")
+        raise ValueError("latest_scan.json is not a valid scan payload (missing 'stocks')")
     if not isinstance(scan["stocks"], list) or len(scan["stocks"]) == 0:
-        raise ValueError(f"latest_scan.json has no stocks (refusing to snapshot empty universe)")
+        raise ValueError("latest_scan.json has no stocks (refusing to snapshot empty universe)")
 
     if not generated_at_iso:
         generated_at_iso = scan.get("generated_at")
@@ -160,9 +160,15 @@ def write_snapshot(
                 existing = json.load(f)
             if isinstance(existing, list):
                 index = existing
-        except (OSError, json.JSONDecodeError):
-            # Corrupt index — rebuild from disk on the next prune.
-            index = []
+            else:
+                # Rebuild rather than silently truncating history: the frontend
+                # diffs and the receipts strip both read this index, so an
+                # empty index makes every "since last scan" surface disappear.
+                print("::warning::history_index.json is not a list; rebuilding from disk")
+                index = rebuild_index_from_disk(snapshots_dir)
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"::warning::history_index.json unreadable ({exc}); rebuilding from disk")
+            index = rebuild_index_from_disk(snapshots_dir)
 
     entry = {
         "date": date_str,
@@ -189,6 +195,45 @@ def write_snapshot(
         json.dump(index, f, indent=2, ensure_ascii=False)
 
     return filename, {"entries": index, "file": filename}
+
+
+def rebuild_index_from_disk(snapshots_dir: str) -> List[dict]:
+    """
+    Reconstruct history_index.json entries by scanning the snapshot directory.
+
+    Used when the index is missing/corrupt. Each snapshot carries its own
+    metadata (`generated_at`, `gate_pass_count`, `universe_size`), so nothing is
+    lost — the previous behaviour was to write an index containing only the new
+    entry, which silently orphaned every older snapshot.
+    """
+    entries: List[dict] = []
+    if not os.path.isdir(snapshots_dir):
+        return entries
+    for name in sorted(os.listdir(snapshots_dir)):
+        m = SNAPSHOT_FILENAME_RE.match(name)
+        if not m:
+            continue
+        path = os.path.join(snapshots_dir, name)
+        try:
+            with open(path, "r") as f:
+                scan = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(scan, dict):
+            continue
+        stocks = scan.get("stocks") or []
+        entries.append({
+            "date": m.group(1),
+            "slot": m.group(2),
+            "file": name,
+            "generated_at": scan.get("generated_at"),
+            "universe_size": scan.get("universe_size", len(stocks)),
+            "gate_pass_count": scan.get(
+                "gate_pass_count", sum(1 for s in stocks if s.get("gate_pass"))
+            ),
+        })
+    entries.sort(key=lambda e: (e.get("date", ""), e.get("slot", "")))
+    return entries
 
 
 def prune_snapshots(

@@ -16,6 +16,8 @@
     <meta property="og:title" content="NSE Swing Scanner" />
     <meta property="og:description" content="Open-source NSE swing-trade scanner. Free data, transparent gates, public dashboard." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nse-swing-scanner.netlify.app/" />
+    <meta property="og:site_name" content="NSE Swing Scanner" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="NSE Swing Scanner" />
     <meta name="twitter:description" content="Open-source NSE swing-trade scanner. Free data, transparent gates, public dashboard." />
@@ -28,7 +30,18 @@
     />
   </head>
   <body>
+    <script src="/theme-init.js"></script>
     <div id="root"></div>
+    <noscript>
+      <div style="padding: 2rem; font-family: system-ui, sans-serif">
+        <h1>NSE Swing Scanner</h1>
+        <p>
+          This dashboard renders committed scan data with JavaScript. The raw
+          data is available at
+          <a href="/data/latest_scan.json">/data/latest_scan.json</a>.
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

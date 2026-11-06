@@ -1,5 +1,6 @@
+import { memo } from "react";
 import ScoreRing from "./ScoreRing.jsx";
-import { entryAction } from "../utils/scanPlan.js";
+import { planAction } from "../utils/scanPlan.js";
 import { pickReasons, upsideToT1 } from "../utils/picks.js";
 import { planRiskReward, computePositionSize, readSizing } from "../utils/sizing.js";
 
@@ -39,8 +40,12 @@ function StarButton({ on, onToggle, symbol }) {
  * where to exit, and how much to risk. Reasons and the tracker evidence sit
  * alongside so the decision is informed, not just instructed.
  */
-export default function TopPickCard({ stock, onOpen, watchlist, journal, scanDate }) {
-  const action = entryAction(stock);
+function TopPickCard({ stock, onOpen, watchlist, journal, scanDate, priorPlan }) {
+  // `priorPlan` is the levels record from the previous snapshot. Without it the
+  // action degrades to a plan-only label (`basis: "plan_only"`) instead of
+  // asserting the price is "in the buy zone" purely because the scanner set
+  // entry_zone_high = current_price.
+  const action = planAction(stock, priorPlan);
   const reasons = pickReasons(stock);
   const upside = upsideToT1(stock);
   const rr = planRiskReward(stock);
@@ -89,7 +94,15 @@ export default function TopPickCard({ stock, onOpen, watchlist, journal, scanDat
       {action && (
         <div className={`pick-action pick-action--${action.tone}`}>
           <span className="pick-action-label">{action.label}</span>
-          <span className="pick-action-detail">{action.detail}</span>
+          <span className="pick-action-detail">
+            {action.detail}
+            {action.basis === "plan_only" && (
+              <span className="pick-action-note">
+                {" "}
+                Plan only — no prior scan to compare against yet.
+              </span>
+            )}
+          </span>
         </div>
       )}
 
@@ -201,3 +214,7 @@ export default function TopPickCard({ stock, onOpen, watchlist, journal, scanDat
     </article>
   );
 }
+
+// 501 cards re-rendered on every keystroke without this: the sort/filter
+// pipeline produces new row objects on each search input.
+export default memo(TopPickCard);

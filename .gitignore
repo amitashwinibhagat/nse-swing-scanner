@@ -11,3 +11,10 @@ backend/.venv/
 
 # Local Netlify folder
 .netlify
+
+# Tool / test artefacts (untracked before, and easy to commit by accident)
+.pytest_cache/
+.commandcode/
+.ruff_cache/
+*.orig
+*.rej

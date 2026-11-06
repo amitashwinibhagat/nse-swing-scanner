@@ -1,8 +1,6 @@
 // Delta utilities for the B2 "since last scan" strip.
 // Pure functions over snapshot data so they are unit-testable in isolation.
 
-const EVENING_HOUR_UTC = 8; // >= 8 UTC → pm slot (per scanner/snapshot_writer)
-
 function isEvening(label) {
   // label like "2026-07-18-pm" — slot is the part after the last dash.
   const parts = label.split("-");
@@ -138,4 +136,4 @@ function _entryTag(stock) {
   return "in_zone";
 }
 
-export { _entryTag as _entryTagForTesting, isEvening, snapshotDate, EVENING_HOUR_UTC };
+export { _entryTag as _entryTagForTesting, isEvening, snapshotDate };

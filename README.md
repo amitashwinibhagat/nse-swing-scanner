@@ -87,19 +87,23 @@ So the system is split by what each platform is genuinely good at:
 
 The two meet at the simplest possible contract: GitHub Actions writes
 `frontend/public/data/latest_scan.json` and commits it. Netlify rebuilds on that
-push. The React app fetches a static JSON file — no API layer, no database, no auth.
+push. The React app fetches a static JSON file — no API layer, no database. The
+only server-side endpoint is an owner-only, bearer-token scan trigger.
 
 ## Features
 
 - **Seven hard gates, fail-closed.** An unreachable source fails a gate rather
-  than silently passing it. No phantom candidates.
+  than silently passing it, and the dashboard shows a source-outage banner so
+  an outage is never mistaken for a quiet market.
 - **A transparent soft score.** Seven named sub-scores blended into 0–100, with a
   relative-strength multiplier vs the Nifty 50. Every component is visible.
 - **Decision-complete cards.** Each pick leads with the action, the ATR-based
   buy zone, the stop, two targets, the per-share risk, and a share-count preview.
 - **A public track record.** A weekly outcome tracker computes T+5 / T+10 / T+20
   forward returns of past cohorts vs the index, with bootstrap confidence
-  intervals. Weak bands are demoted and labelled, never hidden.
+  intervals. Weak bands are demoted and labelled, never hidden — including the
+  top band: as of the latest run **no band has an established edge**, and the
+  dashboard says so rather than claiming one.
 - **Scan history.** Dated snapshots and a "what changed since last scan" diff.
 - **Personal watchlist and local trade journal.** Everything stays in
   `localStorage` — no account, no server, nothing uploaded.
@@ -114,7 +118,8 @@ push. The React app fetches a static JSON file — no API layer, no database, no
 ```mermaid
 flowchart TD
     subgraph GHA["GitHub Actions — compute"]
-        CRON["cron · 09:00 & 16:00 IST<br/>Mon–Fri"] --> SCAN["backend/scanner.py"]
+        CRON["Netlify scheduler<br/>09:00 & 16:00 IST"] --> SCAN["backend/scanner.py"]
+        FALLBACK["GitHub cron<br/>(fallback, hours late)"] -.-> SCAN
         UNI["Nifty 500 universe"] --> SCAN
         SRC["yfinance · Screener.in<br/>NSE bhavcopy · NSE filings"] --> SCAN
         SCAN --> EVAL["7 hard gates<br/>+ soft score + ATR plan"]
@@ -152,7 +157,7 @@ row fails that gate rather than passing it silently.
 | **Drawdown** | −40% ≤ % off 52-week high ≤ −15% | yfinance |
 | **RSI** | 25 ≤ RSI(14) ≤ 40 | yfinance |
 | **Liquidity adequacy** | real NSE delivery ≥ ₹5 cr **or** 20-day ADV ≥ ₹10 cr | NSE bhavcopy (preferred) / yfinance ADV |
-| **T-group / suspension** | not in T-group, GSM, or suspension | NSE → BSE → flag-only |
+| **Surveillance** | not in ASM, GSM, trade-for-trade or suspension | NSE `reportASM` + NSE `sec_list.csv` |
 | **Holdings conviction** | promoter + FII + DII > 50% | Screener.in |
 | **Pending corporate actions** | no excluded action in the next 30 days | NSE corporate actions |
 
@@ -176,6 +181,8 @@ What that discipline buys you:
 
 - Cohorts are **never pooled** across overlapping windows (they are
   autocorrelated) — each snapshot is measured on its own.
+- **One cohort per trading date**: the am and pm runs land after the same close,
+  so counting both would double N and flatter every interval.
 - Bands whose confidence interval straddles zero are shown as *not established*,
   not spun as an edge.
 - A band that underperforms is labelled as such. The dashboard says so on the
@@ -222,10 +229,41 @@ on every push and PR. Both jobs must be green before merging.
 
 ### 5. Confirm the schedule
 
-Cron in `scan.yml` is **09:00 and 16:00 IST on weekdays** (UTC `30 3 * * 1-5` and
-`30 10 * * 1-5`). GitHub Actions cron is best-effort and can drift — treat these
-as "approximately." The *Last scan* KPI shows the relative age and a drift
-indicator so slippage is visible at a glance.
+Two crons are defined in `scan.yml`: **09:00 and 16:00 IST on weekdays** (UTC
+`30 3 * * 1-5` and `30 10 * * 1-5`).
+
+**GitHub's cron does not honour them.** Measured over 45 scheduled runs on this
+repo: median delay **5.4 h**, 37 of 45 more than 4 h late, worst 10 h. A cron
+cannot fire early, so the run that lands at 11:16 UTC *is* the 03:30 cron. Left
+to GitHub alone, the "09:00 IST" scan completes around 16:45 IST — after the
+15:30 close.
+
+So the punctual trigger is **Netlify Scheduled Functions**:
+
+| Function | Cron (UTC) | IST | Purpose |
+|---|---|---|---|
+| `scheduled-scan-morning` | `30 3 * * 1-5` | 09:00 | pre-open scan |
+| `scheduled-scan-evening` | `30 10 * * 1-5` | 16:00 | post-close scan |
+
+They run on Netlify's own UTC scheduler (not GitHub's runner queue) and dispatch
+`scan.yml` via `repository_dispatch`, naming the window in `client_payload`.
+`scan_status.json` then attributes the run correctly and the dashboard's
+freshness threshold adapts: **90 minutes** for a punctual run, 8 h for the cron
+fallback.
+
+The GitHub crons stay as a fallback (if Netlify is down, a scan still happens,
+late). Because both can fire for the same window, the workflow skips itself when
+the last committed scan is already newer than the window occurrence — see
+`backend/scripts/resolve_schedule_context.py`.
+
+**Deploying this requires one Netlify env var:** `GITHUB_DISPATCH_TOKEN` — a
+fine-grained PAT scoped to this repo with **Actions: read and write**. Without
+it the scheduled functions fail loudly (they do not silently no-op). Set
+`GITHUB_REPO` only if you forked.
+
+If you would rather not use Netlify for this, any external cron works: POST
+`repository_dispatch` with `event_type: scheduled-scan` and
+`client_payload: {"window": "03:30"}` (or `"10:30"`).
 
 ### 6. (Optional) Owner-only on-demand scan trigger
 
@@ -405,12 +443,17 @@ decision, the JSON contract, and the bootstrap-CI statistics.
   is used as the "current" reference.
 - **Earnings surprise is not a hard gate.** There is no clean free source for
   Indian consensus estimates, so the scanner does not pretend to screen on it.
-- **Soft-score weights are hand-tuned, not backtested.** Treat the score as a
-  degree-of-match ranking, not a strategy signal. The weekly feedback report
-  exists to move this toward evidence, not vibes.
+- **Soft-score weights are hand-tuned, not backtested**, and the tracker
+  currently finds **no established edge for any score band**. Treat the score
+  as a degree-of-match ranking, not a strategy signal. The weekly feedback
+  report exists to move this toward evidence, not vibes.
 - **Not real-time.** The scan runs twice daily; data is stale within hours of a
   market session.
-- **Cron drift** is real and mitigated, not eliminated — see Monitoring above.
+- **The punctual trigger is Netlify, not GitHub.** GitHub's free-tier
+  scheduler runs the scan hours late (median 5.4 h measured), so the primary
+  trigger is a pair of Netlify Scheduled Functions; the GitHub crons remain a
+  fallback. If Netlify is down and the fallback also drifts, scans are late
+  rather than lost, and the watchdog still fires. See "Confirm the schedule".
 
 Also see [`docs/methodology.md`](docs/methodology.md) and the
 [CHANGELOG](CHANGELOG.md) for the full history of decisions and known issues.

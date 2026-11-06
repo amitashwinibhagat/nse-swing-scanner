@@ -16,7 +16,7 @@ Missing / source-failed status is returned honestly; the UI must fail-open
 (no chip rendered) rather than auto-blocking a PASS.
 """
 
-from datetime import datetime, date, timedelta, timezone
+from datetime import datetime, date, timezone
 from typing import Optional
 
 from source_status import make_status

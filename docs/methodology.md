@@ -28,16 +28,32 @@ all gates pass.
 | Gate | Criterion | Source | Defaults |
 |---|---|---|---|
 | `gate_f_score` | Piotroski F-Score ≥ MIN_F_SCORE with all 9 components available | yfinance | MIN_F_SCORE=6 |
-| `gate_drawdown` | -40% ≤ pct off 52W high ≤ -15% | yfinance | -40, -15 |
+| `gate_drawdown` | -40% ≤ pct off 52W high ≤ -15%, measured on intraday highs over a full 252-session window (partial-window names fail closed) | yfinance | -40, -15 |
 | `gate_rsi` | 25 ≤ RSI(14) ≤ 40 | yfinance | 25, 40 |
 | `gate_liquidity_adequacy` | real delivery ≥ ₹5cr with ADV secondary floor, or 20-session ADV ≥ ₹10cr | NSE bhavcopy / yfinance | 5_00_00_000 / 10_00_00_000 INR |
-| `gate_surveillance` | not in T-group / GSM / suspension | NSE → BSE → flag-only | — |
+| `gate_surveillance` | not in ASM / GSM / trade-for-trade / suspension | NSE `reportASM` + NSE `sec_list.csv` | — |
 | `gate_holdings` | promoter + FII + DII > 50% | Screener.in | 50% |
 | `gate_corporate_actions` | no excluded action in next 30 days | NSE corporate actions | 30 days |
 
-If any external source returns `source_failed`, the corresponding gate
-fails-closed — the row gets `gate_pass: false` and the source status is
-visible in the JSON and the UI.
+If any external source returns `source_failed` **or** `flag_only` ("reachable
+but could not verify"), the corresponding gate fails closed — the row gets
+`gate_pass: false` and the source status is visible in the JSON and the UI.
+`--lenient-external-gates` is the explicit, documented opt-out.
+
+Because a fail-closed gate makes an outage look like a quiet market, the
+scanner also publishes a root-level `source_health` block:
+
+```json
+"source_health": {
+  "corporate_actions": {"ok": 501, "dominant": "ok"},
+  "degraded_gates": [],
+  "critical_source_failed": false
+}
+```
+
+`critical_source_failed` is true when a gate could not verify for the whole
+universe. The workflow treats that as an incident and the dashboard renders a
+"Source outage, not a quiet market" banner instead of "no top picks today".
 
 ## Soft score
 
@@ -88,7 +104,8 @@ Every external fetch returns a `source_status`:
 - `flag_only` — could not confirm; scanner must flag, not auto-pass
 - `not_applicable` — source does not apply for this symbol
 
-Hard gates fail-closed on `source_failed` for delivery, holdings, and
+Hard gates fail-closed on `source_failed`/`flag_only` for surveillance,
+holdings, and
 corporate actions. Surveillance `flag_only` does not fail the gate (we
 don't know, so we don't claim the stock is restricted); the source status
 is visible in the JSON/UI.
@@ -109,6 +126,16 @@ are fast on subsequent scans.
 
 - Not investment advice.
 - Not SEBI-registered research.
+- The forward-return tracker computes T+0 from the session the snapshot
+  describes. A pre-open scan (`--scan-phase pre_open`) uses the prior session,
+  because its stored price is the previous close.
+- Cohorts are deduped to **one per trading date**. Both daily runs currently
+  complete after the close, so the am and pm snapshots describe the same
+  session; counting them as independent cohorts would roughly double N and
+  make every confidence interval look tighter than the data supports.
+- As of the latest committed payload, **no score band has an established
+  edge** (the 63+ band's T+5 mean is −0.26% with a 95% CI of −0.54%..+0.02%).
+  The dashboard derives its copy from the tracker rather than asserting one.
 - Not a backtested strategy — the score weights and gate thresholds are
   hand-tuned starting points, not optimized.
 - Not a real-time system — the scan runs twice daily at NSE market open and

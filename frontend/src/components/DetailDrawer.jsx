@@ -4,7 +4,7 @@ import DonutHoldings from "./DonutHoldings.jsx";
 import SubscoreBars from "./SubscoreBars.jsx";
 import { readSizing, saveSizing, computePositionSize } from "../utils/sizing.js";
 import {
-  computeEntryState,
+  evaluatePlanState,
   confirmationChip,
   earningsChip,
   exitWarnings,
@@ -103,27 +103,65 @@ function PositionSizer({ stock }) {
   );
 }
 
-export default function DetailDrawer({ stock, onClose, watchlist, scanDate, performance }) {
+export default function DetailDrawer({ stock, onClose, watchlist, scanDate, performance, priorPlan }) {
   const closeRef = useRef(null);
+  const dialogRef = useRef(null);
 
-  // Esc to close + scroll lock
+  // Esc to close, focus trap, scroll lock, focus restore.
+  //
+  // The dependency array is deliberately `[]`: `onClose` is an inline arrow in
+  // App, so depending on it re-ran this effect on EVERY parent render (each
+  // watchlist toggle stole focus back to the close button and thrashed
+  // body.overflow). The handler reads the latest callback through a ref.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
+    const previouslyFocused = document.activeElement;
+
     function onKey(e) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onCloseRef.current?.();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      // aria-modal="true" is a promise the browser does not enforce: without a
+      // trap, Tab walks into the table rows behind the drawer.
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusables = root.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
+
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
     closeRef.current?.focus();
+
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", onKey);
+      // Return focus to whatever opened the drawer, not to <body>.
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
     };
-  }, [onClose]);
+  }, []);
 
   if (!stock) return null;
 
-  const entryState = computeEntryState(stock);
+  const entryState = priorPlan
+    ? evaluatePlanState(priorPlan, stock.current_price)
+    : null;
   const conf = confirmationChip(stock);
   const band = scoreBandChip(stock.swing_score, performance);
   const perf = performance;
@@ -145,6 +183,7 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
     >
       <aside
         className="drawer"
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -294,7 +333,7 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
                           {detail && <span className="gate-inline-value"> · {detail}</span>}
                         </span>
                         <b title={g.reason || ""}>
-                          {g.passed ? "pass" : (g.reason || "fail")}
+                          {g.passed ? "pass" : humanGateReason(g.reason) || "fail"}
                         </b>
                       </li>
                     );
@@ -504,7 +543,9 @@ export default function DetailDrawer({ stock, onClose, watchlist, scanDate, perf
             <p className="plan-asof">
               Mean excess return vs Nifty 50 with 95% bootstrap CI, from the
               forward-return tracker (T+5). n per cell; cells with n &lt; 5
-              are suppressed. Single 90-day window. Directional only.
+              are suppressed. A CI that spans zero means the band&apos;s edge is
+              <strong> not established</strong> at this sample size — currently
+              the case for every band. Directional only.
             </p>
             <div className="perf-table-wrap">
               <table className="perf-table">
@@ -583,6 +624,27 @@ const REGIMES = [
   { key: "risk_off", label: "Risk-off" },
 ];
 
+/** Raw gate reasons are snake_case machine strings; show them readably. */
+export function humanGateReason(reason) {
+  if (!reason) return "";
+  const map = {
+    corporate_actions_source_failed: "corporate-action feed unreachable",
+    holdings_source_failed: "shareholding feed unreachable",
+    holdings_missing: "no shareholding data",
+    f_score_missing: "F-Score unavailable",
+    pct_off_high_missing: "52-week high unavailable",
+    rsi_missing: "RSI unavailable",
+    t_group_or_suspended: "restricted (T-group / GSM / suspended)",
+  };
+  const key = String(reason).trim();
+  if (map[key]) return map[key];
+  if (key.startsWith("surveillance_unverified")) {
+    return "surveillance list could not be verified";
+  }
+  // e.g. "rsi 40.52 outside [25,40]" reads fine already.
+  return key.replace(/_/g, " ");
+}
+
 // Compact inline value shown next to each gate's ✓/✗ so the underlying
 // numbers (F-Score, ADV, holdings %, etc.) stay one glance away.
 function _gateDetail(gate, stock) {
@@ -604,11 +666,22 @@ function _gateDetail(gate, stock) {
     case "rsi":
       return stock.rsi14 != null ? `RSI ${stock.rsi14.toFixed(1)}` : null;
     case "surveillance":
-      return stock.surveillance_is_restricted
-        ? `${stock.surveillance_restriction_type || "restricted"}`
-        : "clear";
+      if (stock.surveillance_is_restricted) {
+        return stock.surveillance_restriction_type || "restricted";
+      }
+      // "clear" is only true when the list was actually verified. With
+      // flag_only/source_failed the gate fails closed, and showing "clear"
+      // next to a red ✗ was self-contradictory.
+      return ["ok", "fallback_used", "not_applicable"].includes(
+        stock.surveillance_source_status,
+      )
+        ? "clear"
+        : `unverified (${stock.surveillance_source_status || "missing"})`;
     case "corporate_actions":
-      return stock.pending_corporate_action ? "excluded action in window" : "clear";
+      if (stock.pending_corporate_action) return "excluded action in window";
+      return ["ok", "not_applicable"].includes(stock.corporate_actions_status)
+        ? "clear"
+        : `unverified (${stock.corporate_actions_status || "missing"})`;
     default:
       return null;
   }

@@ -14,8 +14,6 @@ before sizing a real position.
 ATR / target / stop: heuristic only. Not backtested. Documented in methodology.md.
 """
 
-from typing import Optional, Tuple
-
 import numpy as np
 import pandas as pd
 import yfinance as yf
@@ -61,7 +59,7 @@ def compute_atr(high: pd.Series, low: pd.Series, close: pd.Series, period: int =
     return atr
 
 
-def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
+def _compute_technicals_impl(yf_ticker: str, period: str = "2y") -> dict:
     """Implementation behind the cached_call wrapper. See compute_technicals."""
     try:
         def _hist():
@@ -106,7 +104,27 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
     volume = hist["Volume"]
 
     current_price = float(close.iloc[-1])
-    fifty_two_wk_high = float(close.rolling(252, min_periods=100).max().iloc[-1])
+
+    # 52-week high: intraday highs, full 252-session window only.
+    #
+    # Two biases fixed here:
+    #  1. It used to be computed from *closes*, which understates the true high
+    #     and therefore understates the drawdown (making the gate too lenient).
+    #  2. It used `min_periods=100` on a 252-session window while the minimum
+    #     history is 210 bars, so a freshly listed name could report a "52-week
+    #     high" from 100 sessions and pass the drawdown gate on an artificially
+    #     shallow drawdown. We now require the full window and fall back to the
+    #     longest available window only when it is at least
+    #     52W_HIGH_MIN_SESSIONS, flagging the row as partial.
+    window_252 = high.rolling(252, min_periods=252).max()
+    if pd.notna(window_252.iloc[-1]):
+        fifty_two_wk_high = float(window_252.iloc[-1])
+        fifty_two_wk_high_sessions = 252
+    else:
+        available = int(high.notna().sum())
+        fifty_two_wk_high = float(high.max())
+        fifty_two_wk_high_sessions = available
+    fifty_two_wk_high_partial = fifty_two_wk_high_sessions < 252
     pct_off_high = (current_price / fifty_two_wk_high - 1) * 100  # negative number
 
     ema200 = close.ewm(span=200, adjust=False).mean()
@@ -185,9 +203,11 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
     # Exit-side warning #1: nearby swing high capping T1.
     # 63 sessions ≈ 3 trading months. If a recent swing high sits between
     # entry and T1, the measured-move target is structurally optimistic.
+    # Requires the full window: a 21-session "63-day high" is not the same
+    # thing and used to understate resistance.
     swing_high_63d = None
-    if len(high) >= 21:
-        swing_high_63d = float(high.rolling(63, min_periods=21).max().iloc[-1])
+    if len(high) >= 63:
+        swing_high_63d = float(high.tail(63).max())
 
     # Exit-side warning #2: ATR expanding (stop too tight).
     # Ratio of current ATR to ATR 20 sessions ago. >1.3 = volatility
@@ -202,6 +222,8 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
         "yf_ticker": yf_ticker,
         "current_price": round(current_price, 2),
         "fifty_two_wk_high": round(fifty_two_wk_high, 2),
+        "fifty_two_wk_high_sessions": fifty_two_wk_high_sessions,
+        "fifty_two_wk_high_partial": fifty_two_wk_high_partial,
         "pct_off_52wk_high": round(pct_off_high, 2),
         "ema200": round(current_ema200, 2),
         "pct_from_ema200": round(pct_from_ema200, 2),
@@ -231,7 +253,7 @@ def _compute_technicals_impl(yf_ticker: str, period: str = "1y") -> dict:
     }
 
 
-def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
+def compute_technicals(yf_ticker: str, period: str = "2y") -> dict:
     """
     Returns a dict of computed technical fields for one ticker, or a dict with
     'error' set if data was insufficient/unavailable. Results are cached on
@@ -239,9 +261,15 @@ def compute_technicals(yf_ticker: str, period: str = "1y") -> dict:
     Bumping the schema suffix invalidates old cached payloads whose shape would
     otherwise be silently merged with the new field set (causing missing/null
     fields in the JSON contract for one full TTL).
+
+    `period="2y"`: the drawdown gate needs a full 252-session window of
+    intraday highs. A `1y` fetch returns ~248-252 rows, so demanding 252 from it
+    made every name look like a partial-window IPO and failed the gate for the
+    entire universe. 2y gives the window room to be complete; names with less
+    history are still flagged `fifty_two_wk_high_partial`.
     """
     return cached_call(
-        f"tech:{yf_ticker}:{period}:v3",
+        f"tech:{yf_ticker}:{period}:v4",
         YF_CACHE_TTL_SECONDS,
         _compute_technicals_impl,
         yf_ticker,

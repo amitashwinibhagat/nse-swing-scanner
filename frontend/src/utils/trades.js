@@ -90,6 +90,12 @@ export function tradeStatus(trade, latestPrice) {
 /**
  * Aggregate P&L across priced trades. Unpriced symbols are counted, not
  * silently dropped, so the totals never pretend to cover everything.
+ *
+ * `pnlPct` is null when there is no *invested capital* to measure against —
+ * which includes every trade with `shares: 0`. Callers MUST null-check it: a
+ * zero-share row used to yield `pnlAbs: 0, pnlPct: null`, and the journal
+ * header rendered `summary.pnlPct.toFixed(1)` unguarded, crashing the whole
+ * dashboard on every reload once such a trade was saved.
  */
 export function summarizeTrades(trades, priceBySymbol) {
   const list = Array.isArray(trades) ? trades : [];
@@ -107,7 +113,19 @@ export function summarizeTrades(trades, priceBySymbol) {
     invested += t.entry * t.shares;
     value += p * t.shares;
   }
-  const pnlAbs = priced > 0 ? value - invested : null;
-  const pnlPct = priced > 0 && invested > 0 ? (pnlAbs / invested) * 100 : null;
+  const hasCapital = priced > 0 && invested > 0;
+  const pnlAbs = hasCapital ? value - invested : null;
+  const pnlPct = hasCapital ? (pnlAbs / invested) * 100 : null;
   return { count: list.length, priced, unpriced, invested, value, pnlAbs, pnlPct };
+}
+
+/**
+ * Explanation for a missing P&L total. Returns null when a total *is*
+ * available, so callers can do `summarizeLabel(s) ?? <the number>`.
+ */
+export function summarizeLabel(summary) {
+  if (!summary || summary.count === 0) return "No trades";
+  if (summary.pnlAbs != null) return null;
+  if (summary.priced === 0) return "No fresh prices";
+  return "Set a share count to see P&L";
 }

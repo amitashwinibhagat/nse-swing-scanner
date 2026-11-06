@@ -54,11 +54,17 @@ jobs:
 
       - name: Compute performance
         working-directory: backend
+        # --scan-phase auto (the default): the morning scan runs pre-open, so
+        # its stored price is the PREVIOUS close and its T+0 must be the prior
+        # session; the evening scan is post-close and T+0 is that session.
+        # Inferred per snapshot from generated_at. Cohorts are deduped to one
+        # per trading date.
         run: |
           python scripts/compute_performance.py \
             --snapshots ../frontend/public/data/snapshots \
             --output ../frontend/public/data/performance.json \
-            --cache-dir cache
+            --cache-dir cache \
+            --scan-phase auto
 
       - name: Evaluate feedback loop
         # 1.5.0: close the loop — sub-score ICs + shadow re-scoring evidence
@@ -75,18 +81,35 @@ jobs:
         # Public accuracy digest (1.4.3): committed under frontend/public/
         # digests/ so Netlify serves it at /digests/YYYY-Www.md with no
         # extra routing. %G-W%V = ISO week-year + week (GNU date).
+        #
+        # Exit 2 means "nothing digestable yet" (no closed windows), which is a
+        # normal state in the first weeks. Treating it as a failure skipped the
+        # git-commit step below, so a valid performance.json was silently never
+        # committed.
         working-directory: backend
         run: |
+          set +e
           python scripts/generate_digest.py \
             --performance ../frontend/public/data/performance.json \
-            --out ../frontend/public/digests/$(date -u +'%G-W%V').md \
+            --out "../frontend/public/digests/$(date -u +'%G-W%V').md" \
             --site-base https://nse-swing-scanner.netlify.app
+          code=$?
+          if [ "$code" -eq 2 ]; then
+            echo "::notice::digest skipped: no closed windows yet"
+            exit 0
+          fi
+          exit "$code"
 
       - name: Commit and push performance.json + feedback + digest
         run: |
           git config user.name "nse-swing-scanner-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add frontend/public/data/performance.json frontend/public/digests/ docs/feedback/ || true
+          # Separate `git add` calls: a multi-path `git add` validates every
+          # pathspec before staging anything, so one missing directory staged
+          # NOTHING and this step exited 0 having committed nothing.
+          git add frontend/public/data/performance.json
+          git add frontend/public/digests/ || true
+          git add docs/feedback/ || true
           git diff --staged --quiet && echo "No changes to performance.json" && exit 0
           git commit -m "Performance update: $(date -u +'%Y-%m-%d %H:%M UTC')"
           ## Resolve any rebase conflicts in favour of our new commit

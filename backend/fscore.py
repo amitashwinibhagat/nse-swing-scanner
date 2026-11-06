@@ -66,8 +66,19 @@ def _get_ticker(yf_ticker: str):
 
 
 def _safe_get(df: pd.DataFrame, row_names, col) -> float:
-    """Try multiple possible row-label spellings (yfinance labels drift across versions)."""
+    """
+    Try multiple possible row-label spellings (yfinance labels drift across
+    versions).
+
+    The column is checked too: yfinance occasionally returns statements whose
+    fiscal-year columns differ between the income statement, balance sheet and
+    cash-flow table. `df.loc[name, col]` then raises KeyError, which used to
+    abort the whole row as a worker exception instead of costing one F-Score
+    component.
+    """
     if df is None or df.empty:
+        return np.nan
+    if col not in df.columns:
         return np.nan
     for name in row_names:
         if name in df.index:

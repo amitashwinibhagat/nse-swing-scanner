@@ -67,3 +67,21 @@ def nse_get_json(path: str, **kwargs) -> Optional[dict]:
         return resp.json()
     except ValueError:
         return None
+
+
+def nse_get_abs(url: str, *, timeout: int = 15) -> Optional[requests.Response]:
+    """
+    GET an absolute URL (e.g. an `nsearchives.nseindia.com` CSV) using the same
+    primed session + browser headers as the JSON helpers.
+
+    Exists so callers do not have to abuse `nse_get(path, base="")` to pass an
+    absolute URL through a parameter named `path`.
+    """
+    s = get_session()
+    try:
+        resp = s.get(url, timeout=timeout)
+        if resp.status_code == 200:
+            return resp
+    except Exception:
+        return None
+    return None

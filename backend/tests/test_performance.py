@@ -139,8 +139,10 @@ def _perf(excess):
 class TestBuildPayload(unittest.TestCase):
     def test_per_scan_and_buckets(self):
         snapshots = [
-            ("2026-07-15-pm", _scan([("A", 62), ("B", 57), ("C", 52), ("D", 40)])),
-            ("2026-07-16-pm", _scan([("A", 61), ("B", 56), ("E", 65)])),
+            ("2026-07-15-pm", _scan([("A", 62), ("B", 57), ("C", 52), ("D", 40)],
+                                    generated_at="2026-07-15T10:31:00+00:00")),
+            ("2026-07-16-pm", _scan([("A", 61), ("B", 56), ("E", 65)],
+                                    generated_at="2026-07-16T10:31:00+00:00")),
         ]
         forward = {
             ("2026-07-15-pm", "A"): {w: _perf(2.0) for w in (5, 10, 20)},
@@ -248,8 +250,10 @@ class TestRegimeAndPerName(unittest.TestCase):
 
     def test_by_regime_splits_cohorts(self):
         snapshots = [
-            ("2026-07-14-pm", _scan([("X", 62)], idx_pct=3.0)),
-            ("2026-07-15-pm", _scan([("Y", 62)], idx_pct=-3.0)),
+            ("2026-07-14-pm", _scan([("X", 62)], idx_pct=3.0,
+                                    generated_at="2026-07-14T10:31:00+00:00")),
+            ("2026-07-15-pm", _scan([("Y", 62)], idx_pct=-3.0,
+                                    generated_at="2026-07-15T10:31:00+00:00")),
         ]
         forward = {
             ("2026-07-14-pm", "X"): {w: _perf(4.0) for w in (5, 10, 20)},
@@ -266,8 +270,10 @@ class TestRegimeAndPerName(unittest.TestCase):
         # Drawer table (1.4.0): per (window, bucket, regime) cells with
         # cohort stats, regime tag from the scan, bucket from pass_v3.
         snapshots = [
-            ("2026-07-14-pm", _scan([("X", 64), ("Z", 57)], idx_pct=3.0)),
-            ("2026-07-15-pm", _scan([("Y", 64)], idx_pct=-3.0)),
+            ("2026-07-14-pm", _scan([("X", 64), ("Z", 57)], idx_pct=3.0,
+                                    generated_at="2026-07-14T10:31:00+00:00")),
+            ("2026-07-15-pm", _scan([("Y", 64)], idx_pct=-3.0,
+                                    generated_at="2026-07-15T10:31:00+00:00")),
         ]
         forward = {
             ("2026-07-14-pm", "X"): {w: _perf(4.0) for w in (5, 10, 20)},
@@ -561,3 +567,137 @@ class TestCoverageHelper(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCohortDedupeAndT0Phase(unittest.TestCase):
+    """Both fixes protect N and the return window from being silently wrong."""
+
+    def test_dedupe_keeps_one_snapshot_per_trading_date(self):
+        snapshots = [
+            ("2026-07-15-am", _scan([("A", 62)], generated_at="2026-07-15T03:31:00+00:00")),
+            ("2026-07-15-pm", _scan([("A", 62), ("B", 57)], generated_at="2026-07-15T10:31:00+00:00")),
+            ("2026-07-16-pm", _scan([("C", 60)], generated_at="2026-07-16T10:31:00+00:00")),
+        ]
+        deduped = performance.dedupe_snapshots_by_date(snapshots)
+        labels = [label for label, _ in deduped]
+        self.assertEqual(labels, ["2026-07-15-pm", "2026-07-16-pm"])
+
+    def test_dedupe_passes_through_snapshots_without_a_date(self):
+        snapshots = [("broken", {"stocks": []}), ("2026-07-15-pm", _scan([("A", 62)]))]
+        deduped = performance.dedupe_snapshots_by_date(snapshots)
+        self.assertIn("broken", [label for label, _ in deduped])
+
+    def test_payload_counts_one_cohort_per_date(self):
+        snapshots = [
+            ("2026-07-15-am", _scan([("A", 62)], generated_at="2026-07-15T03:31:00+00:00")),
+            ("2026-07-15-pm", _scan([("A", 62)], generated_at="2026-07-15T10:31:00+00:00")),
+        ]
+        forward = {
+            ("2026-07-15-pm", "A"): {w: _perf(2.0) for w in (5, 10, 20)},
+        }
+        payload = performance.build_performance_payload(snapshots, forward)
+        self.assertEqual(payload["meta"]["snapshots_used"], 1)
+        self.assertEqual(payload["meta"]["total_passed"], 1)
+        self.assertEqual(payload["windows"]["T+5"]["trackable_count"], 1)
+        self.assertIn("one cohort per trading date", payload["meta"]["cohort_policy"])
+
+    def test_dedupe_can_be_disabled_for_legacy_reproduction(self):
+        snapshots = [
+            ("2026-07-15-am", _scan([("A", 62)], generated_at="2026-07-15T03:31:00+00:00")),
+            ("2026-07-15-pm", _scan([("A", 62)], generated_at="2026-07-15T10:31:00+00:00")),
+        ]
+        payload = performance.build_performance_payload(
+            snapshots, {}, dedupe_by_date=False
+        )
+        self.assertEqual(payload["meta"]["snapshots_used"], 2)
+
+    def test_pre_open_snaps_t0_to_the_previous_session(self):
+        """A 03:30 UTC scan runs before the open, so its prices are the prior
+        close. T+0 must be that prior session, not the following one."""
+        sessions = [datetime.date(2026, 7, 13), datetime.date(2026, 7, 14),
+                    datetime.date(2026, 7, 15), datetime.date(2026, 7, 16)]
+        scan_date = datetime.date(2026, 7, 15)
+        self.assertEqual(
+            performance.t_plus_session(sessions, scan_date, 0, scan_phase="pre_open"),
+            datetime.date(2026, 7, 14),
+        )
+        self.assertEqual(
+            performance.t_plus_session(sessions, scan_date, 2, scan_phase="pre_open"),
+            datetime.date(2026, 7, 16),
+        )
+        # post_close keeps the old behaviour
+        self.assertEqual(
+            performance.t_plus_session(sessions, scan_date, 0),
+            datetime.date(2026, 7, 15),
+        )
+
+    def test_pre_open_with_no_prior_session_returns_none(self):
+        sessions = [datetime.date(2026, 7, 15)]
+        self.assertIsNone(
+            performance.t_plus_session(sessions, datetime.date(2026, 7, 15), 0,
+                                       scan_phase="pre_open")
+        )
+
+
+class TestScanPhaseInference(unittest.TestCase):
+    """The morning run is pre-open, so its stored price is the previous close."""
+
+    def _scan(self, generated_at):
+        return {"generated_at": generated_at, "stocks": []}
+
+    def test_pre_open_morning_run_is_detected(self):
+        # 03:30 UTC = 09:00 IST, before the 09:15 open.
+        self.assertEqual(
+            performance.infer_scan_phase(self._scan("2026-11-05T03:31:00+00:00")),
+            "pre_open",
+        )
+
+    def test_post_close_evening_run_is_detected(self):
+        # 10:30 UTC = 16:00 IST, after the 15:30 close.
+        self.assertEqual(
+            performance.infer_scan_phase(self._scan("2026-11-05T10:31:00+00:00")),
+            "post_close",
+        )
+
+    def test_the_boundary_is_the_0915_ist_open(self):
+        # 03:44 UTC = 09:14 IST -> pre-open; 03:45 UTC = 09:15 IST -> open.
+        self.assertEqual(
+            performance.infer_scan_phase(self._scan("2026-11-05T03:44:00+00:00")),
+            "pre_open",
+        )
+        self.assertEqual(
+            performance.infer_scan_phase(self._scan("2026-11-05T03:45:00+00:00")),
+            "post_close",
+        )
+
+    def test_weekend_scans_are_never_pre_open(self):
+        # 2026-11-07 is a Saturday.
+        self.assertEqual(
+            performance.infer_scan_phase(self._scan("2026-11-07T03:31:00+00:00")),
+            "post_close",
+        )
+
+    def test_missing_or_invalid_timestamp_defaults_to_post_close(self):
+        self.assertEqual(performance.infer_scan_phase({}), "post_close")
+        self.assertEqual(performance.infer_scan_phase(self._scan("nonsense")), "post_close")
+
+    def test_payload_records_which_phases_were_used(self):
+        # Two different dates: an am-only date survives dedupe (no pm to shadow
+        # it), so its pre-open phase is actually used.
+        snapshots = [
+            ("2026-07-15-am", _scan([("A", 62)], generated_at="2026-07-15T03:31:00+00:00")),
+            ("2026-07-16-pm", _scan([("B", 62)], generated_at="2026-07-16T10:31:00+00:00")),
+        ]
+        payload = performance.build_performance_payload(snapshots, {})
+        self.assertEqual(payload["meta"]["scan_phases"], ["post_close", "pre_open"])
+
+    def test_dedupe_keeps_the_post_close_snapshot_for_shared_dates(self):
+        """When both runs exist, pm wins — and pm is post-close, so the phase of
+        the surviving cohort is post_close. The pre-open path only matters for
+        dates where the evening scan is missing."""
+        snapshots = [
+            ("2026-07-15-am", _scan([("A", 62)], generated_at="2026-07-15T03:31:00+00:00")),
+            ("2026-07-15-pm", _scan([("A", 62)], generated_at="2026-07-15T10:31:00+00:00")),
+        ]
+        payload = performance.build_performance_payload(snapshots, {})
+        self.assertEqual(payload["meta"]["scan_phases"], ["post_close"])

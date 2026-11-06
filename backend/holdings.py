@@ -140,6 +140,10 @@ def fetch_holdings(symbol: str, *, sleep_between: float = 0.2) -> dict:
         used_fallback = True
 
     if soup is None:
+        # Be polite on failure too. The success path slept, so a Screener block
+        # meant every worker hammered it at full pool concurrency for the whole
+        # scan — which is how a temporary block becomes a lasting one.
+        time.sleep(sleep_between)
         result = make_status(
             source="screener.in",
             status="source_failed",
