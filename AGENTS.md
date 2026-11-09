@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-11-09 (1.8.1 scoring + scheduler pass).
+> Last updated: 2026-11-09 (1.8.2 scoring + scheduler pass, verified live).
 
 ## Project Overview
 
@@ -61,7 +61,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
             │
             ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ Netlify  (static SPA + 1 serverless function)                            │
+│ Netlify  (static SPA + 3 serverless functions)                           │
 │                                                                          │
 │  Frontend (React 18 + Vite 8):                                           │
 │    - App.jsx (KPI dashboard, table, drawer)                              │
@@ -128,7 +128,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── generate_digest.py         # 1.4.3: public weekly accuracy digest (markdown)
 │   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
 │   ├── cache/             # On-disk JSON cache (gitignored, restored/saved via actions/cache)
-│   └── tests/             # 340 tests, all run in ~2s
+│   └── tests/             # 341 tests, all run in ~2s
 ├── frontend/
 │   ├── public/data/
 │   │   ├── latest_scan.json    # Committed by scan.yml after each run
@@ -142,7 +142,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── main.jsx             # React root
 │   │   ├── styles.css           # Single CSS file, ~1900 lines
 │   │   ├── utils/
-│   │   │   ├── scanPlan.js      # Entry-state, regime, RS factor, earnings chip (pure)
+│   │   │   ├── scanPlan.js      # Entry-state, regime, RS penalty, earnings chip (pure)
 │   │   │   ├── picks.js        # Top-band shortlist tiering, reasons, band mirror (pure)
 │   │   │   ├── sizing.js       # Position sizing + risk math (card & drawer)
 │   │   │   ├── trades.js       # Trade-journal status/aggregate math (pure)
@@ -158,12 +158,12 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │       ├── MyTrades.jsx     # Local-only trade journal panel
 │   │       ├── StockCard.jsx    # Card view (entry-state + earnings chips, watch star)
 │   │       ├── ScoreRing.jsx    # Soft score donut
-│   │       ├── SubscoreBars.jsx # Sub-score breakdown (+ RS adjustment line)
+│   │       ├── SubscoreBars.jsx # Sub-score breakdown (+ relative-strength penalty line)
 │   │       ├── DonutHoldings.jsx
 │   │       ├── Rationale.jsx    # Methodology explainer
 │   │       ├── DetailDrawer.jsx # Per-stock detail panel (gate checklist, position sizer)
 │   │       ├── DeltaStrip.jsx   # "Since last scan" banner (B2)
-│       ├── RecentPicksStrip.jsx # Receipts banner (63+ evidence) + last-cohort scorecard (C2-adjacent)
+│       ├── RecentPicksStrip.jsx # Receipts banner (top-band evidence) + last-cohort scorecard (C2-adjacent)
 │   │       ├── PerformanceSection.jsx # Score-bucket hit-rate view (C2)
 │   │       ├── SegmentedControl.jsx, Skeleton.jsx, ErrorBoundary.jsx
 │   ├── netlify/
@@ -180,7 +180,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   └── analytics.md          # North-star metric definition + analytics decision log
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.8.1)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.8.2)
 ├── PROJECT_REVIEW.md             # full review that drove the 1.7.0 pass
 └── AGENTS.md                     # ← you are here
 ```
@@ -193,7 +193,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
-pytest -q                                            # 340 tests, ~2s
+pytest -q                                            # 341 tests, ~2s
 python scanner.py --top-n 500 --workers 8 --sleep 0.3 \
     --lenient-external-gates \
     --output ../frontend/public/data/latest_scan.json
@@ -332,6 +332,94 @@ a fallback; the GitHub-Integration auto-deploy handles most updates.
 /demergers. Cached scalars reflect the pre-event snapshot for up to 12 h.
 Documented in CHANGELOG 1.1.6; revisit if NSE splits become more frequent.
 
+## Soft Score & Bands (weights-2026-11-v2 / pass_v4)
+
+The score is the part most likely to be "improved" by someone who has not read
+the tracker. Read this first.
+
+```
+base_score = 100 * sum(weight_i * sub_i) / sum(weight_i over non-NaN)
+swing_score = base_score - relative_strength_penalty      # additive, in POINTS
+```
+
+### Six components (`settings.WEIGHTS`, sums to exactly 1.0)
+
+| Component | Weight | Source |
+|---|---|---|
+| `valuation_compression` | 4/17 | trailing P/E vs 5Y average P/E |
+| `oversold_positioning` | 3/17 | RSI(14) |
+| `drawdown_sweetspot` | 2/17 | % off 52-week high |
+| `volume_capitulation` | 2/17 | peak down-day volume / 30d average |
+| `quality_composite` | 4/17 | Piotroski F-Score |
+| `conviction_holding` | 2/17 | promoter + FII + DII |
+
+`support_proximity` (200EMA distance, was 0.15) was **retired** in
+`weights-2026-11-v2`. It scored 0 beyond 5% from the EMA, i.e. **0.0 for 80% of
+gate-passed names** — the gates select names 15-40% off their high, which sit
+far from the EMA. It also read the same input as the relative-strength factor,
+so a name far below support was punished twice. **Do not reintroduce it.** If
+you add a component, take weight proportionally from all others rather than
+IC-weighting the winner: in-sample IC weighting is exactly the overfit the
+promotion checklist in `evaluate_feedback.py` forbids.
+
+### Relative-strength penalty — ADDITIVE
+
+- more than 10pp worse than the index from the 200EMA → **−15 points**
+- more than 5pp worse → **−8 points**
+- otherwise → no change
+
+It was a `{0.70, 0.85, 1.0, 1.05}` **multiplier** until `weights-2026-11-v2`. A
+multiplier caps the attainable score: `base × 0.70 ≤ 70` while the top band is
+74, so 13.5% of tracked rows were arithmetically excluded from it. A band that
+cannot be reached is an exclusion dressed as a ranking. The deleted `1.05x`
+bonus marked the **worst** cohort (T+20 −6.45% vs −0.00% at 1.0x).
+
+`market_correction_factor` is still published per row, but only as the
+*equivalent* multiplier (`1 - penalty/base`) for display and contract
+compatibility. **Never multiply a score by it** — that reintroduces the ceiling.
+The authoritative fields are `base_score` and `relative_strength_penalty`.
+
+### Bands (`performance.BUCKET_BANDS`, scheme `pass_v4`)
+
+| Label | Cut | Share selected |
+|---|---|---|
+| `74+` | 74 | 18.4% |
+| `70-74` | 70 | 25.3% |
+| `64-70` | 64 | 39.8% |
+| `53-64` | 53 | 70.4% |
+| `<53` | — | — |
+
+These are the old `pass_v3` cuts (63/60/55/45) **re-expressed at equal selection
+share** on the new score scale, not new thresholds. The top band's measured
+outcome did not improve (T+5 −0.25% vs −0.26%): the change re-scores the same
+names. **There is no established edge for any band**, so do not write copy that
+implies one, and do not lower a cut to make the page look busy — a test pins
+`TOP_PICK_MIN_SCORE === BUCKET_BANDS[0][1]`.
+
+### Mirrors and drift guards
+
+The frontend cannot import Python, so these are hardcoded copies with a
+mechanical guard (`check_cron_consistency.py`, `test_workflow_guards.py`):
+
+- `frontend/src/utils/picks.js` — `TOP_PICK_MIN_SCORE` + `BUCKET_BANDS`
+- `frontend/src/utils/scanData.js` — `TOP_BAND_LABEL`
+- `frontend/src/utils/scanPlan.js` — chip labels and the RS threshold mirrors
+- `frontend/public/methodology.html` — the public explainer (users read this)
+
+`SCORE_VERSION` must be bumped whenever `WEIGHTS` or the penalty magnitudes
+change; snapshots stamp it per row so the tracker can attribute a regime change
+to a date.
+
+### Historical payloads are re-scored
+
+`performance.score_under_current_scheme()` re-scores every stored row from its
+`sub_scores` under the current weights, because `latest_scan.json` and the
+snapshots hold the score that was *published at scan time*. Bucketing those
+raw numbers with new cuts silently relabels history: after the scale change,
+re-bucketing one cohort pushed 54 of 100 names into `<53` for no reason other
+than a ~7-point offset. `per_name[].score` is the re-scored value;
+`per_name[].stored_score` is what the scan actually published.
+
 ## Data Sources & Fallback Chains
 
 | Source | Primary | Fallback 1 | Fallback 2 |
@@ -412,6 +500,10 @@ a new cached call with a long key, hash it.
   `skip=true` when the last committed scan is already newer than the window
   occurrence, so a late GitHub cron does not re-scan a window the punctual
   trigger already covered. A missing/unreadable scan never skips.
+  `client_payload.force: true` bypasses it for a deliberate re-run (a source was
+  fixed, an operator wants a fresh snapshot); the run is still attributed to
+  its window, so the forced drift is reported honestly rather than relabelled
+  "manual". Never set `force` on a routine tick.
 - Concurrency: `group: nse-swing-scan, cancel-in-progress: false`
   (queue duplicate runs, don't cancel)
 - Timeout: 60 minutes (cold-cache + recovery-pass headroom)
@@ -506,6 +598,39 @@ observed 3h+ late runs and missed slots in 2026-07.
 scan.yml resolves the URL from the cron that fired in one place
 ("Resolve schedule context" step, backed by `scan_schedule.WINDOW_LABELS`),
 instead of four duplicated `case` blocks.
+
+### Verifying the scheduler (how the 1.8.1 fix was proven)
+
+The punctual path fails silently by design if you only look at green workflow
+runs: a Netlify function that 422s throws, but nothing in the repo records it.
+Check all four layers, in this order:
+
+```bash
+# 1. Did the function actually invoke, and did GitHub accept it?
+npx netlify-cli@27 logs --source functions --function scheduled-scan-morning --since 2d
+#    expect: INFO Duration: ... , NOT "giving up dispatching ... Error: HTTP 422"
+
+# 2. Did a run with event=repository_dispatch appear?
+gh run list --repo amitashwinibhagat/nse-swing-scanner --workflow=scan.yml --limit 3 \
+  --json createdAt,event,conclusion --jq '.[]|"\(.createdAt) \(.event) \(.conclusion)"'
+
+# 3. What did the resolver decide?
+gh run view <run-id> --log | grep -A12 '"source"'
+
+# 4. What did the committed status record?
+curl -s https://nse-swing-scanner.netlify.app/data/scan_status.json | python3 -m json.tool
+```
+
+A healthy punctual run shows `schedule_source=external-scheduler`, a
+`scheduled_window_utc` matching the window, and a small `drift_minutes`.
+
+To test the path on demand without waiting for a window, deploy a temporary
+one-shot function with an inline `export const config = { schedule: "M H D M *" }`
+(do NOT add it to `netlify.toml` — the CI guard asserts that file holds exactly
+the real windows), dispatch with `{ force: true }` so duplicate suppression does
+not swallow the test, then delete it. That is exactly how 1.8.2 was verified:
+invocation at `11:43:03.973Z`, dispatch HTTP 204 on the first attempt, workflow
+queued 3 s later.
 
 ### Three-check setup (recommended, third pending)
 
@@ -666,7 +791,7 @@ Three places, kept in sync by `backend/scripts/check_cron_consistency.py`:
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 340 tests in ~2s
+.venv/bin/python -m pytest -q          # 341 tests in ~2s
 ```
 
 Coverage (manual map):
@@ -683,7 +808,7 @@ Coverage (manual map):
 | `test_corporate_actions.py` | 28 | NSE date formats, excluded-action window, request params, failure not cached |
 | `test_surveillance.py` | 11 | reportASM + sec_list parsing, restriction severity, status policy |
 | `test_write_scan_status.py` | 7 | Cron-based window attribution, drift, staleness grace |
-| `test_resolve_schedule_context.py` | 13 | Trigger→window mapping, duplicate suppression, weekend window math |
+| `test_resolve_schedule_context.py` | 14 | Trigger→window mapping, duplicate suppression, weekend window math |
 | `test_workflow_guards.py` | 23 | The guards catch the failures they exist for; plus workflow-step assertions (GH_TOKEN, ping ordering, absolute deploy paths, single-path `git add`, dispatch trigger) |
 | `test_performance.py` | 54 | Cohort dedupe, T+0 phase, bootstrap CI, bucketing, current-scheme re-scoring, payload split |
 
@@ -696,7 +821,7 @@ list.
 ## See also
 
 - `README.md` — user-facing docs (setup, methodology, operational risks)
-- `CHANGELOG.md` — versioned release notes (current: 1.8.1)
+- `CHANGELOG.md` — versioned release notes (current: 1.8.2)
 - `netlify.toml` — build config + cache-control headers
 - `backend/scripts/check_cron_consistency.py` — CI guard (cron windows)
 - `backend/scripts/check_workflow_scripts.py` — CI guard (script import path)
