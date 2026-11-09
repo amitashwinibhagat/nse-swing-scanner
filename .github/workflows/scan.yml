@@ -89,6 +89,7 @@ jobs:
           GH_EVENT_NAME: ${{ github.event_name }}
           GH_EVENT_SCHEDULE: ${{ github.event.schedule }}
           GH_PAYLOAD_WINDOW: ${{ github.event.client_payload.window }}
+          GH_PAYLOAD_FORCE: ${{ github.event.client_payload.force }}
           MORNING_URL: ${{ secrets.HEALTHCHECK_PING_URL_MORNING }}
           EVENING_URL: ${{ secrets.HEALTHCHECK_PING_URL_EVENING }}
         run: python scripts/resolve_schedule_context.py

@@ -54,7 +54,7 @@ async function sleep(ms) {
  * @param {{attempts?: number}} [opts]
  * @returns {Promise<{ok: boolean, status: number, window: string, attempts: number}>}
  */
-export async function dispatchScan(window, { attempts = 3 } = {}) {
+export async function dispatchScan(window, { attempts = 3, force = false } = {}) {
   // Resolve the token BEFORE the retry loop. A missing/blank token is a
   // configuration error: retrying it three times with backoff just delays the
   // failure and hides the real reason behind a generic "status 0".
@@ -88,7 +88,14 @@ export async function dispatchScan(window, { attempts = 3 } = {}) {
           // run. Without the payload the run is treated as ad-hoc: no window,
           // no healthcheck ping, no snapshot slot.
           event_type: "scheduled-scan",
-          client_payload: { window, source: "netlify-schedule" },
+          client_payload: {
+            window,
+            source: "netlify-schedule",
+            // Bypasses duplicate suppression for a DELIBERATE re-run. Normal
+            // scheduled ticks leave this false so a window is never scanned
+            // twice.
+            force: force === true,
+          },
         }),
       });
 
@@ -138,8 +145,8 @@ export async function dispatchScan(window, { attempts = 3 } = {}) {
  * Scheduled functions cannot be invoked over HTTP (Netlify does not expose a
  * URL for them), so there is no unauthenticated surface here.
  */
-export async function runScheduledWindow(window) {
-  const result = await dispatchScan(window);
+export async function runScheduledWindow(window, { force = false } = {}) {
+  const result = await dispatchScan(window, { force });
   if (!result.ok) {
     // Throwing marks the invocation failed, which Netlify surfaces in the
     // function log and in the deploy's function summary. A silent failure here
@@ -150,7 +157,7 @@ export async function runScheduledWindow(window) {
   }
   console.log(
     `dispatch-scan: queued scan.yml for window ${window} ` +
-      `(attempt ${result.attempts})`,
+      `(attempt ${result.attempts}${force ? ", forced" : ""})`,
   );
   return result;
 }

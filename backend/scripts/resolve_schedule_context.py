@@ -34,6 +34,11 @@ window is covered and the run is skipped instead of scanning twice.
 A missing/unreadable last-good scan never skips: a missing scan is exactly
 what these triggers exist to fix.
 
+`client_payload.force` bypasses the suppression. It exists for the deliberate
+re-run case (a source was fixed, or an operator wants a fresh snapshot for a
+window that already ran); the run is still attributed to the window, so its
+drift is reported honestly rather than being hidden.
+
 Usage (from scan.yml, cwd=backend):
     GH_EVENT_NAME=schedule GH_EVENT_SCHEDULE="30 3 * * 1-5" \\
     GH_PAYLOAD_WINDOW= MORNING_URL=... EVENING_URL=... \\
@@ -105,6 +110,7 @@ def resolve(
     evening_url: str = "",
     latest_scan_path: Optional[Path] = None,
     now: Optional[datetime.datetime] = None,
+    force: bool = False,
 ) -> dict:
     """
     The decision, as a plain dict.
@@ -145,7 +151,7 @@ def resolve(
     if window is not None:
         occurrence = window_occurrence(window, now)
         occurrence_iso = occurrence.isoformat()
-        if latest_scan_path is not None:
+        if latest_scan_path is not None and not force:
             last = _last_scan_generated_at(Path(latest_scan_path))
             if last is not None and last >= occurrence:
                 skip = True
@@ -207,6 +213,7 @@ def main(argv=None) -> int:
             evening_url=os.environ.get("EVENING_URL", ""),
             latest_scan_path=Path(args.latest_scan) if args.latest_scan else None,
             now=now,
+            force=os.environ.get("GH_PAYLOAD_FORCE", "").lower() in ("1", "true", "yes"),
         )
     except ValueError as exc:
         print(f"::error::{exc}", file=sys.stderr)

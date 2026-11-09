@@ -194,3 +194,32 @@ def test_external_dispatch_without_a_window_warns_but_still_runs(capsys):
     assert out["source"] == "external-scheduler"
     assert out["scheduled"] == "false"
     assert "without client_payload.window" in capsys.readouterr().err
+
+
+def test_force_bypasses_duplicate_suppression():
+    """A deliberate re-run must not be suppressed, but must still be attributed
+    to the window so its drift is reported honestly."""
+    import json as _json
+    import pathlib as _pathlib
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        p = _pathlib.Path(tmp) / "latest_scan.json"
+        p.write_text(_json.dumps({"generated_at": "2026-11-09T10:32:24+00:00"}))
+        now = datetime.datetime(2026, 11, 9, 11, 43, tzinfo=UTC)
+
+        normal = rsc.resolve(
+            event="repository_dispatch", payload_window="10:30",
+            latest_scan_path=p, now=now,
+        )
+        assert normal["skip"] == "true"
+        assert normal["source"] == "external-scheduler"
+
+        forced = rsc.resolve(
+            event="repository_dispatch", payload_window="10:30",
+            latest_scan_path=p, now=now, force=True,
+        )
+        assert forced["skip"] == "false"
+        # Attribution survives, so the run is not silently "manual".
+        assert forced["window_utc"] == "10:30"
+        assert forced["source"] == "external-scheduler"
+        assert forced["scheduled"] == "true"
