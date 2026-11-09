@@ -601,35 +601,59 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>Valuation compression</td><td>trailing P/E vs 5-year average P/E</td><td>0.20</td></tr>
-            <tr><td>Oversold positioning</td><td>RSI(14)</td><td>0.15</td></tr>
-            <tr><td>Support proximity</td><td>% from 200-day EMA</td><td>0.15</td></tr>
-            <tr><td>Drawdown sweetspot</td><td>% off 52-week high</td><td>0.10</td></tr>
-            <tr><td>Volume capitulation</td><td>peak down-day volume / 30-day average</td><td>0.10</td></tr>
-            <tr><td>Quality composite</td><td>F-Score</td><td>0.20</td></tr>
-            <tr><td>Conviction holding</td><td>Promoter + FII + DII</td><td>0.10</td></tr>
+            <tr><td>Valuation compression</td><td>trailing P/E vs 5-year average P/E</td><td>4/17 ≈ 0.235</td></tr>
+            <tr><td>Oversold positioning</td><td>RSI(14)</td><td>3/17 ≈ 0.176</td></tr>
+            <tr><td>Drawdown sweetspot</td><td>% off 52-week high</td><td>2/17 ≈ 0.118</td></tr>
+            <tr><td>Volume capitulation</td><td>peak down-day volume / 30-day average</td><td>2/17 ≈ 0.118</td></tr>
+            <tr><td>Quality composite</td><td>F-Score</td><td>4/17 ≈ 0.235</td></tr>
+            <tr><td>Conviction holding</td><td>Promoter + FII + DII</td><td>2/17 ≈ 0.118</td></tr>
           </tbody>
         </table>
       </div>
+      <p class="muted">
+        A seventh component, <strong>support proximity</strong> (200EMA
+        distance, weight 0.15), was retired in
+        <code>weights-2026-11-v2</code>. It scored 0 beyond 5% from the EMA,
+        which is zero for <strong>80% of gate-passed names</strong> — the gates
+        select stocks 15–40% off their high, and those sit far from the EMA. It
+        also read the same input as the relative-strength factor below, so a
+        name far below support was penalised twice. Its weight was
+        redistributed proportionally across the six remaining components.
+      </p>
 
-      <h3>Relative-strength factor</h3>
+      <h3>Relative-strength penalty</h3>
       <p>
-        A multiplier from the discrete set
-        <code>{0.70, 0.85, 1.0, 1.05}</code> is applied to
-        <code>base_score</code> based on how the stock is behaving
-        relative to the Nifty 50 index:
+        Points are <strong>subtracted</strong> from <code>base_score</code>
+        based on how the stock is behaving relative to the Nifty 50 index:
       </p>
       <ul>
-        <li>Stock is ≥ 5 percentage points worse than the index from its 200EMA → penalty (0.85× or 0.70×).</li>
-        <li>Index is correcting and the stock is tracking it closely → small bonus (1.05×).</li>
-        <li>Otherwise → neutral (1.00×).</li>
+        <li>Stock is more than 10 percentage points worse than the index from its 200EMA → <strong>−15 points</strong>.</li>
+        <li>More than 5 points worse → <strong>−8 points</strong>.</li>
+        <li>Otherwise → no change.</li>
       </ul>
       <div class="formula">
-        swing_score = base_score × relative_strength_factor
+        swing_score = base_score − relative_strength_penalty
       </div>
       <p class="muted">
-        The weights are hand-tuned, not backtested. Treat the score as a
-        degree-of-match ranking, not a strategy signal.
+        This is deliberately <em>additive</em>. It was a multiplier
+        (<code>×0.70</code>) until <code>weights-2026-11-v2</code>, but a
+        multiplier caps the achievable score: with <code>×0.70</code> no name
+        could exceed 70, so the top band was arithmetically unreachable for
+        13.5% of tracked rows no matter how strong their components were.
+        Subtracting points demotes a name without forbidding the top of the
+        scale. On the tracked history the top band is no worse either way.
+      </p>
+      <p class="muted">
+        A <code>×1.05</code> "index is correcting and the stock is tracking it"
+        bonus was removed in the same release: measured over the tracked
+        history it marked the <em>worst</em> cohort (T+20 excess −6.45% against
+        −0.00% for the neutral case), i.e. it rewarded weakness in a weak tape.
+      </p>
+      <p class="muted">
+        The weights are measured where evidence exists and hand-tuned where it
+        does not. Treat the score as a degree-of-match ranking, not a strategy
+        signal — the forward-return tracker currently finds no established edge
+        for any band.
       </p>
     </section>
 
@@ -721,8 +745,8 @@
       <h3>Score-honesty labels</h3>
       <p>Three labels surface what the score <em>doesn't</em> tell you:</p>
       <ul>
-        <li><strong>"Scored on N/7 components"</strong> — when a sub-score is missing (e.g. P/E blank for ADR-listed names), the composite renormalises over the remaining weights. Two rows scored on different component counts are not directly comparable.</li>
-        <li><strong>"Market adjustment ×0.85"</strong> — the relative-strength multiplier applied after the weighted sum. The sub-score bars show the pre-multiplier breakdown; this line reconciles them with the final score.</li>
+        <li><strong>"Scored on N/6 components"</strong> — when a sub-score is missing (e.g. P/E blank for ADR-listed names), the composite renormalises over the remaining weights. Two rows scored on different component counts are not directly comparable.</li>
+        <li><strong>"Relative-strength penalty −15"</strong> — the points subtracted after the weighted sum. The sub-score bars show the pre-penalty breakdown; this line reconciles them with the final score.</li>
         <li><strong>R:R "(fixed)"</strong> — risk-reward to T1 is a constant 1.5×ATR multiple from the entry midpoint (T2 is 2.5×), identical for every stock. It is <em>not</em> a discriminating variable; displayed for completeness.</li>
       </ul>
 

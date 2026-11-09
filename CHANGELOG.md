@@ -48,6 +48,22 @@ Effect on the committed payload: the 74+ band went from n=122 / T+5 −1.28% to
 **n=520 / T+5 −0.39%**, and 2026-10-26's cohort now selects 19% at the top band
 against the 18.4% the cut was calibrated for.
 
+**3. `generate_digest.py` still had the pass_v3 bands hardcoded.**
+
+It filtered rows with a local `BUCKET_ORDER = ["63+", "60-63", ...]`. After the
+pass_v4 recalibration no row matched, so `band_tables` returned empty and the
+weekly digest printed "nothing to digest" — a silent failure that would have
+stopped the public digest without any error. It now imports `BUCKET_ORDER` from
+`performance`, so the labels cannot drift again.
+
+**4. `performance.json` shipped 2.2 MB that one collapsed panel used.**
+
+`per_name` was 70% of the payload. It is now split into
+`performance-per-name.json`, fetched only when the per-symbol lookup runs:
+**3.17 MB → 94 KB** for the payload every visitor downloads, with no loss of
+detail. `load_per_name_rows()` reads the companion with a fallback to an
+embedded array, so older payloads and fixtures keep working.
+
 ### Changed
 
 - `performance.py` imports `WEIGHTS` and the penalty constants from `settings`,

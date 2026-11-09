@@ -311,3 +311,18 @@ def test_score_version_tracks_the_weights():
         "names and duplicated the relative-strength multiplier"
     )
     assert abs(sum(WEIGHTS.values()) - 1.0) < 1e-9
+
+
+def test_digest_bands_come_from_the_tracker():
+    """generate_digest.py hardcoded pass_v3's band labels. After the pass_v4
+    recalibration `band_tables` filtered every row out and the weekly digest
+    reported "nothing to digest" instead of failing loudly."""
+    import sys as _sys
+    from performance import BUCKET_ORDER
+
+    script = (BACKEND / "scripts" / "generate_digest.py").read_text()
+    assert "from performance import BUCKET_ORDER" in script
+    # No hardcoded band LIST may survive (a comment mentioning the old labels is
+    # fine — that is how the next reader learns why the import exists).
+    assert "BUCKET_ORDER = [" not in script
+    assert BUCKET_ORDER[0] == "74+"

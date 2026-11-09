@@ -37,8 +37,15 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-# pass_v3 display order (matches performance.py; unknown excluded).
-BUCKET_ORDER = ["63+", "60-63", "55-60", "45-55", "<45"]
+_PATH_BOOTSTRAP = str(Path(__file__).resolve().parents[1])
+if _PATH_BOOTSTRAP not in sys.path:
+    sys.path.insert(0, _PATH_BOOTSTRAP)
+
+# Band labels come from the tracker, never from a literal list. They were
+# hardcoded here as pass_v3's ["63+", ...] and silently stopped matching the
+# payload after the pass_v4 recalibration: `band_tables` filtered every row out
+# and the weekly digest reported "nothing to digest" instead of failing.
+from performance import BUCKET_ORDER  # noqa: E402
 WINDOWS = ["T+5", "T+10", "T+20"]
 MIN_CI_N = 20  # below this, refuse to headline a band's numbers
 
@@ -83,7 +90,15 @@ def load_rows(perf_path: Path):
     with perf_path.open("r", encoding="utf-8") as f:
         perf = json.load(f)
     meta = perf.get("meta") or {}
+    # perf_name rows may live in the companion file written by
+    # write_performance_payload (see performance.load_per_name_rows).
     rows = perf.get("per_name") or []
+    if not rows:
+        try:
+            from performance import load_per_name_rows
+            rows = load_per_name_rows(perf, path_hint=str(perf_path))
+        except Exception:
+            rows = []
     return perf, meta, rows
 
 

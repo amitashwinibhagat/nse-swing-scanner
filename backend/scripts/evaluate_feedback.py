@@ -64,7 +64,7 @@ def _bootstrap_path() -> None:
 
 _bootstrap_path()
 from settings import WEIGHTS  # noqa: E402  (backend/settings.py)
-from performance import BUCKET_ORDER, cohort_stats, score_bucket  # noqa: E402
+from performance import BUCKET_ORDER, cohort_stats, load_per_name_rows, score_bucket  # noqa: E402
 
 WINDOWS = ["T+5", "T+10", "T+20"]
 IC_MIN_N = 30          # below this, an IC is reported but flagged unusable
@@ -316,7 +316,10 @@ def top_band_lift(shadow, window="T+5", band=None):
 def build_feedback(perf_path: Path) -> dict:
     with perf_path.open("r", encoding="utf-8") as f:
         perf = json.load(f)
+    # per_name rows may live in the companion file (performance.load_per_name_rows)
     rows = perf.get("per_name") or []
+    if not rows:
+        rows = load_per_name_rows(perf, path_hint=str(perf_path))
     closed_rows = [
         r for r in rows
         if any(

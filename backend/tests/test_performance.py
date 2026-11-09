@@ -777,3 +777,51 @@ class TestCurrentSchemeRescoring(unittest.TestCase):
         assert row["stored_score"] == 63.0
         assert row["bucket"] == "74+", "bucketed on the re-scored value"
         assert "current WEIGHTS" in payload["meta"]["score_rescoring"]
+
+
+class TestPayloadSplit(unittest.TestCase):
+    """per_name is 70% of the payload and only the per-symbol lookup reads it.
+    Serving it in the main file made every visitor download 2.2 MB for one
+    summary number."""
+
+    def test_write_splits_aggregates_from_per_name(self):
+        import tempfile, pathlib
+        payload = {
+            "generated_at": "2026-11-09T00:00:00+00:00",
+            "retention_days": 90,
+            "windows": {"T+5": {"buckets": {}}},
+            "per_scan": [],
+            "per_name": [{"snapshot": "x", "symbol": "A"}],
+            "meta": {"snapshots_used": 1},
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            main_path = str(pathlib.Path(tmp) / "performance.json")
+            side = performance.write_performance_payload(payload, main_path)
+            assert side.endswith("performance-per-name.json")
+
+            import json as _json
+            with open(main_path) as f:
+                main = _json.load(f)
+            assert "per_name" not in main
+            assert main["per_name_file"] == "performance-per-name.json"
+            assert main["per_name_count"] == 1
+            assert "windows" in main and "meta" in main
+
+            with open(side) as f:
+                sidebody = _json.load(f)
+            assert sidebody["per_name"] == [{"snapshot": "x", "symbol": "A"}]
+
+    def test_load_per_name_rows_reads_the_companion(self):
+        import tempfile, pathlib
+        payload = {"per_name": [{"symbol": "B"}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            main_path = str(pathlib.Path(tmp) / "performance.json")
+            performance.write_performance_payload(payload, main_path)
+            rows = performance.load_per_name_rows(main_path)
+            assert rows == [{"symbol": "B"}]
+
+    def test_load_per_name_rows_falls_back_to_an_embedded_array(self):
+        assert performance.load_per_name_rows(
+            {"per_name": [{"symbol": "C"}]}
+        ) == [{"symbol": "C"}]
+        assert performance.load_per_name_rows({}, path_hint="/nonexistent") == []

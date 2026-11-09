@@ -124,7 +124,7 @@ def main(argv=None) -> int:
     payload = build_performance_payload(
         snapshots, forward, dedupe_by_date=not args.no_dedupe_cohorts
     )
-    write_performance_payload(payload, args.output)
+    side_path = write_performance_payload(payload, args.output)
     n = payload["meta"]["snapshots_used"]
     t5 = (payload["meta"].get("trackable_count") or {}).get("T+5", 0)
     u5 = (payload["meta"].get("untrackable_count") or {}).get("T+5", 0)
@@ -132,7 +132,7 @@ def main(argv=None) -> int:
     print(
         f"compute_performance: {n} snapshots; windows={WINDOWS}; "
         f"T+5 trackable={t5} untrackable={u5} not_closed={nc5}; "
-        f"output={args.output}"
+        f"output={args.output} (+ {side_path})"
     )
 
     ok, reason = outcome_quality_ok(payload)

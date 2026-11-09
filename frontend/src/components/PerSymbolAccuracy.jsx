@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 /**
  * Per-symbol accuracy lookup — score-at-suggestion-time vs realized excess
@@ -68,9 +68,32 @@ export default function PerSymbolAccuracy({ data }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
 
+  // The per-name rows live in a companion file (~2.2 MB, 70% of the old
+  // payload) because only this lookup needs them. Fetch on mount: the whole
+  // component is inside a collapsed panel, so this only happens when a
+  // developer mounts it directly.
+  const [perName, setPerName] = useState(
+    () => (Array.isArray(data?.per_name) ? data.per_name : null),
+  );
+  useEffect(() => {
+    if (perName && perName.length > 0) return undefined;
+    const file = data?.per_name_file;
+    if (!file) return undefined;
+    let cancelled = false;
+    fetch(`/data/${file}`, { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((payload) => {
+        if (!cancelled && Array.isArray(payload?.per_name)) setPerName(payload.per_name);
+      })
+      .catch(() => {
+        /* the lookup degrades to "no rows"; the scoreboard still renders */
+      });
+    return () => { cancelled = true; };
+  }, [data, perName]);
+
   const symbols = useMemo(
-    () => (data ? buildBySymbol(data.per_name) : []),
-    [data],
+    () => (perName ? buildBySymbol(perName) : []),
+    [perName],
   );
 
   const results = useMemo(() => {

@@ -108,6 +108,9 @@ jobs:
           # pathspec before staging anything, so one missing directory staged
           # NOTHING and this step exited 0 having committed nothing.
           git add frontend/public/data/performance.json
+          # Companion: the per-name rows are split out so the dashboard's main
+          # payload stays ~90 KB instead of 3.2 MB (see performance.py).
+          git add frontend/public/data/performance-per-name.json || true
           git add frontend/public/digests/ || true
           git add docs/feedback/ || true
           git diff --staged --quiet && echo "No changes to performance.json" && exit 0

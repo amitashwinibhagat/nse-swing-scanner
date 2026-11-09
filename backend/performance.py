@@ -580,11 +580,80 @@ def build_performance_payload(
     }
 
 
-def write_performance_payload(payload: dict, output_path: str) -> None:
-    """Pretty-print; the file is human-readable and small."""
+def per_name_path_for(output_path: str) -> str:
+    """Companion file that carries the (large) per-name rows."""
+    base, ext = os.path.splitext(output_path)
+    return f"{base}-per-name{ext or '.json'}"
+
+
+def load_per_name_rows(payload_or_path, path_hint: Optional[str] = None) -> List[dict]:
+    """
+    Return the per-name labelled rows for a performance payload.
+
+    The payload is SPLIT on write: `performance.json` carries the aggregates
+    (windows / by_regime / per_scan / meta, ~60 KB) and
+    `performance-per-name.json` carries the raw per-name rows (~2.2 MB, 70% of
+    the old file). The dashboard only needs the rows for its per-symbol lookup,
+    so serving them in the main payload made every visitor download 2.2 MB to
+    read one summary number.
+
+    Accepts either a parsed dict (with an optional `path_hint` to find the
+    companion) or a path to the main payload. Falls back to an embedded
+    `per_name` array so older payloads and fixtures keep working.
+    """
+    if isinstance(payload_or_path, dict):
+        payload = payload_or_path
+        path = path_hint
+    else:
+        path = str(payload_or_path)
+        try:
+            with open(path, "r") as f:
+                payload = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return []
+
+    rows = payload.get("per_name")
+    if isinstance(rows, list) and rows:
+        return rows
+
+    if path:
+        companion = per_name_path_for(path)
+        try:
+            with open(companion, "r") as f:
+                side = json.load(f)
+            side_rows = side.get("per_name") if isinstance(side, dict) else side
+            if isinstance(side_rows, list):
+                return side_rows
+        except (OSError, json.JSONDecodeError):
+            pass
+    return []
+
+
+def write_performance_payload(payload: dict, output_path: str) -> str:
+    """
+    Write the aggregates to `output_path` and the per-name rows to a companion.
+
+    Returns the companion path. See `load_per_name_rows` for why the split
+    exists: the rows are 70% of the payload and only one collapsed panel on the
+    dashboard uses them.
+    """
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+
+    main = {k: v for k, v in payload.items() if k != "per_name"}
+    main["per_name_file"] = os.path.basename(per_name_path_for(output_path))
+    main["per_name_count"] = len(payload.get("per_name") or [])
     with open(output_path, "w") as f:
-        json.dump(payload, f, indent=2, ensure_ascii=False)
+        json.dump(main, f, indent=2, ensure_ascii=False)
+
+    side_path = per_name_path_for(output_path)
+    side = {
+        "generated_at": payload.get("generated_at"),
+        "retention_days": payload.get("retention_days"),
+        "per_name": payload.get("per_name") or [],
+    }
+    with open(side_path, "w") as f:
+        json.dump(side, f, separators=(",", ":"), ensure_ascii=False)
+    return side_path
 
 
 # --- Pure helpers (unit-tested, no network) ---------------------------------

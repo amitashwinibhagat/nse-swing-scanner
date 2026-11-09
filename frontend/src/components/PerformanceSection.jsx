@@ -239,9 +239,11 @@ export default function PerformanceSection({ data }) {
             </table>
           </div>
           <p className="perf-fineprint">
-            Calibration raw material: <code>performance.json</code> carries
-            a <code>per_name</code> array (snapshot, symbol, score, bucket,
-            regime, confirmation, per-window excess). Confirmation overlay is
+            Calibration raw material: <code>performance-per-name.json</code>
+            carries the <code>per_name</code> rows (snapshot, symbol, score,
+            stored score, bucket, regime, confirmation, per-window excess) —
+            split from <code>performance.json</code> so the aggregate payload
+            stays small. Confirmation overlay is
             A/B-label only until N is sufficient.
           </p>
         </>
