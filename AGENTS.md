@@ -2,7 +2,7 @@
 
 > Operational reference for any agent (Kilo, Cursor, human) working on this
 > codebase. README.md is user-facing; this file is the technical contract.
-> Last updated: 2026-11-06 (1.7.0 correctness pass).
+> Last updated: 2026-11-09 (1.8.1 scoring + scheduler pass).
 
 ## Project Overview
 
@@ -102,7 +102,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   ├── holdings.py        # Screener.in shareholding scraper + cache
 │   ├── corporate_actions.py # NSE corporate-actions endpoint + cache
 │   ├── earnings.py        # yfinance earnings-date lookup (gate-passed names only)
-│   ├── performance.py     # Forward returns, pass_v3 buckets + bootstrap CI, trackable meta
+│   ├── performance.py     # Forward returns, pass_v4 buckets + bootstrap CI, re-scoring, trackable meta
 │   ├── yf_retry.py        # Shared 429 retry + rate-limit cache predicate
 │   ├── surveillance.py    # NSE/BSE T-group/suspension/GSM fetcher
 │   ├── bhavcopy.py        # Multi-provider delivery data (NSE/yfinance/BSE)
@@ -128,12 +128,13 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── generate_digest.py         # 1.4.3: public weekly accuracy digest (markdown)
 │   │   └── send_digest.py             # C3: Telegram digest (soft-fail)
 │   ├── cache/             # On-disk JSON cache (gitignored, restored/saved via actions/cache)
-│   └── tests/             # 314 tests, all run in ~2s
+│   └── tests/             # 340 tests, all run in ~2s
 ├── frontend/
 │   ├── public/data/
 │   │   ├── latest_scan.json    # Committed by scan.yml after each run
 │   │   ├── scan_status.json    # Committed by scan.yml (drift calc)
-│   │   ├── performance.json    # Committed by outcome-tracker.yml (weekly)
+│   │   ├── performance.json    # Committed by outcome-tracker.yml (weekly, aggregates only)
+│   │   ├── performance-per-name.json # Companion: raw per_name rows (loaded on demand)
 │   │   ├── snapshots/          # Dated minified scans + history_index.json (90d window)
 │   │   └── .gitkeep
 │   ├── src/
@@ -142,7 +143,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   ├── styles.css           # Single CSS file, ~1900 lines
 │   │   ├── utils/
 │   │   │   ├── scanPlan.js      # Entry-state, regime, RS factor, earnings chip (pure)
-│   │   │   ├── picks.js        # 63+ shortlist tiering, reasons, band mirror (pure)
+│   │   │   ├── picks.js        # Top-band shortlist tiering, reasons, band mirror (pure)
 │   │   │   ├── sizing.js       # Position sizing + risk math (card & drawer)
 │   │   │   ├── trades.js       # Trade-journal status/aggregate math (pure)
 ││   │   ├── delta.js           # Snapshot diffing (new PASS / dropped / watchlist)
@@ -170,7 +171,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   │   │   ├── trigger-scan.cjs          # Owner-only POST trigger (?admin=1)
 │   │   │   ├── scheduled-scan-morning.mjs # punctual 03:30 UTC dispatch
 │   │   │   └── scheduled-scan-evening.mjs # punctual 10:30 UTC dispatch
-│   │   └── lib/dispatch-scan.mjs          # shared repository_dispatch client
+│   │   └── lib/dispatch-scan.mjs          # shared repository_dispatch client (POST /dispatches, NOT /actions/workflows/.../dispatches)
 │   ├── package.json             # React 18.3, Vite 8.2
 │   └── dist/                    # Build output (gitignored, deployed by Netlify)
 ├── plans/                        # Older planning docs (kept for context)
@@ -179,7 +180,7 @@ GitHub Actions cron ──► scanner.py ──► frontend/public/data/*.json
 │   └── analytics.md          # North-star metric definition + analytics decision log
 ├── netlify.toml                  # Build config + cache-control headers
 ├── README.md                     # User-facing docs
-├── CHANGELOG.md                  # Versioned release notes (latest: 1.7.0)
+├── CHANGELOG.md                  # Versioned release notes (latest: 1.8.1)
 ├── PROJECT_REVIEW.md             # full review that drove the 1.7.0 pass
 └── AGENTS.md                     # ← you are here
 ```
@@ -192,7 +193,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
-pytest -q                                            # 314 tests, ~2s
+pytest -q                                            # 340 tests, ~2s
 python scanner.py --top-n 500 --workers 8 --sleep 0.3 \
     --lenient-external-gates \
     --output ../frontend/public/data/latest_scan.json
@@ -625,6 +626,11 @@ Three places, kept in sync by `backend/scripts/check_cron_consistency.py`:
    (`scheduled-scan-{morning,evening}.mjs`); the GitHub crons are a fallback and
    the workflow skips an already-covered window. If Netlify is down AND the
    fallback drifts, scans are late rather than lost — the watchdog still fires.
+   **The scheduler function MUST post to `/repos/{owner}/{repo}/dispatches`**
+   (repository_dispatch), never `/actions/workflows/scan.yml/dispatches`: the
+   workflow_dispatch endpoint rejects `client_payload` with HTTP 422, and that
+   silently lost every scheduled run from 2026-11-07 to 2026-11-09. 422 is
+   treated as permanent (no retry) and its message is surfaced.
 2. **GH Actions free-tier runner scarcity** (1.1.7 mitigation: extended
    watchdog window + cancellation healthchecks ping). During the
    11:30–13:30 UTC peak the scheduler can fail to provision a runner for
@@ -646,8 +652,8 @@ Three places, kept in sync by `backend/scripts/check_cron_consistency.py`:
    `client_payload.window`), so `scan_status.json` reports the true delay. The
    Netlify scheduler is what makes the delay small; GitHub's is the fallback.
 7. **No backtest / paper-trade validation**, and the committed tracker shows
-   **no established edge for any score band** (63+ T+5 mean −0.26%, CI
-   −0.54..+0.02). The dashboard derives its copy from the tracker instead of
+   **no established edge for any score band** (74+ T+5 mean −0.39%, CI
+   −0.78..−0.00). The dashboard derives its copy from the tracker instead of
    asserting an edge.
 8. **yfinance rate-limits on GHA egress** (1.3.1 mitigation: yf_retry,
    coverage gate at 85%, rate-limit results not cached; 1.3.2 mitigation:
@@ -660,7 +666,7 @@ Three places, kept in sync by `backend/scripts/check_cron_consistency.py`:
 
 ```bash
 cd backend
-.venv/bin/python -m pytest -q          # 314 tests in ~2s
+.venv/bin/python -m pytest -q          # 340 tests in ~2s
 ```
 
 Coverage (manual map):
@@ -677,9 +683,9 @@ Coverage (manual map):
 | `test_corporate_actions.py` | 28 | NSE date formats, excluded-action window, request params, failure not cached |
 | `test_surveillance.py` | 11 | reportASM + sec_list parsing, restriction severity, status policy |
 | `test_write_scan_status.py` | 7 | Cron-based window attribution, drift, staleness grace |
-| `test_resolve_schedule_context.py` | 12 | Trigger→window mapping, duplicate suppression, weekend window math |
-| `test_workflow_guards.py` | 17 | The guards catch the failures they exist for; plus workflow-step assertions (GH_TOKEN, ping ordering, absolute deploy paths, single-path `git add`, dispatch trigger) |
-| `test_performance.py` | 45 | Cohort dedupe, T+0 phase, bootstrap CI, bucketing |
+| `test_resolve_schedule_context.py` | 13 | Trigger→window mapping, duplicate suppression, weekend window math |
+| `test_workflow_guards.py` | 23 | The guards catch the failures they exist for; plus workflow-step assertions (GH_TOKEN, ping ordering, absolute deploy paths, single-path `git add`, dispatch trigger) |
+| `test_performance.py` | 54 | Cohort dedupe, T+0 phase, bootstrap CI, bucketing, current-scheme re-scoring, payload split |
 
 The `test_cache.py` regression suite was added in 1.1.6 after the
 `YF_CACHE_TTL_SECONDS` import-bug incident. They exercise the cache
@@ -690,7 +696,7 @@ list.
 ## See also
 
 - `README.md` — user-facing docs (setup, methodology, operational risks)
-- `CHANGELOG.md` — versioned release notes (current: 1.7.0)
+- `CHANGELOG.md` — versioned release notes (current: 1.8.1)
 - `netlify.toml` — build config + cache-control headers
 - `backend/scripts/check_cron_consistency.py` — CI guard (cron windows)
 - `backend/scripts/check_workflow_scripts.py` — CI guard (script import path)

@@ -296,6 +296,24 @@ def build_digest(perf_path: Path, week_label: str | None, site_base: str | None)
     resolved_week = week_label or _iso_week(date.fromisoformat(gen_at[:10]))
     tables = band_tables(rows)
     if not tables:
+        # Distinguish "not enough history yet" from "the band labels do not
+        # match the payload". The latter is a code/config bug that used to look
+        # identical and silently skipped a week of digests (2026-W45).
+        try:
+            labels = {r.get("bucket") for r in rows if r.get("bucket")}
+        except Exception:
+            labels = set()
+        if rows and labels and not (labels & set(BUCKET_ORDER)):
+            print(
+                f"::error::digest bands do not match the payload: payload has "
+                f"{sorted(labels)[:5]}, code expects {BUCKET_ORDER}. Refusing to "
+                f"publish an empty digest.",
+                file=sys.stderr,
+            )
+            # Exit 1, not 2. Exit 2 means "no closed windows yet", which the
+            # workflow deliberately treats as a notice; a label mismatch is a
+            # bug and must fail the step.
+            raise SystemExit(1)
         return resolved_week, None
     wrows = week_rows(rows, resolved_week)
     return resolved_week, render_digest(resolved_week, perf, meta, rows, tables, wrows, site_base)
