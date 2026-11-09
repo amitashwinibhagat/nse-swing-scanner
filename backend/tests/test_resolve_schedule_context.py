@@ -179,3 +179,18 @@ def test_cli_writes_github_output(tmp_path, monkeypatch, capsys):
     assert written["window_utc"] == "03:30"
     assert written["skip"] == "false"
     assert written["slot"] == "am"
+
+
+def test_external_dispatch_without_a_window_warns_but_still_runs(capsys):
+    """A dispatch with no window is a wiring fault, not an ad-hoc run: it would
+    produce a scan with no healthcheck, no slot and no drift attribution. Warn
+    loudly rather than failing the run — the scan itself is still useful."""
+    out = rsc.resolve(
+        event="repository_dispatch",
+        payload_window="",
+        now=datetime.datetime(2026, 11, 9, 3, 30, tzinfo=UTC),
+    )
+    assert out["window_utc"] == ""
+    assert out["source"] == "external-scheduler"
+    assert out["scheduled"] == "false"
+    assert "without client_payload.window" in capsys.readouterr().err

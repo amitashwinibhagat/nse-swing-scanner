@@ -16,7 +16,7 @@ async function loadLib() {
   return import(`${LIB.href}?t=${Math.random()}`);
 }
 
-test("dispatchScan posts the window in client_payload", async () => {
+test("dispatchScan uses the repository_dispatch endpoint", async () => {
   process.env.GITHUB_DISPATCH_TOKEN = "t";
   const calls = [];
   globalThis.fetch = async (url, init) => {
@@ -30,14 +30,44 @@ test("dispatchScan posts the window in client_payload", async () => {
   assert.equal(result.ok, true);
   assert.equal(result.status, 204);
   assert.equal(calls.length, 1);
-  assert.match(calls[0].url, /\/actions\/workflows\/scan\.yml\/dispatches$/);
+  // The workflow_dispatch endpoint rejects `client_payload` with HTTP 422 and
+  // that is exactly how two days of scheduled runs were lost.
+  assert.match(calls[0].url, /\/repos\/[^/]+\/[^/]+\/dispatches$/);
+  assert.doesNotMatch(calls[0].url, /actions\/workflows/);
 
   const body = JSON.parse(calls[0].init.body);
-  assert.equal(body.ref, "main");
-  // Without this the workflow cannot attribute the run to a window.
+  // scan.yml listens on `repository_dispatch: types: [scheduled-scan]`.
+  assert.equal(body.event_type, "scheduled-scan");
   assert.equal(body.client_payload.window, "03:30");
   assert.equal(body.client_payload.source, "netlify-schedule");
   assert.match(calls[0].init.headers.Authorization, /^Bearer /);
+});
+
+test("a 422 is not retried and its message is surfaced", async () => {
+  process.env.GITHUB_DISPATCH_TOKEN = "t";
+  let calls = 0;
+  const errors = [];
+  const origError = console.error;
+  console.error = (...a) => errors.push(a.join(" "));
+  globalThis.fetch = async () => {
+    calls += 1;
+    return {
+      status: 422,
+      ok: false,
+      json: async () => ({ message: '"client_payload" is not a permitted key.' }),
+    };
+  };
+
+  try {
+    const { dispatchScan } = await loadLib();
+    const result = await dispatchScan("03:30", { attempts: 3 });
+    assert.equal(result.ok, false);
+    assert.equal(result.status, 422);
+    assert.equal(calls, 1, "422 is permanent; retrying hides the cause");
+    assert.ok(errors.some((e) => e.includes("not a permitted key")));
+  } finally {
+    console.error = origError;
+  }
 });
 
 test("dispatchScan does not retry a configuration error", async () => {

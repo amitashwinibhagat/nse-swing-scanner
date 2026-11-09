@@ -124,6 +124,16 @@ def resolve(
             raise ValueError(
                 f"repository_dispatch window {payload_window!r} is not one of {WINDOWS}"
             )
+        if window is None:
+            # The external scheduler exists to fire a NAMED window. A dispatch
+            # without one is a wiring fault: it would run a scan with no
+            # healthcheck ping, no snapshot slot and no drift attribution —
+            # exactly the silent degradation this whole path exists to avoid.
+            print(
+                "::warning::repository_dispatch arrived without client_payload.window; "
+                "running as an un-attributed scan. The scheduler is misconfigured.",
+                file=sys.stderr,
+            )
         source = "external-scheduler"
     else:
         window = None

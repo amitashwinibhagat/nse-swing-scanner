@@ -60,7 +60,14 @@ export async function dispatchScan(window, { attempts = 3 } = {}) {
   // failure and hides the real reason behind a generic "status 0".
   const authToken = token();
 
-  const url = `${GITHUB_API}/repos/${CONFIG.repo}/actions/workflows/scan.yml/dispatches`;
+  // `POST /repos/{owner}/{repo}/dispatches` is the repository_dispatch endpoint
+  // and it is the ONLY one that accepts `client_payload`. The previous code
+  // posted to `/actions/workflows/scan.yml/dispatches`, which is the
+  // workflow_dispatch endpoint: it accepts `ref` and `inputs` and rejects
+  // `client_payload` outright with HTTP 422 ("client_payload is not a
+  // permitted key"). Every scheduled run failed that way for two days while
+  // the function logs recorded it and nothing surfaced it in the dashboard.
+  const url = `${GITHUB_API}/repos/${CONFIG.repo}/dispatches`;
   let lastStatus = 0;
   let lastError = null;
 
@@ -76,9 +83,11 @@ export async function dispatchScan(window, { attempts = 3 } = {}) {
           "User-Agent": "nse-swing-scanner-netlify-scheduler",
         },
         body: JSON.stringify({
-          ref: CONFIG.ref,
-          // The workflow reads `client_payload.window` to attribute the run.
-          // Without it the run is treated as ad-hoc and gets no healthcheck.
+          // scan.yml declares `repository_dispatch: types: [scheduled-scan]`
+          // and reads `github.event.client_payload.window` to attribute the
+          // run. Without the payload the run is treated as ad-hoc: no window,
+          // no healthcheck ping, no snapshot slot.
+          event_type: "scheduled-scan",
           client_payload: { window, source: "netlify-schedule" },
         }),
       });
@@ -88,8 +97,10 @@ export async function dispatchScan(window, { attempts = 3 } = {}) {
         return { ok: true, status: res.status, window, attempts: attempt };
       }
 
-      // 401/403/404: configuration problem, retrying cannot help.
-      if ([401, 403, 404].includes(res.status)) {
+      // 401/403/404/422: configuration or payload problem. Retrying cannot
+      // help, and surfacing GitHub's message is what turns "dispatch failed"
+      // into "client_payload is not a permitted key".
+      if ([401, 403, 404, 422].includes(res.status)) {
         let detail = "";
         try {
           const body = await res.json();
