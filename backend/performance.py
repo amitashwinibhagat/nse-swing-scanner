@@ -37,6 +37,12 @@ import time
 from collections import Counter
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
+from settings import (
+    RELATIVE_STRENGTH_HARD_PENALTY,
+    RELATIVE_STRENGTH_MILD_PENALTY,
+    WEIGHTS,
+)
+
 # Trading days to evaluate at. T+5/T+10/T+20 covers short and medium swing
 # windows; widen cautiously — small-sample noise grows fast.
 WINDOWS = [5, 10, 20]
@@ -296,6 +302,62 @@ def _empty_bucket_map() -> Dict[str, List[float]]:
     return {b: [] for b in BUCKET_ORDER}
 
 
+def relative_strength_penalty_from_factor(market_correction_factor) -> float:
+    """
+    Recover the additive penalty from a stored `market_correction_factor`.
+
+    Rows written before weights-2026-11-v2 stored the factor as a MULTIPLIER
+    (0.70 / 0.85 / 1.00 / 1.05); rows written after store it as the equivalent
+    multiplier (1 - penalty/base). Both encode the same three states, so the
+    bucket is recoverable either way without the original price series.
+    """
+    if not isinstance(market_correction_factor, (int, float)):
+        return 0.0
+    factor = float(market_correction_factor)
+    if factor <= 0.70:
+        return RELATIVE_STRENGTH_HARD_PENALTY
+    if factor < 1.0:
+        return RELATIVE_STRENGTH_MILD_PENALTY
+    return 0.0
+
+
+def score_under_current_scheme(
+    sub_scores: Optional[dict],
+    market_correction_factor=None,
+    fallback_score=None,
+) -> Optional[float]:
+    """
+    Re-score a stored row under the CURRENT weights, so the band series is on
+    one scale regardless of when the snapshot was taken.
+
+    Why this is necessary: snapshots persist the `swing_score` that was
+    published at scan time. When the score changes (weights, a retired
+    component, an additive penalty) those stored numbers are on the OLD scale,
+    and bucketing them with the new cuts silently relabels history. After
+    weights-2026-11-v2, re-bucketing 2026-10-26's passing cohort pushed 54 of
+    100 names into "<53" — not because they were weak, but because the numbers
+    were seven points adrift.
+
+    Re-scoring from `sub_scores` makes every band comparison apples-to-apples
+    and is the reason the tracker stores the raw components at all. Falls back
+    to the stored score when components are absent.
+    """
+    if not isinstance(sub_scores, dict) or not sub_scores:
+        return fallback_score if isinstance(fallback_score, (int, float)) else None
+    numerator = 0.0
+    denominator = 0.0
+    for key, weight in WEIGHTS.items():
+        value = sub_scores.get(key)
+        if isinstance(value, (int, float)):
+            numerator += float(value) * weight
+            denominator += weight
+    if denominator <= 0:
+        return fallback_score if isinstance(fallback_score, (int, float)) else None
+    base = 100.0 * numerator / denominator
+    penalty = relative_strength_penalty_from_factor(market_correction_factor)
+    return round(max(0.0, base - penalty), 1)
+
+
 def build_performance_payload(
     snapshots: List[Tuple[str, dict]],
     forward_returns: Dict[Tuple[str, str], Dict[int, dict]],
@@ -360,12 +422,23 @@ def build_performance_payload(
             sym = s.get("symbol")
             key = (label, sym)
             fetches = forward_returns.get(key, {})
-            bucket = score_bucket(s.get("swing_score"))
+            # One scale for the whole history — see score_under_current_scheme.
+            scored = score_under_current_scheme(
+                s.get("sub_scores"),
+                s.get("market_correction_factor"),
+                fallback_score=s.get("swing_score"),
+            )
+            bucket = score_bucket(scored)
             confirmation = s.get("confirmation_state") or "unknown"
             name_row = {
                 "snapshot": label,
                 "symbol": sym,
-                "score": s.get("swing_score"),
+                # `score` is the CURRENT-scheme value used for bucketing;
+                # `stored_score` is what the scan actually published, kept for
+                # audit and for detecting future re-scoring drift.
+                "score": scored,
+                "stored_score": s.get("swing_score"),
+                "score_version": s.get("score_version"),
                 "bucket": bucket,
                 "regime": scan_regime,
                 "confirmation": confirmation,
@@ -375,7 +448,6 @@ def build_performance_payload(
                 # regime that produced them, so evaluate_feedback.py can
                 # re-score history under candidate weight sets.
                 "sub_scores": s.get("sub_scores") if isinstance(s.get("sub_scores"), dict) else None,
-                "score_version": s.get("score_version"),
                 "windows": {},
             }
             for w in WINDOWS:
@@ -485,6 +557,11 @@ def build_performance_payload(
             # stored scores (lossless: score is the immutable source of
             # truth; score_bucket_pass_v2 is retained for old-scheme views).
             "bucket_scheme_history": ["pass_v2", "pass_v3", "pass_v4"],
+            # `per_name[].score` is re-scored from the stored components under
+            # the CURRENT weights so the band series is on one scale; the value
+            # the scan published is kept in `stored_score`.
+            "score_rescoring": "per_name.score = current WEIGHTS + additive RS penalty, "
+                               "recomputed from sub_scores; stored_score keeps the published value",
             "scan_phases": sorted(
                 {infer_scan_phase(scan) for _, scan in snapshots}
             ),

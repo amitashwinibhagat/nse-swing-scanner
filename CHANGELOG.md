@@ -1,5 +1,64 @@
 # Changelog
 
+## 1.8.1 — Re-score history, and the scheduler that never fired
+
+### Why
+
+Two problems surfaced after 1.8.0 shipped, both from checking the live system
+rather than the tests.
+
+**1. The punctual scheduler had never delivered a single run.**
+
+It fired on time on every tick — the function logs show `03:30:40`,
+`10:30:37` — and failed every time with HTTP 422:
+
+```
+dispatch-scan: giving up dispatching window 03:30 after 3 attempts
+Error: HTTP 422
+{"message":"Invalid request. \"client_payload\" is not a permitted key."}
+```
+
+`dispatch-scan.mjs` posted to `/actions/workflows/scan.yml/dispatches`, which is
+the **workflow_dispatch** endpoint: it takes `ref` and `inputs` and rejects
+`client_payload`. Only `/repos/{owner}/{repo}/dispatches` — the
+**repository_dispatch** endpoint — accepts it. Verified against the live API:
+the first returns 422 for that body, the second returns 204 and queues a run
+immediately. The retry loop then burned three attempts on a permanent error and
+logged a generic "status 422", so GitHub's actual explanation never reached a
+human.
+
+Fixed: correct endpoint, `event_type: "scheduled-scan"`, and 422 added to the
+non-retryable set with GitHub's message surfaced.
+
+**2. The band series was mixing two score scales.**
+
+Snapshots persist the `swing_score` published at scan time. After 1.8.0 changed
+the score, the tracker kept bucketing those *stored* numbers with the *new*
+cuts — so 2026-10-26's passing cohort, which had 19 names that should land in
+the top band, produced only 6. Re-bucketing that one cohort pushed **54 of 100
+names into `<53`** purely because their stored scores were ~7 points adrift.
+
+Fixed: `score_under_current_scheme()` re-scores every historical row from its
+stored `sub_scores` under the current `WEIGHTS` and additive penalty, so the
+whole series is on one scale. `per_name[].score` is now the re-scored value and
+`stored_score` keeps what the scan actually published. Retired components are
+ignored automatically because the loop iterates `WEIGHTS`.
+
+Effect on the committed payload: the 74+ band went from n=122 / T+5 −1.28% to
+**n=520 / T+5 −0.39%**, and 2026-10-26's cohort now selects 19% at the top band
+against the 18.4% the cut was calibrated for.
+
+### Changed
+
+- `performance.py` imports `WEIGHTS` and the penalty constants from `settings`,
+  so the tracker cannot drift from the scanner.
+- `meta.score_rescoring` documents the policy; `meta.scan_phases` records which
+  T+0 anchoring was used.
+- `resolve_schedule_context.py` warns when a `repository_dispatch` arrives with
+  no `client_payload.window` — a wiring fault that otherwise yields a scan with
+  no healthcheck, no snapshot slot and no drift attribution.
+- Regenerated `performance.json` (3.2 MB, 66 cohorts, pass_v4 bands).
+
 ## 1.8.0 — The score measured its own selection, and lost
 
 ### Why

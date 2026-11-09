@@ -730,3 +730,50 @@ class TestScanPhaseInference(unittest.TestCase):
         ]
         payload = performance.build_performance_payload(snapshots, {})
         self.assertEqual(payload["meta"]["scan_phases"], ["post_close"])
+
+
+class TestCurrentSchemeRescoring(unittest.TestCase):
+    """Snapshots persist the score that was published at scan time. When the
+    score changes, bucketing those stored numbers with new cuts silently
+    relabels history — 2026-10-26's cohort had 54 of 100 names pushed into
+    "<53" purely because the old numbers were ~7 points adrift."""
+
+    def test_rescore_ignores_a_retired_component(self):
+        sub = {"quality_composite": 1.0, "support_proximity": 0.0}
+        # support is no longer weighted, so its absence/presence is irrelevant.
+        assert performance.score_under_current_scheme(sub, 1.0) == 100.0
+        assert performance.score_under_current_scheme(
+            {"quality_composite": 1.0}, 1.0
+        ) == 100.0
+
+    def test_rescore_applies_the_penalty_from_an_old_multiplier(self):
+        sub = {"quality_composite": 1.0}
+        from settings import RELATIVE_STRENGTH_HARD_PENALTY, RELATIVE_STRENGTH_MILD_PENALTY
+        assert performance.score_under_current_scheme(sub, 0.70) == 100.0 - RELATIVE_STRENGTH_HARD_PENALTY
+        assert performance.score_under_current_scheme(sub, 0.85) == 100.0 - RELATIVE_STRENGTH_MILD_PENALTY
+        # The retired x1.05 bonus is not a penalty.
+        assert performance.score_under_current_scheme(sub, 1.05) == 100.0
+
+    def test_rescore_falls_back_to_the_stored_score(self):
+        assert performance.score_under_current_scheme(None, 1.0, fallback_score=61.5) == 61.5
+        assert performance.score_under_current_scheme({}, 1.0, fallback_score=61.5) == 61.5
+        assert performance.score_under_current_scheme({}, 1.0) is None
+
+    def test_payload_scores_are_rescored_and_keep_the_published_value(self):
+        # A row published on the old scale with the OLD 63-style score.
+        scan = {
+            "generated_at": "2026-07-15T10:31:00+00:00",
+            "stocks": [{
+                "symbol": "A", "yf_ticker": "A.NS", "gate_pass": True,
+                "swing_score": 63.0,                     # old scale
+                "market_correction_factor": 1.0,
+                "sub_scores": {"quality_composite": 1.0},  # re-scores to 100
+            }],
+        }
+        forward = {("2026-07-15-pm", "A"): {w: _perf(1.0) for w in (5, 10, 20)}}
+        payload = performance.build_performance_payload([("2026-07-15-pm", scan)], forward)
+        row = payload["per_name"][0]
+        assert row["score"] == 100.0
+        assert row["stored_score"] == 63.0
+        assert row["bucket"] == "74+", "bucketed on the re-scored value"
+        assert "current WEIGHTS" in payload["meta"]["score_rescoring"]
