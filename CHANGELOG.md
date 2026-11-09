@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.8.2 — The scheduler fires
+
+A one-shot probe function was deployed and left to run at a real scheduled
+minute, to test the fix in 1.8.1 rather than trust it.
+
+| Stage | Observed |
+|---|---|
+| Netlify scheduled invocation | `11:43:03.973Z` against a `43 11 9 11 *` cron |
+| Dispatch to GitHub | HTTP 204, **first attempt**, no retry |
+| Workflow queued | `11:43:07Z` (`repository_dispatch`) |
+| Resolver | `source=external-scheduler`, `window_utc=10:30`, `skip=false` |
+| Scan | `11:43:07Z` → `11:46:16Z`, committed `11:45:47Z` |
+| `scan_status.json` | `schedule_source=external-scheduler`, `drift_minutes=75` |
+| Live site | 10 passes, 0 degraded gates |
+
+`drift_minutes=75` is a test artefact: the probe deliberately forced a re-run of
+the already-covered 10:30 window at 11:43. A normal tick fires seconds after
+its window. The probe has been removed.
+
+### Added
+
+- `client_payload.force` bypasses duplicate suppression for a deliberate re-run
+  while keeping window attribution, so a forced run is still reported as
+  `external-scheduler` with an honest drift rather than being relabelled
+  "manual". Exposed as `runScheduledWindow(window, { force: true })` and
+  `GH_PAYLOAD_FORCE` in the workflow.
+
 ## 1.8.1 — Re-score history, and the scheduler that never fired
 
 ### Why
