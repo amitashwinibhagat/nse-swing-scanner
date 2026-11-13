@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-11-12T10:33:24.017588+00:00",
-  "triggered_at": "2026-11-12T10:33:24.413883+00:00",
-  "commit_sha": "003943eb2fe2486c732d9979b748a82eca1e3792",
-  "run_id": "43201009297",
+  "generated_at": "2026-11-13T03:35:15.716458+00:00",
+  "triggered_at": "2026-11-13T03:35:16.288671+00:00",
+  "commit_sha": "2ca7830ca735a2306e5cc04b6d2d95cdcbc36dad",
+  "run_id": "43359443387",
   "trigger": "repository_dispatch",
-  "scheduled_window_utc": "10:30",
+  "scheduled_window_utc": "03:30",
   "scheduled_cron": "30 3 * * 1-5, 30 10 * * 1-5",
-  "scheduled_window_at_utc": "2026-11-12T10:30:00+00:00",
-  "next_expected_utc": "2026-11-13T03:30:00+00:00",
-  "drift_minutes": 3,
+  "scheduled_window_at_utc": "2026-11-13T03:30:00+00:00",
+  "next_expected_utc": "2026-11-13T10:30:00+00:00",
+  "drift_minutes": 5,
   "stale_after_minutes": 90,
   "schedule_source": "external-scheduler",
   "source_health": {
     "critical_source_failed": false,
     "degraded_gates": []
   },
-  "gate_pass_count": 10,
+  "gate_pass_count": 9,
   "universe_size": 501
 }
