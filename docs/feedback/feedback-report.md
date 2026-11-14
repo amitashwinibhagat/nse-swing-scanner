@@ -1,53 +1,53 @@
 # Feedback loop report
 
-_Generated 2026-11-07 from 2880 closed rows (of 2894). IN-SAMPLE — read with the promotion checklist, not instead of it._
+_Generated 2026-11-14 from 2799 closed rows (of 2862). IN-SAMPLE — read with the promotion checklist, not instead of it._
 
 ## Sub-score rank IC — T+5
 
 | Sub-score | IC | 95% CI | n | usable |
 |---|---|---|---|---|
-| conviction_holding | 0.009 | [-0.041, 0.053] | 1829 | yes |
-| drawdown_sweetspot | -0.006 | [-0.042, 0.031] | 2880 | yes |
-| oversold_positioning | 0.001 | [-0.034, 0.034] | 2880 | yes |
-| quality_composite | 0.012 | [-0.03, 0.048] | 2880 | yes |
-| valuation_compression | -0.002 | [-0.048, 0.04] | 2603 | yes |
-| volume_capitulation | 0.063 | [0.024, 0.096] | 2880 | yes |
+| conviction_holding | 0.008 | [-0.038, 0.054] | 1812 | yes |
+| drawdown_sweetspot | -0.013 | [-0.05, 0.023] | 2799 | yes |
+| oversold_positioning | 0.002 | [-0.033, 0.038] | 2799 | yes |
+| quality_composite | 0.01 | [-0.028, 0.045] | 2799 | yes |
+| valuation_compression | 0.003 | [-0.037, 0.038] | 2523 | yes |
+| volume_capitulation | 0.059 | [0.025, 0.095] | 2799 | yes |
 
 ## Sub-score rank IC — T+10
 
 | Sub-score | IC | 95% CI | n | usable |
 |---|---|---|---|---|
-| conviction_holding | 0.085 | [0.039, 0.124] | 1729 | yes |
-| drawdown_sweetspot | 0.006 | [-0.033, 0.045] | 2780 | yes |
-| oversold_positioning | -0.012 | [-0.054, 0.021] | 2780 | yes |
-| quality_composite | 0.037 | [-0.004, 0.077] | 2780 | yes |
-| valuation_compression | 0.034 | [-0.007, 0.077] | 2516 | yes |
-| volume_capitulation | 0.09 | [0.051, 0.13] | 2780 | yes |
+| conviction_holding | 0.08 | [0.034, 0.123] | 1812 | yes |
+| drawdown_sweetspot | 0.001 | [-0.033, 0.036] | 2799 | yes |
+| oversold_positioning | -0.016 | [-0.053, 0.019] | 2799 | yes |
+| quality_composite | 0.037 | [-0.001, 0.07] | 2799 | yes |
+| valuation_compression | 0.04 | [0.003, 0.081] | 2523 | yes |
+| volume_capitulation | 0.085 | [0.048, 0.122] | 2799 | yes |
 
 ## Sub-score rank IC — T+20
 
 | Sub-score | IC | 95% CI | n | usable |
 |---|---|---|---|---|
-| conviction_holding | 0.071 | [0.009, 0.129] | 957 | yes |
-| drawdown_sweetspot | 0.018 | [-0.032, 0.062] | 2008 | yes |
-| oversold_positioning | 0.005 | [-0.034, 0.048] | 2008 | yes |
-| quality_composite | 0.055 | [0.005, 0.103] | 2008 | yes |
-| valuation_compression | 0.041 | [-0.005, 0.086] | 1831 | yes |
-| volume_capitulation | 0.048 | [-0.006, 0.09] | 2008 | yes |
+| conviction_holding | 0.067 | [0.015, 0.117] | 1239 | yes |
+| drawdown_sweetspot | 0.027 | [-0.023, 0.061] | 2226 | yes |
+| oversold_positioning | 0.015 | [-0.026, 0.054] | 2226 | yes |
+| quality_composite | 0.028 | [-0.012, 0.067] | 2226 | yes |
+| valuation_compression | 0.058 | [0.013, 0.103] | 2022 | yes |
+| volume_capitulation | 0.032 | [-0.014, 0.07] | 2226 | yes |
 
 ## Confirmation A/B
 
 | Window | Confirmed mean (n) | Anticipatory mean (n) |
 |---|---|---|
-| T+5 | -0.8 (380) | -0.26 (2500) |
-| T+10 | -1.2 (364) | -1.25 (2416) |
-| T+20 | -1.64 (249) | -2.0 (1759) |
+| T+5 | -0.83 (374) | -0.28 (2425) |
+| T+10 | -1.37 (374) | -1.34 (2425) |
+| T+20 | -2.4 (313) | -2.83 (1913) |
 
 ## Shadow re-scoring (in-sample)
 
-- Top-band lift vs baseline at T+5: ic_proportional: +0.85pp
-- Top-band lift vs baseline at T+10: ic_proportional: +1.40pp
-- Top-band lift vs baseline at T+20: ic_proportional: +2.19pp
+- Top-band lift vs baseline at T+5: ic_proportional: +0.86pp
+- Top-band lift vs baseline at T+10: ic_proportional: +1.24pp
+- Top-band lift vs baseline at T+20: ic_proportional: +1.94pp
 
 Full band tables live in `feedback-latest.json` (`shadow.windows`).
 
