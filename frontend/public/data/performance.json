@@ -1,67 +1,67 @@
 {
-  "generated_at": "2026-11-21T12:15:05.476697+00:00",
+  "generated_at": "2026-11-28T12:46:41.391927+00:00",
   "retention_days": 90,
   "windows": {
     "T+5": {
       "buckets": {
         "74+": {
-          "n": 520,
-          "median": -0.55,
-          "q1": -2.69,
-          "q3": 2.1,
-          "mean": -0.53,
-          "hit_rate": 0.429,
+          "n": 516,
+          "median": -0.59,
+          "q1": -2.72,
+          "q3": 1.94,
+          "mean": -0.65,
+          "hit_rate": 0.424,
           "ci95": {
-            "low": -0.91,
-            "high": -0.16
+            "low": -1.01,
+            "high": -0.28
           }
         },
         "70-74": {
-          "n": 194,
-          "median": -0.72,
-          "q1": -2.56,
-          "q3": 2.33,
-          "mean": -0.33,
-          "hit_rate": 0.428,
+          "n": 182,
+          "median": -0.74,
+          "q1": -2.66,
+          "q3": 2.42,
+          "mean": -0.31,
+          "hit_rate": 0.429,
           "ci95": {
-            "low": -0.88,
-            "high": 0.21
+            "low": -0.86,
+            "high": 0.25
           }
         },
         "64-70": {
-          "n": 357,
-          "median": -0.58,
-          "q1": -2.26,
-          "q3": 1.68,
-          "mean": -0.38,
-          "hit_rate": 0.42,
+          "n": 348,
+          "median": -0.61,
+          "q1": -2.31,
+          "q3": 1.71,
+          "mean": -0.4,
+          "hit_rate": 0.417,
           "ci95": {
-            "low": -0.75,
-            "high": 0.03
+            "low": -0.77,
+            "high": 0.02
           }
         },
         "53-64": {
-          "n": 886,
-          "median": -0.26,
-          "q1": -2.45,
-          "q3": 1.36,
-          "mean": -0.43,
-          "hit_rate": 0.455,
+          "n": 870,
+          "median": -0.29,
+          "q1": -2.5,
+          "q3": 1.35,
+          "mean": -0.48,
+          "hit_rate": 0.449,
           "ci95": {
-            "low": -0.66,
-            "high": -0.18
+            "low": -0.69,
+            "high": -0.24
           }
         },
         "<53": {
-          "n": 781,
-          "median": -0.41,
-          "q1": -2.46,
-          "q3": 1.66,
-          "mean": -0.42,
+          "n": 738,
+          "median": -0.4,
+          "q1": -2.7,
+          "q3": 1.62,
+          "mean": -0.47,
           "hit_rate": 0.447,
           "ci95": {
-            "low": -0.67,
-            "high": -0.13
+            "low": -0.74,
+            "high": -0.18
           }
         },
         "unknown": {
@@ -77,25 +77,22 @@
       "by_regime_buckets": {
         "74+": {
           "risk_on": {
-            "n": 13,
-            "median": -3.36,
+            "n": 24,
+            "median": -2.88,
             "q1": -4.23,
-            "q3": -2.72,
-            "mean": -2.63,
-            "hit_rate": 0.077,
+            "q3": -1.31,
+            "mean": -2.7,
+            "hit_rate": 0.083,
             "ci95": null
           },
           "neutral": {
-            "n": 42,
-            "median": 1.44,
-            "q1": -0.69,
-            "q3": 2.63,
-            "mean": 1.73,
-            "hit_rate": 0.619,
-            "ci95": {
-              "low": 0.53,
-              "high": 3.03
-            }
+            "n": 27,
+            "median": 2.1,
+            "q1": 0.68,
+            "q3": 2.62,
+            "mean": 1.7,
+            "hit_rate": 0.778,
+            "ci95": null
           },
           "risk_off": {
             "n": 465,
@@ -121,21 +118,21 @@
         },
         "70-74": {
           "risk_on": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 3,
+            "median": -2.19,
+            "q1": -3.15,
+            "q3": -0.33,
+            "mean": -1.59,
+            "hit_rate": 0.333,
             "ci95": null
           },
           "neutral": {
-            "n": 26,
-            "median": -0.69,
-            "q1": -1.94,
-            "q3": 0.76,
-            "mean": -0.44,
-            "hit_rate": 0.385,
+            "n": 11,
+            "median": -0.62,
+            "q1": -1.89,
+            "q3": 0.73,
+            "mean": 0.14,
+            "hit_rate": 0.364,
             "ci95": null
           },
           "risk_off": {
@@ -162,21 +159,21 @@
         },
         "64-70": {
           "risk_on": {
-            "n": 7,
-            "median": 2.3,
-            "q1": -0.88,
-            "q3": 7.2,
-            "mean": 2.73,
-            "hit_rate": 0.714,
+            "n": 11,
+            "median": 1.35,
+            "q1": -2.77,
+            "q3": 5.1,
+            "mean": 1.19,
+            "hit_rate": 0.545,
             "ci95": null
           },
           "neutral": {
-            "n": 21,
-            "median": -0.62,
-            "q1": -1.92,
-            "q3": 1.11,
-            "mean": -0.3,
-            "hit_rate": 0.429,
+            "n": 8,
+            "median": -0.66,
+            "q1": -2.01,
+            "q3": 0.93,
+            "mean": -0.51,
+            "hit_rate": 0.375,
             "ci95": null
           },
           "risk_off": {
@@ -203,27 +200,27 @@
         },
         "53-64": {
           "risk_on": {
-            "n": 31,
-            "median": -1.97,
-            "q1": -3.2,
-            "q3": 0.27,
-            "mean": -1.05,
-            "hit_rate": 0.29,
+            "n": 53,
+            "median": -1.16,
+            "q1": -2.76,
+            "q3": 1.18,
+            "mean": -0.69,
+            "hit_rate": 0.358,
             "ci95": {
-              "low": -2.38,
-              "high": 0.38
+              "low": -1.48,
+              "high": 0.18
             }
           },
           "neutral": {
-            "n": 81,
-            "median": 0.43,
-            "q1": -0.83,
-            "q3": 1.98,
-            "mean": 0.77,
-            "hit_rate": 0.568,
+            "n": 43,
+            "median": 0.34,
+            "q1": -1.06,
+            "q3": 1.88,
+            "mean": 0.86,
+            "hit_rate": 0.558,
             "ci95": {
-              "low": 0.08,
-              "high": 1.48
+              "low": -0.12,
+              "high": 2.06
             }
           },
           "risk_off": {
@@ -250,24 +247,27 @@
         },
         "<53": {
           "risk_on": {
-            "n": 12,
-            "median": -5.25,
-            "q1": -5.75,
-            "q3": -3.73,
-            "mean": -4.82,
-            "hit_rate": 0.0,
-            "ci95": null
+            "n": 31,
+            "median": -1.85,
+            "q1": -5.63,
+            "q3": -0.16,
+            "mean": -2.47,
+            "hit_rate": 0.226,
+            "ci95": {
+              "low": -3.72,
+              "high": -1.14
+            }
           },
           "neutral": {
-            "n": 120,
-            "median": 0.14,
-            "q1": -1.31,
-            "q3": 1.87,
-            "mean": 0.48,
-            "hit_rate": 0.525,
+            "n": 58,
+            "median": 0.63,
+            "q1": -0.58,
+            "q3": 1.79,
+            "mean": 0.92,
+            "hit_rate": 0.638,
             "ci95": {
-              "low": 0.08,
-              "high": 0.92
+              "low": 0.41,
+              "high": 1.54
             }
           },
           "risk_off": {
@@ -331,73 +331,73 @@
           }
         }
       },
-      "trackable_count": 2738,
+      "trackable_count": 2654,
       "untrackable_count": 0,
-      "window_not_closed_count": 71,
+      "window_not_closed_count": 125,
       "reasons": {
-        "window_not_closed": 71
+        "window_not_closed": 125
       }
     },
     "T+10": {
       "buckets": {
         "74+": {
-          "n": 507,
-          "median": -1.15,
-          "q1": -4.17,
-          "q3": 2.13,
-          "mean": -1.3,
-          "hit_rate": 0.41,
+          "n": 503,
+          "median": -1.26,
+          "q1": -4.3,
+          "q3": 2.09,
+          "mean": -1.47,
+          "hit_rate": 0.398,
           "ci95": {
-            "low": -1.85,
-            "high": -0.72
+            "low": -1.97,
+            "high": -0.93
           }
         },
         "70-74": {
-          "n": 194,
-          "median": -1.47,
-          "q1": -4.14,
-          "q3": 1.47,
-          "mean": -1.34,
-          "hit_rate": 0.397,
+          "n": 179,
+          "median": -1.76,
+          "q1": -4.21,
+          "q3": 1.52,
+          "mean": -1.42,
+          "hit_rate": 0.385,
           "ci95": {
-            "low": -2.14,
-            "high": -0.6
+            "low": -2.22,
+            "high": -0.59
           }
         },
         "64-70": {
-          "n": 350,
-          "median": -1.42,
-          "q1": -4.85,
-          "q3": 1.41,
-          "mean": -1.69,
-          "hit_rate": 0.363,
+          "n": 343,
+          "median": -1.51,
+          "q1": -4.99,
+          "q3": 1.42,
+          "mean": -1.75,
+          "hit_rate": 0.367,
           "ci95": {
-            "low": -2.2,
-            "high": -1.15
+            "low": -2.27,
+            "high": -1.17
           }
         },
         "53-64": {
-          "n": 855,
-          "median": -1.34,
-          "q1": -4.2,
-          "q3": 1.23,
-          "mean": -1.62,
-          "hit_rate": 0.365,
+          "n": 844,
+          "median": -1.42,
+          "q1": -4.51,
+          "q3": 0.99,
+          "mean": -1.71,
+          "hit_rate": 0.35,
           "ci95": {
-            "low": -2.0,
-            "high": -1.22
+            "low": -2.12,
+            "high": -1.29
           }
         },
         "<53": {
-          "n": 769,
-          "median": -1.15,
-          "q1": -4.36,
-          "q3": 2.05,
-          "mean": -1.21,
-          "hit_rate": 0.388,
+          "n": 717,
+          "median": -1.34,
+          "q1": -4.76,
+          "q3": 1.84,
+          "mean": -1.51,
+          "hit_rate": 0.372,
           "ci95": {
-            "low": -1.6,
-            "high": -0.76
+            "low": -1.91,
+            "high": -1.08
           }
         },
         "unknown": {
@@ -413,25 +413,22 @@
       "by_regime_buckets": {
         "74+": {
           "risk_on": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 11,
+            "median": -3.76,
+            "q1": -5.19,
+            "q3": -2.79,
+            "mean": -3.48,
+            "hit_rate": 0.091,
             "ci95": null
           },
           "neutral": {
-            "n": 42,
-            "median": 1.18,
-            "q1": -1.26,
-            "q3": 4.58,
-            "mean": 1.93,
-            "hit_rate": 0.619,
-            "ci95": {
-              "low": 0.52,
-              "high": 3.47
-            }
+            "n": 27,
+            "median": 1.19,
+            "q1": -1.2,
+            "q3": 4.67,
+            "mean": 1.47,
+            "hit_rate": 0.63,
+            "ci95": null
           },
           "risk_off": {
             "n": 465,
@@ -466,12 +463,12 @@
             "ci95": null
           },
           "neutral": {
-            "n": 26,
-            "median": -0.72,
-            "q1": -2.37,
-            "q3": 0.9,
-            "mean": -0.35,
-            "hit_rate": 0.462,
+            "n": 11,
+            "median": -1.04,
+            "q1": -2.33,
+            "q3": 1.18,
+            "mean": -0.36,
+            "hit_rate": 0.364,
             "ci95": null
           },
           "risk_off": {
@@ -498,21 +495,21 @@
         },
         "64-70": {
           "risk_on": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 6,
+            "median": 0.74,
+            "q1": -2.62,
+            "q3": 4.25,
+            "mean": -1.06,
+            "hit_rate": 0.667,
             "ci95": null
           },
           "neutral": {
-            "n": 21,
-            "median": -0.6,
-            "q1": -2.3,
-            "q3": 0.47,
-            "mean": -0.41,
-            "hit_rate": 0.333,
+            "n": 8,
+            "median": -1.01,
+            "q1": -2.74,
+            "q3": 0.16,
+            "mean": -1.3,
+            "hit_rate": 0.25,
             "ci95": null
           },
           "risk_off": {
@@ -539,24 +536,24 @@
         },
         "53-64": {
           "risk_on": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 27,
+            "median": -0.96,
+            "q1": -2.84,
+            "q3": 3.49,
+            "mean": -0.3,
+            "hit_rate": 0.296,
             "ci95": null
           },
           "neutral": {
-            "n": 81,
-            "median": 0.9,
-            "q1": -2.2,
-            "q3": 3.22,
-            "mean": 1.53,
-            "hit_rate": 0.593,
+            "n": 43,
+            "median": 0.59,
+            "q1": -2.67,
+            "q3": 2.71,
+            "mean": 1.68,
+            "hit_rate": 0.535,
             "ci95": {
-              "low": 0.28,
-              "high": 3.0
+              "low": -0.39,
+              "high": 4.32
             }
           },
           "risk_off": {
@@ -583,24 +580,24 @@
         },
         "<53": {
           "risk_on": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 10,
+            "median": -5.35,
+            "q1": -6.15,
+            "q3": -4.58,
+            "mean": -5.06,
+            "hit_rate": 0.0,
             "ci95": null
           },
           "neutral": {
-            "n": 120,
+            "n": 58,
             "median": 0.09,
-            "q1": -1.57,
-            "q3": 2.94,
-            "mean": 1.25,
-            "hit_rate": 0.508,
+            "q1": -1.87,
+            "q3": 2.69,
+            "mean": 0.86,
+            "hit_rate": 0.517,
             "ci95": {
-              "low": 0.53,
-              "high": 2.08
+              "low": -0.18,
+              "high": 2.06
             }
           },
           "risk_off": {
@@ -664,73 +661,73 @@
           }
         }
       },
-      "trackable_count": 2675,
+      "trackable_count": 2586,
       "untrackable_count": 0,
-      "window_not_closed_count": 134,
+      "window_not_closed_count": 193,
       "reasons": {
-        "window_not_closed": 134
+        "window_not_closed": 193
       }
     },
     "T+20": {
       "buckets": {
         "74+": {
-          "n": 470,
-          "median": -3.15,
-          "q1": -8.36,
-          "q3": 0.83,
-          "mean": -3.66,
-          "hit_rate": 0.298,
+          "n": 492,
+          "median": -3.68,
+          "q1": -8.72,
+          "q3": 0.8,
+          "mean": -4.04,
+          "hit_rate": 0.289,
           "ci95": {
-            "low": -4.46,
-            "high": -2.79
+            "low": -4.82,
+            "high": -3.24
           }
         },
         "70-74": {
           "n": 179,
-          "median": -4.33,
-          "q1": -8.73,
-          "q3": 0.73,
-          "mean": -4.3,
-          "hit_rate": 0.291,
+          "median": -4.68,
+          "q1": -8.94,
+          "q3": 0.33,
+          "mean": -4.67,
+          "hit_rate": 0.263,
           "ci95": {
-            "low": -5.56,
-            "high": -2.97
+            "low": -5.95,
+            "high": -3.29
           }
         },
         "64-70": {
-          "n": 327,
-          "median": -3.58,
-          "q1": -7.79,
-          "q3": 1.17,
-          "mean": -3.65,
-          "hit_rate": 0.306,
+          "n": 337,
+          "median": -3.68,
+          "q1": -8.57,
+          "q3": 1.1,
+          "mean": -3.94,
+          "hit_rate": 0.303,
           "ci95": {
-            "low": -4.5,
-            "high": -2.71
+            "low": -4.85,
+            "high": -3.03
           }
         },
         "53-64": {
-          "n": 778,
-          "median": -2.68,
-          "q1": -7.9,
-          "q3": 1.66,
-          "mean": -3.33,
-          "hit_rate": 0.339,
+          "n": 817,
+          "median": -3.19,
+          "q1": -8.95,
+          "q3": 1.51,
+          "mean": -3.76,
+          "hit_rate": 0.332,
           "ci95": {
-            "low": -3.93,
-            "high": -2.68
+            "low": -4.32,
+            "high": -3.12
           }
         },
         "<53": {
-          "n": 713,
-          "median": -2.93,
-          "q1": -8.08,
-          "q3": 1.43,
-          "mean": -3.02,
-          "hit_rate": 0.318,
+          "n": 707,
+          "median": -3.73,
+          "q1": -8.79,
+          "q3": 0.89,
+          "mean": -3.59,
+          "hit_rate": 0.29,
           "ci95": {
-            "low": -3.6,
-            "high": -2.37
+            "low": -4.21,
+            "high": -2.88
           }
         },
         "unknown": {
@@ -755,27 +752,24 @@
             "ci95": null
           },
           "neutral": {
-            "n": 42,
-            "median": 0.97,
-            "q1": -1.39,
-            "q3": 7.24,
-            "mean": 2.93,
-            "hit_rate": 0.667,
-            "ci95": {
-              "low": 1.24,
-              "high": 4.8
-            }
+            "n": 27,
+            "median": 1.09,
+            "q1": -1.04,
+            "q3": 5.78,
+            "mean": 2.66,
+            "hit_rate": 0.704,
+            "ci95": null
           },
           "risk_off": {
-            "n": 428,
-            "median": -3.99,
-            "q1": -8.73,
-            "q3": 0.45,
-            "mean": -4.3,
-            "hit_rate": 0.262,
+            "n": 465,
+            "median": -4.1,
+            "q1": -9.02,
+            "q3": 0.62,
+            "mean": -4.42,
+            "hit_rate": 0.265,
             "ci95": {
-              "low": -5.2,
-              "high": -3.46
+              "low": -5.25,
+              "high": -3.55
             }
           },
           "unknown": {
@@ -799,24 +793,24 @@
             "ci95": null
           },
           "neutral": {
-            "n": 26,
-            "median": -1.29,
-            "q1": -6.76,
-            "q3": 2.51,
-            "mean": -1.95,
-            "hit_rate": 0.423,
+            "n": 11,
+            "median": -2.87,
+            "q1": -8.04,
+            "q3": -0.17,
+            "mean": -3.7,
+            "hit_rate": 0.273,
             "ci95": null
           },
           "risk_off": {
-            "n": 153,
-            "median": -4.6,
-            "q1": -8.83,
-            "q3": 0.37,
-            "mean": -4.7,
-            "hit_rate": 0.268,
+            "n": 168,
+            "median": -4.75,
+            "q1": -8.94,
+            "q3": 0.32,
+            "mean": -4.73,
+            "hit_rate": 0.262,
             "ci95": {
-              "low": -6.14,
-              "high": -3.18
+              "low": -6.08,
+              "high": -3.33
             }
           },
           "unknown": {
@@ -840,24 +834,24 @@
             "ci95": null
           },
           "neutral": {
-            "n": 21,
-            "median": -1.95,
-            "q1": -4.29,
-            "q3": 2.82,
-            "mean": -1.27,
-            "hit_rate": 0.381,
+            "n": 8,
+            "median": -5.03,
+            "q1": -10.33,
+            "q3": 0.33,
+            "mean": -4.17,
+            "hit_rate": 0.25,
             "ci95": null
           },
           "risk_off": {
-            "n": 306,
-            "median": -3.67,
-            "q1": -8.04,
-            "q3": 1.05,
-            "mean": -3.81,
-            "hit_rate": 0.301,
+            "n": 329,
+            "median": -3.68,
+            "q1": -8.54,
+            "q3": 1.1,
+            "mean": -3.94,
+            "hit_rate": 0.304,
             "ci95": {
-              "low": -4.75,
-              "high": -2.9
+              "low": -4.79,
+              "high": -2.99
             }
           },
           "unknown": {
@@ -881,27 +875,27 @@
             "ci95": null
           },
           "neutral": {
-            "n": 81,
-            "median": 0.68,
-            "q1": -2.05,
-            "q3": 4.55,
-            "mean": 1.8,
-            "hit_rate": 0.543,
+            "n": 43,
+            "median": 0.31,
+            "q1": -2.97,
+            "q3": 3.4,
+            "mean": 1.59,
+            "hit_rate": 0.535,
             "ci95": {
-              "low": 0.34,
-              "high": 3.62
+              "low": -0.73,
+              "high": 4.49
             }
           },
           "risk_off": {
-            "n": 697,
+            "n": 774,
             "median": -3.43,
-            "q1": -9.13,
-            "q3": 1.26,
-            "mean": -3.92,
-            "hit_rate": 0.316,
+            "q1": -9.6,
+            "q3": 1.38,
+            "mean": -4.06,
+            "hit_rate": 0.32,
             "ci95": {
-              "low": -4.57,
-              "high": -3.25
+              "low": -4.61,
+              "high": -3.39
             }
           },
           "unknown": {
@@ -925,27 +919,27 @@
             "ci95": null
           },
           "neutral": {
-            "n": 120,
-            "median": 0.67,
-            "q1": -1.92,
-            "q3": 4.4,
-            "mean": 2.03,
-            "hit_rate": 0.567,
+            "n": 58,
+            "median": 0.35,
+            "q1": -2.15,
+            "q3": 4.27,
+            "mean": 1.83,
+            "hit_rate": 0.534,
             "ci95": {
-              "low": 1.04,
-              "high": 3.2
+              "low": 0.26,
+              "high": 3.59
             }
           },
           "risk_off": {
-            "n": 593,
-            "median": -4.12,
-            "q1": -9.21,
+            "n": 649,
+            "median": -4.08,
+            "q1": -9.4,
             "q3": 0.47,
-            "mean": -4.04,
+            "mean": -4.08,
             "hit_rate": 0.268,
             "ci95": {
-              "low": -4.68,
-              "high": -3.26
+              "low": -4.73,
+              "high": -3.33
             }
           },
           "unknown": {
@@ -997,38 +991,38 @@
           }
         }
       },
-      "trackable_count": 2467,
+      "trackable_count": 2532,
       "untrackable_count": 0,
-      "window_not_closed_count": 342,
+      "window_not_closed_count": 247,
       "reasons": {
-        "window_not_closed": 342
+        "window_not_closed": 247
       }
     }
   },
   "by_regime": {
     "T+5": {
       "risk_on": {
-        "n": 63,
-        "median": -2.72,
-        "q1": -4.23,
-        "q3": -0.07,
-        "mean": -1.67,
-        "hit_rate": 0.238,
+        "n": 122,
+        "median": -1.83,
+        "q1": -3.6,
+        "q3": 0.4,
+        "mean": -1.39,
+        "hit_rate": 0.287,
         "ci95": {
-          "low": -2.64,
-          "high": -0.61
+          "low": -2.04,
+          "high": -0.72
         }
       },
       "neutral": {
-        "n": 290,
-        "median": 0.31,
-        "q1": -1.39,
-        "q3": 1.96,
-        "mean": 0.6,
-        "hit_rate": 0.531,
+        "n": 147,
+        "median": 0.65,
+        "q1": -0.67,
+        "q3": 2.06,
+        "mean": 0.91,
+        "hit_rate": 0.605,
         "ci95": {
-          "low": 0.28,
-          "high": 0.98
+          "low": 0.51,
+          "high": 1.38
         }
       },
       "risk_off": {
@@ -1055,24 +1049,27 @@
     },
     "T+10": {
       "risk_on": {
-        "n": 0,
-        "median": null,
-        "q1": null,
-        "q3": null,
-        "mean": null,
-        "hit_rate": null,
-        "ci95": null
+        "n": 54,
+        "median": -2.76,
+        "q1": -5.25,
+        "q3": -0.62,
+        "mean": -1.91,
+        "hit_rate": 0.241,
+        "ci95": {
+          "low": -3.19,
+          "high": -0.66
+        }
       },
       "neutral": {
-        "n": 290,
-        "median": 0.26,
-        "q1": -1.67,
-        "q3": 3.08,
-        "mean": 1.16,
-        "hit_rate": 0.531,
+        "n": 147,
+        "median": 0.2,
+        "q1": -2.25,
+        "q3": 2.79,
+        "mean": 1.01,
+        "hit_rate": 0.517,
         "ci95": {
-          "low": 0.63,
-          "high": 1.81
+          "low": 0.22,
+          "high": 1.94
         }
       },
       "risk_off": {
@@ -1108,27 +1105,27 @@
         "ci95": null
       },
       "neutral": {
-        "n": 290,
-        "median": 0.52,
-        "q1": -2.23,
-        "q3": 4.33,
-        "mean": 1.5,
-        "hit_rate": 0.548,
+        "n": 147,
+        "median": 0.31,
+        "q1": -2.83,
+        "q3": 4.04,
+        "mean": 1.17,
+        "hit_rate": 0.531,
         "ci95": {
-          "low": 0.79,
-          "high": 2.31
+          "low": 0.08,
+          "high": 2.49
         }
       },
       "risk_off": {
-        "n": 2177,
-        "median": -3.87,
-        "q1": -8.86,
-        "q3": 0.8,
-        "mean": -4.07,
-        "hit_rate": 0.287,
+        "n": 2385,
+        "median": -3.91,
+        "q1": -9.21,
+        "q3": 0.85,
+        "mean": -4.17,
+        "hit_rate": 0.289,
         "ci95": {
-          "low": -4.4,
-          "high": -3.73
+          "low": -4.53,
+          "high": -3.83
         }
       },
       "unknown": {
@@ -1143,230 +1140,6 @@
     }
   },
   "per_scan": [
-    {
-      "date": "2026-08-24-pm",
-      "passed_count": 29,
-      "regime": "neutral",
-      "windows": {
-        "T+5": {
-          "n": 29,
-          "stats": {
-            "n": 29,
-            "median": -0.47,
-            "q1": -1.78,
-            "q3": 1.25,
-            "mean": 0.38,
-            "hit_rate": 0.414,
-            "ci95": null
-          }
-        },
-        "T+10": {
-          "n": 29,
-          "stats": {
-            "n": 29,
-            "median": -0.44,
-            "q1": -1.41,
-            "q3": 1.97,
-            "mean": 0.89,
-            "hit_rate": 0.483,
-            "ci95": null
-          }
-        },
-        "T+20": {
-          "n": 29,
-          "stats": {
-            "n": 29,
-            "median": 1.48,
-            "q1": -2.67,
-            "q3": 4.14,
-            "mean": 1.59,
-            "hit_rate": 0.586,
-            "ci95": null
-          }
-        }
-      }
-    },
-    {
-      "date": "2026-08-25-pm",
-      "passed_count": 28,
-      "regime": "neutral",
-      "windows": {
-        "T+5": {
-          "n": 28,
-          "stats": {
-            "n": 28,
-            "median": 0.24,
-            "q1": -1.51,
-            "q3": 2.01,
-            "mean": 0.74,
-            "hit_rate": 0.5,
-            "ci95": null
-          }
-        },
-        "T+10": {
-          "n": 28,
-          "stats": {
-            "n": 28,
-            "median": 0.89,
-            "q1": -0.76,
-            "q3": 4.05,
-            "mean": 2.17,
-            "hit_rate": 0.643,
-            "ci95": null
-          }
-        },
-        "T+20": {
-          "n": 28,
-          "stats": {
-            "n": 28,
-            "median": 1.16,
-            "q1": -1.41,
-            "q3": 4.86,
-            "mean": 2.32,
-            "hit_rate": 0.571,
-            "ci95": null
-          }
-        }
-      }
-    },
-    {
-      "date": "2026-08-26-pm",
-      "passed_count": 30,
-      "regime": "neutral",
-      "windows": {
-        "T+5": {
-          "n": 30,
-          "stats": {
-            "n": 30,
-            "median": -0.7,
-            "q1": -2.1,
-            "q3": 2.23,
-            "mean": 0.41,
-            "hit_rate": 0.467,
-            "ci95": {
-              "low": -0.75,
-              "high": 1.75
-            }
-          }
-        },
-        "T+10": {
-          "n": 30,
-          "stats": {
-            "n": 30,
-            "median": 0.73,
-            "q1": -1.16,
-            "q3": 4.68,
-            "mean": 2.38,
-            "hit_rate": 0.6,
-            "ci95": {
-              "low": 0.83,
-              "high": 4.02
-            }
-          }
-        },
-        "T+20": {
-          "n": 30,
-          "stats": {
-            "n": 30,
-            "median": 1.35,
-            "q1": -1.38,
-            "q3": 5.63,
-            "mean": 2.06,
-            "hit_rate": 0.567,
-            "ci95": {
-              "low": 0.36,
-              "high": 3.79
-            }
-          }
-        }
-      }
-    },
-    {
-      "date": "2026-08-27-pm",
-      "passed_count": 29,
-      "regime": "neutral",
-      "windows": {
-        "T+5": {
-          "n": 29,
-          "stats": {
-            "n": 29,
-            "median": -0.78,
-            "q1": -1.7,
-            "q3": 1.62,
-            "mean": -0.3,
-            "hit_rate": 0.379,
-            "ci95": null
-          }
-        },
-        "T+10": {
-          "n": 29,
-          "stats": {
-            "n": 29,
-            "median": -0.35,
-            "q1": -1.67,
-            "q3": 2.41,
-            "mean": 0.52,
-            "hit_rate": 0.483,
-            "ci95": null
-          }
-        },
-        "T+20": {
-          "n": 29,
-          "stats": {
-            "n": 29,
-            "median": 0.23,
-            "q1": -2.05,
-            "q3": 3.81,
-            "mean": 1.28,
-            "hit_rate": 0.517,
-            "ci95": null
-          }
-        }
-      }
-    },
-    {
-      "date": "2026-08-28-pm",
-      "passed_count": 27,
-      "regime": "neutral",
-      "windows": {
-        "T+5": {
-          "n": 27,
-          "stats": {
-            "n": 27,
-            "median": 0.12,
-            "q1": -1.54,
-            "q3": 1.67,
-            "mean": 0.18,
-            "hit_rate": 0.519,
-            "ci95": null
-          }
-        },
-        "T+10": {
-          "n": 27,
-          "stats": {
-            "n": 27,
-            "median": 0.1,
-            "q1": -1.55,
-            "q3": 2.91,
-            "mean": 0.61,
-            "hit_rate": 0.519,
-            "ci95": null
-          }
-        },
-        "T+20": {
-          "n": 27,
-          "stats": {
-            "n": 27,
-            "median": 0.72,
-            "q1": -1.97,
-            "q3": 4.31,
-            "mean": 1.94,
-            "hit_rate": 0.593,
-            "ci95": null
-          }
-        }
-      }
-    },
     {
       "date": "2026-08-31-pm",
       "passed_count": 27,
@@ -3474,15 +3247,18 @@
           }
         },
         "T+20": {
-          "n": 0,
+          "n": 108,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
-            "ci95": null
+            "n": 108,
+            "median": -3.9,
+            "q1": -11.58,
+            "q3": 4.33,
+            "mean": -4.17,
+            "hit_rate": 0.352,
+            "ci95": {
+              "low": -6.08,
+              "high": -2.3
+            }
           }
         }
       }
@@ -3523,15 +3299,18 @@
           }
         },
         "T+20": {
-          "n": 0,
+          "n": 100,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
-            "ci95": null
+            "n": 100,
+            "median": -5.62,
+            "q1": -13.45,
+            "q3": 0.86,
+            "mean": -6.25,
+            "hit_rate": 0.27,
+            "ci95": {
+              "low": -8.2,
+              "high": -4.54
+            }
           }
         }
       }
@@ -3898,14 +3677,14 @@
           }
         },
         "T+10": {
-          "n": 0,
+          "n": 14,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 14,
+            "median": -1.09,
+            "q1": -4.69,
+            "q3": 2.73,
+            "mean": -0.37,
+            "hit_rate": 0.429,
             "ci95": null
           }
         },
@@ -3941,14 +3720,14 @@
           }
         },
         "T+10": {
-          "n": 0,
+          "n": 10,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 10,
+            "median": -5.01,
+            "q1": -6.75,
+            "q3": -3.38,
+            "mean": -4.27,
+            "hit_rate": 0.1,
             "ci95": null
           }
         },
@@ -3984,14 +3763,14 @@
           }
         },
         "T+10": {
-          "n": 0,
+          "n": 10,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 10,
+            "median": -3.26,
+            "q1": -5.13,
+            "q3": -0.85,
+            "mean": -1.85,
+            "hit_rate": 0.2,
             "ci95": null
           }
         },
@@ -4027,14 +3806,14 @@
           }
         },
         "T+10": {
-          "n": 0,
+          "n": 10,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 10,
+            "median": -3.26,
+            "q1": -5.13,
+            "q3": -0.85,
+            "mean": -1.85,
+            "hit_rate": 0.2,
             "ci95": null
           }
         },
@@ -4070,14 +3849,14 @@
           }
         },
         "T+10": {
-          "n": 0,
+          "n": 10,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 10,
+            "median": -1.69,
+            "q1": -2.37,
+            "q3": -0.62,
+            "mean": -1.85,
+            "hit_rate": 0.2,
             "ci95": null
           }
         },
@@ -4144,14 +3923,14 @@
       "regime": "risk_on",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 10,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 10,
+            "median": -1.48,
+            "q1": -2.61,
+            "q3": 1.35,
+            "mean": -0.57,
+            "hit_rate": 0.4,
             "ci95": null
           }
         },
@@ -4187,14 +3966,14 @@
       "regime": "risk_on",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 13,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 13,
+            "median": -1.41,
+            "q1": -2.19,
+            "q3": -0.48,
+            "mean": -1.46,
+            "hit_rate": 0.154,
             "ci95": null
           }
         },
@@ -4230,14 +4009,14 @@
       "regime": "risk_on",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 18,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 18,
+            "median": -0.97,
+            "q1": -2.75,
+            "q3": -0.19,
+            "mean": -2.12,
+            "hit_rate": 0.222,
             "ci95": null
           }
         },
@@ -4273,14 +4052,14 @@
       "regime": "risk_on",
       "windows": {
         "T+5": {
-          "n": 0,
+          "n": 18,
           "stats": {
-            "n": 0,
-            "median": null,
-            "q1": null,
-            "q3": null,
-            "mean": null,
-            "hit_rate": null,
+            "n": 18,
+            "median": 0.73,
+            "q1": -1.61,
+            "q3": 2.31,
+            "mean": -0.08,
+            "hit_rate": 0.556,
             "ci95": null
           }
         },
@@ -4352,11 +4131,226 @@
           }
         }
       }
+    },
+    {
+      "date": "2026-11-23-pm",
+      "passed_count": 13,
+      "regime": "risk_on",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-11-24-pm",
+      "passed_count": 22,
+      "regime": "risk_on",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-11-25-pm",
+      "passed_count": 26,
+      "regime": "risk_on",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-11-26-pm",
+      "passed_count": 30,
+      "regime": "risk_on",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-11-27-pm",
+      "passed_count": 22,
+      "regime": "risk_on",
+      "windows": {
+        "T+5": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+10": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        },
+        "T+20": {
+          "n": 0,
+          "stats": {
+            "n": 0,
+            "median": null,
+            "q1": null,
+            "q3": null,
+            "mean": null,
+            "hit_rate": null,
+            "ci95": null
+          }
+        }
+      }
     }
   ],
   "meta": {
     "snapshots_used": 66,
-    "total_passed": 2809,
+    "total_passed": 2779,
     "windows": [
       5,
       10,
@@ -4387,9 +4381,9 @@
       "<53"
     ],
     "trackable_count": {
-      "T+5": 2738,
-      "T+10": 2675,
-      "T+20": 2467
+      "T+5": 2654,
+      "T+10": 2586,
+      "T+20": 2532
     },
     "untrackable_count": {
       "T+5": 0,
@@ -4397,11 +4391,11 @@
       "T+20": 0
     },
     "window_not_closed_count": {
-      "T+5": 71,
-      "T+10": 134,
-      "T+20": 342
+      "T+5": 125,
+      "T+10": 193,
+      "T+20": 247
     }
   },
   "per_name_file": "performance-per-name.json",
-  "per_name_count": 2809
+  "per_name_count": 2779
 }
